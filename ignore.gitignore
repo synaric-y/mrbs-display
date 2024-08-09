@@ -1,5 +1,5 @@
 .vscode
-
+.hbuilderx
 # package manager log files
 npm-debug.log*
 yarn-debug.log*
@@ -18,6 +18,6 @@ yarn-debug.log*
 yarn-error.log*
 
 node_modules/
-/unpackage
-.hbuilderx
+unpackage/
+
 
