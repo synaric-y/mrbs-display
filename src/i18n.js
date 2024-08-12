@@ -13,7 +13,8 @@ const messages = {
 			"booked": '已预定',
 			"over_meeting":'已结束',
 			"small_in_meeting": '会议中',
-			"alert_error_code": '请输入正确的内置码'
+			"alert_error_code": '请输入正确的内置码',
+			"canBook": '可预定'
 		}
 	},
 	"en":{
@@ -29,7 +30,8 @@ const messages = {
 			"booked": 'Booked',
 			"over_meeting":'Over',
 			"small_in_meeting": 'Meeting',
-			"alert_error_code": 'Please enter the correct built-in code'
+			"alert_error_code": 'Please enter the correct built-in code',
+			"canBook": 'Available'
 		}	
 	},
 	"ko": {
@@ -45,7 +47,8 @@ const messages = {
 			"booked": '이미 예약됨',
 			"over_meeting":'~ 위에',
 			"small_in_meeting": '회의 중',
-			"alert_error_code": '올바른 내장 코드를 입력하세요.'
+			"alert_error_code": '올바른 내장 코드를 입력하세요.',
+			"canBook": '예약 가능'
 		}
 	}
 }

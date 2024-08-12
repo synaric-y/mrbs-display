@@ -228,8 +228,9 @@
 								if (w > 0) {
 									if (tempTime > nowTime) {
 										console.log('case 1')
+										let booktext = this.$t('message.canBook')
 										timelineColorList.push({
-											text: this.hideTimelineText(tempTime - idleStartTime, '可预订'),
+											text: this.hideTimelineText(tempTime - idleStartTime, booktext),
 											textColor: 'white',
 											bg: '#08D50A',
 											width: (tempTime - idleStartTime) / totalSeconds * totalWidth
@@ -307,7 +308,7 @@
 						})
 					} else {
 						timelineColorList.push({
-							text: this.hideTimelineText(tempTime - idleStartTime - this.timelineInterval, '可预订'),
+							text: this.hideTimelineText(tempTime - idleStartTime - this.timelineInterval, this.$t('message.canBook')),
 							bg: '#08D50A',
 							textColor: 'white',
 							width: (tempTime - idleStartTime - this.timelineInterval) / totalSeconds * totalWidth
