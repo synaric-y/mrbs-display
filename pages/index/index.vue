@@ -407,8 +407,6 @@
 					console.log(zhDate); // 中文输出
 					this.currenlanguageTime = zhDate
 				}
-				
-				
 			},
 		}
 	}
@@ -479,7 +477,7 @@
 	.select-language {
 		border: none;
 		position: absolute;
-		top: 50rpx;
+		top: 35rpx;
 		right: 20rpx;
 		width: 60rpx;
 		height: 27rpx;
