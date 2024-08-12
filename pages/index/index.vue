@@ -5,16 +5,8 @@
 			<text class="now-time">{{syncData.now_time}}
 				<text class="now-time-tail">{{syncData.now_ap}}</text>
 			</text>
-			<text class="now-date">{{syncData.display_day}}</text>
-
+			<text class="now-date">{{this.currenlanguageTime}}</text>
 			<view class="divider-one"></view>
-
-			<!-- <select v-model="selected" class="language" @change="changeLang">
-				<option value='en'>English</option>
-				<option value='zh' selected>中文</option>
-				<option value='ko'>korean</option>
-			</select> -->
-
 			<uni-data-select style="width: 60rpx;" class="select-language" v-model="value" :localdata="datasource"
 				@change="changeLang">
 
@@ -118,6 +110,7 @@
 					text: '한국인',
 					key: 'ko'
 				}],
+				currenLanguageTime: '',
 			}
 		},
 		onLoad() {
@@ -185,6 +178,7 @@
 						}
 						// this.syncData = data
 						this.initTimeLine(data)
+						this.dateDisplay()
 
 					},
 					fail: (e) => {
@@ -371,18 +365,50 @@
 				}
 				console.log('lang selected lang', lang)
 				this.$i18n.locale = lang
+				this.dateDisplay()
 			},
 			dateDisplay() {
-				// 获取年、月、日、星期
-				
 				// syncData.display_day
 				// 获取当前时间的时间戳
 				// 2024年8月8日星期四、
 				// 英文：Wednesday,September.7,2024
-				// 韩文：
-				let mydate = this.syncData
-
-
+				// 韩文：2024년 8월 8일 목요일
+				// 当前时间戳
+				let nowtimestamp = this.syncData.now_timestamp
+				// 将时间戳转化为日期
+				const timestamp = nowtimestamp * 1000; // 将秒转化为毫秒
+				const date = new Date(timestamp);
+				
+				// 获取年月日和星期几
+				const year = date.getFullYear();
+				const month = date.getMonth() + 1; // 月份从0开始
+				const day = date.getDate();
+				const dayOfWeek = date.getDay(); // 0 是周日, 1 是周一, 以此类推
+				
+				// 星期几的中文、英文、韩文表示
+				const weekDays = {
+				    zh: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'],
+				    en: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+				    ko: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일']
+				};
+				
+				// 拼接成对应语言的日期表示
+				const zhDate = `${year}年${month}月${day}日 ${weekDays.zh[dayOfWeek]}`;
+				const enDate = `${weekDays.en[dayOfWeek]}, ${month}/${day}/${year}`;
+				const koDate = `${year}년 ${month}월 ${day}일 ${weekDays.ko[dayOfWeek]}`;
+				
+				if(this.$i18n.locale == 'en') {
+					console.log(enDate); // 英文输出
+					this.currenlanguageTime = enDate
+				}else if(this.$i18n.locale == 'ko') {
+					console.log(koDate); // 韩文输出
+					this.currenlanguageTime = koDate
+				}else {
+					console.log(zhDate); // 中文输出
+					this.currenlanguageTime = zhDate
+				}
+				
+				
 			},
 		}
 	}
