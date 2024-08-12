@@ -4,6 +4,7 @@
   "requires": true,
   "packages": {},
   "dependencies": {
+    "moment-timezone": "^0.5.45",
     "vue-i18n": "^9.13.1"
   }
 }

@@ -78,7 +78,7 @@
 	import {
 		HOST
 	} from '@/modules/config.js'
-
+import moment from 'moment-timezone';
 	export default {
 
 		interval: null,
@@ -111,6 +111,7 @@
 					key: 'ko'
 				}],
 				currenLanguageTime: '',
+				tempData: null
 			}
 		},
 		onLoad() {
@@ -187,6 +188,7 @@
 				})
 			},
 			initTimeLine(data) {
+				this.tempData = data
 				// 1.生成时间刻度
 				let tempTime = this.lineStartTime
 				let spanList = []
@@ -366,48 +368,74 @@
 				console.log('lang selected lang', lang)
 				this.$i18n.locale = lang
 				this.dateDisplay()
+				this.initTimeLine(this.tempData)
+			},
+			formatDate(timestamp, timeZone, locale) {
+				let dateFormat = 'YYYY年MM月DD日 dddd';
+				if(this.$i18n.locale == 'en') {
+					dateFormat = 'dddd, MMMM D, YYYY';
+				} else if(this.$i18n.locale == 'ko') {
+					dateFormat = 'YYYY년MM월DD일 dddd';
+				} else {
+					dateFormat = 'YYYY年MM月DD日 dddd';
+				}
+			    return moment.unix(timestamp)
+			        .tz(timeZone)
+			        .locale(locale)
+			        .format(dateFormat);
 			},
 			dateDisplay() {
-				// syncData.display_day
-				// 获取当前时间的时间戳
 				// 2024年8月8日星期四、
 				// 英文：Wednesday,September.7,2024
 				// 韩文：2024년 8월 8일 목요일
-				// 当前时间戳
-				let nowtimestamp = this.syncData.now_timestamp
-				// 将时间戳转化为日期
-				const timestamp = nowtimestamp * 1000; // 将秒转化为毫秒
-				const date = new Date(timestamp);
 				
-				// 获取年月日和星期几
-				const year = date.getFullYear();
-				const month = date.getMonth() + 1; // 月份从0开始
-				const day = date.getDate();
-				const dayOfWeek = date.getDay(); // 0 是周日, 1 是周一, 以此类推
+				// 拼接成对应语言的日期表示
+				// const zhDate = `${year}年${month}月${day}日 ${weekDays.zh[dayOfWeek]}`;
+				// const enDate = `${weekDays.en[dayOfWeek]}, ${month}/${day}/${year}`;
+				// const koDate = `${year}년 ${month}월 ${day}일 ${weekDays.ko[dayOfWeek]}`;
 				
-				// 星期几的中文、英文、韩文表示
+				
+				const timestamp = this.syncData.now_timestamp;
+				// 格式化日期为中文、英文、韩文，并考虑时区
+				const koDate = this.formatDate(timestamp, 'Asia/Seoul', 'ko');
+				const enDate = this.formatDate(timestamp, 'America/New_York', 'en');
+				const zhDate = this.formatDate(timestamp, 'Asia/Shanghai', 'zh-cn');
+				
+				if(this.$i18n.locale == 'en') {
+					console.log('英文日期:', enDate); // 英文输出
+					this.currenlanguageTime = enDate
+				}else if(this.$i18n.locale == 'ko') {
+					console.log('韩文日期:', koDate); // 韩文输出
+					// 使用 split 方法分隔字符串
+					const parts = koDate.split(' ');
+					// 提取星期几
+					const dayOfWeek = parts[1];
+					const tempday = this.translateDay(dayOfWeek);
+					this.currenlanguageTime = parts[0] + ' ' + tempday;
+				}else {
+					console.log('中文日期:', zhDate); // 中文输出
+					const parts = zhDate.split(' ');
+					const dayOfWeek = parts[1];
+					const tempday = this.translateDay(dayOfWeek);
+					this.currenlanguageTime = parts[0] + ' ' + tempday;
+				}
+			},
+			
+			translateDay(day) {
+				const lang = this.$i18n.locale;
 				const weekDays = {
 				    zh: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'],
 				    en: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
 				    ko: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일']
 				};
-				
-				// 拼接成对应语言的日期表示
-				const zhDate = `${year}年${month}月${day}日 ${weekDays.zh[dayOfWeek]}`;
-				const enDate = `${weekDays.en[dayOfWeek]}, ${month}/${day}/${year}`;
-				const koDate = `${year}년 ${month}월 ${day}일 ${weekDays.ko[dayOfWeek]}`;
-				
-				if(this.$i18n.locale == 'en') {
-					console.log(enDate); // 英文输出
-					this.currenlanguageTime = enDate
-				}else if(this.$i18n.locale == 'ko') {
-					console.log(koDate); // 韩文输出
-					this.currenlanguageTime = koDate
-				}else {
-					console.log(zhDate); // 中文输出
-					this.currenlanguageTime = zhDate
-				}
-			},
+			    const index = weekDays.en.indexOf(day);
+			    if (index !== -1) {
+			        return weekDays[lang][index];
+			    } else {
+			        throw new Error(`Day "${day}" not found in English weekDays.`);
+			    }
+			}
+			
 		}
 	}
 </script>
