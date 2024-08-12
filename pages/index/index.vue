@@ -7,11 +7,10 @@
 			</text>
 			<text class="now-date">{{this.currenlanguageTime}}</text>
 			<view class="divider-one"></view>
-			<uni-data-select style="width: 60rpx;" class="select-language" v-model="value" :localdata="datasource"
-				@change="changeLang">
-
-			</uni-data-select>
-
+		
+			<uni-data-select style="width: 49rpx;color:#4f4f4f" class="select-language" v-model="value" :localdata="datasource"
+				@change="changeLang" :clear="false"></uni-data-select>
+		
 			<!-- <image class="room-icon-cir" src="/static/room_circle.png"></image> -->
 			<image class="room-icon" v-if="syncData.room" :src="syncData.room.icon"></image>
 			<text class="room-tail" @longpress="onSetting">{{$t('message.meeting')}}</text>
@@ -53,7 +52,8 @@
 				<view class="timeline-line-container">
 					<view class="timeline-line-item" v-for="(item, index) in timelineColorList" :key="index"
 						:style="{background: item.bg, width: item.width + 'rpx', height: '100%', color: item.textColor}">
-						{{item.text}}</view>
+						{{item.text}}
+					</view>
 				</view>
 				<view class="timeline-line-container" style="margin-top: 5rpx;">
 					<view class="timeline-line-entry" :style="{width: item.width + 'rpx', height: '100%'}"
@@ -78,7 +78,7 @@
 	import {
 		HOST
 	} from '@/modules/config.js'
-import moment from 'moment-timezone';
+	import moment from 'moment-timezone';
 	export default {
 
 		interval: null,
@@ -348,11 +348,9 @@ import moment from 'moment-timezone';
 			formatTime(timestamp) {
 				// 将10位时间戳转换为Date对象
 				var date = new Date(timestamp * 1000);
-
 				// 获取小时和分钟
 				var hours = date.getHours().toString().padStart(2, '0');
 				var minutes = date.getMinutes().toString().padStart(2, '0');
-
 				// 返回格式化的时间字符串
 				return hours + ':' + minutes;
 			},
@@ -372,39 +370,31 @@ import moment from 'moment-timezone';
 			},
 			formatDate(timestamp, timeZone, locale) {
 				let dateFormat = 'YYYY年MM月DD日 dddd';
-				if(this.$i18n.locale == 'en') {
+				if (this.$i18n.locale == 'en') {
 					dateFormat = 'dddd, MMMM D, YYYY';
-				} else if(this.$i18n.locale == 'ko') {
+				} else if (this.$i18n.locale == 'ko') {
 					dateFormat = 'YYYY년MM월DD일 dddd';
 				} else {
 					dateFormat = 'YYYY年MM月DD日 dddd';
 				}
-			    return moment.unix(timestamp)
-			        .tz(timeZone)
-			        .locale(locale)
-			        .format(dateFormat);
+				return moment.unix(timestamp)
+					.tz(timeZone)
+					.locale(locale)
+					.format(dateFormat);
 			},
 			dateDisplay() {
 				// 2024年8月8日星期四、
 				// 英文：Wednesday,September.7,2024
 				// 韩文：2024년 8월 8일 목요일
-				
-				// 拼接成对应语言的日期表示
-				// const zhDate = `${year}年${month}月${day}日 ${weekDays.zh[dayOfWeek]}`;
-				// const enDate = `${weekDays.en[dayOfWeek]}, ${month}/${day}/${year}`;
-				// const koDate = `${year}년 ${month}월 ${day}일 ${weekDays.ko[dayOfWeek]}`;
-				
-				
 				const timestamp = this.syncData.now_timestamp;
 				// 格式化日期为中文、英文、韩文，并考虑时区
 				const koDate = this.formatDate(timestamp, 'Asia/Seoul', 'ko');
 				const enDate = this.formatDate(timestamp, 'America/New_York', 'en');
 				const zhDate = this.formatDate(timestamp, 'Asia/Shanghai', 'zh-cn');
-				
-				if(this.$i18n.locale == 'en') {
+				if (this.$i18n.locale == 'en') {
 					console.log('英文日期:', enDate); // 英文输出
 					this.currenlanguageTime = enDate
-				}else if(this.$i18n.locale == 'ko') {
+				} else if (this.$i18n.locale == 'ko') {
 					console.log('韩文日期:', koDate); // 韩文输出
 					// 使用 split 方法分隔字符串
 					const parts = koDate.split(' ');
@@ -412,7 +402,7 @@ import moment from 'moment-timezone';
 					const dayOfWeek = parts[1];
 					const tempday = this.translateDay(dayOfWeek);
 					this.currenlanguageTime = parts[0] + ' ' + tempday;
-				}else {
+				} else {
 					console.log('中文日期:', zhDate); // 中文输出
 					const parts = zhDate.split(' ');
 					const dayOfWeek = parts[1];
@@ -420,22 +410,22 @@ import moment from 'moment-timezone';
 					this.currenlanguageTime = parts[0] + ' ' + tempday;
 				}
 			},
-			
+
 			translateDay(day) {
 				const lang = this.$i18n.locale;
 				const weekDays = {
-				    zh: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'],
-				    en: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-				    ko: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일']
+					zh: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'],
+					en: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+					ko: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일']
 				};
-			    const index = weekDays.en.indexOf(day);
-			    if (index !== -1) {
-			        return weekDays[lang][index];
-			    } else {
-			        throw new Error(`Day "${day}" not found in English weekDays.`);
-			    }
+				const index = weekDays.en.indexOf(day);
+				if (index !== -1) {
+					return weekDays[lang][index];
+				} else {
+					throw new Error(`Day "${day}" not found in English weekDays.`);
+				}
 			}
-			
+
 		}
 	}
 </script>
@@ -501,16 +491,43 @@ import moment from 'moment-timezone';
 		height: 1rpx;
 		background-color: rgba(255, 255, 255, 0.1);
 	}
+	
+	.uni-select {
+		border-radius: 8rpx !important;
+	}
+	
+	.uni-select__input-text {
+		color: #4f4f4f !important;
+	}
+	
+	.uni-select-item {
+		color: #4f4f4f;
+	}
+	
+	/* 针对下拉菜单的样式 */
+	.uni-select-menu {
+	  background-color: #fff; /* 修改下拉菜单的背景颜色 */
+	  border: 1px solid #ccc; /* 修改下拉菜单的边框 */
+	}
 
 	.select-language {
 		border: none;
 		position: absolute;
 		top: 35rpx;
 		right: 20rpx;
-		width: 60rpx;
-		height: 27rpx;
+		width: 49rpx;
+		height: 25rpx;
 		text-align: center;
-		line-height: 27rpx;
+		line-height: 25rpx;
+	}
+	
+	.arrow-down-icon {
+		position: relative;
+		left: 0;
+		top: 0;
+		width: 100rpx;
+		height: 30rpx;
+		background-color: red;
 	}
 
 	.room-icon-cir {
