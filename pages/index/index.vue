@@ -8,15 +8,16 @@
 			<text class="now-date">{{syncData.display_day}}</text>
 
 			<view class="divider-one"></view>
-			
+
 			<!-- <select v-model="selected" class="language" @change="changeLang">
 				<option value='en'>English</option>
 				<option value='zh' selected>中文</option>
 				<option value='ko'>korean</option>
 			</select> -->
-			
-			<uni-data-select style="width: 60rpx;" class="select-language" v-model="value" :localdata="datasource" @change="changeLang">
-				 
+
+			<uni-data-select style="width: 60rpx;" class="select-language" v-model="value" :localdata="datasource"
+				@change="changeLang">
+
 			</uni-data-select>
 
 			<!-- <image class="room-icon-cir" src="/static/room_circle.png"></image> -->
@@ -26,7 +27,8 @@
 			<view class="content-container" v-if="syncData && syncData.current">
 				<view class="room-space"></view>
 				<view class="room-content-container">
-					<text class="room-name">{{$t('message.meeting_theme')}}：<text style="font-size: 26rpx;">{{syncData.current.name}}</text></text>
+					<text class="room-name">{{$t('message.meeting_theme')}}：<text
+							style="font-size: 26rpx;">{{syncData.current.name}}</text></text>
 					<text class="room-entry-duration">{{syncData.current.start_end}}</text>
 					<text class="room-booker">{{$t('message.booker')}}：{{syncData.current.book_by}}</text>
 				</view>
@@ -36,7 +38,8 @@
 				<view class="room-space"></view>
 				<view class="room-status room-status-idle">{{$t('message.no_meeting')}}</view>
 				<view class="room-content-container" v-if="foundNextEntry && foundNextEntry.name">
-					<text class="room-name">{{$t('message.upcoming_meetings')}}：<text style="font-size: 26rpx;">{{foundNextEntry.name}}</text></text>
+					<text class="room-name">{{$t('message.upcoming_meetings')}}：<text
+							style="font-size: 26rpx;">{{foundNextEntry.name}}</text></text>
 					<text class="room-entry-duration">{{foundNextEntry.start_end}}</text>
 					<!-- <text class="room-booker">{{ $t(' hello') }}：{{foundNextEntry.book_by}}</text> -->
 					<text class="room-booker">{{ $t('message.booker') }}：{{foundNextEntry.book_by}}</text>
@@ -50,16 +53,19 @@
 			<view class="timeline-container">
 				<view class="time-span-container">
 					<view style="width: 7rpx;"></view>
-					<view :class="[item.type == 0 ? 'time-span-text' : 'time-span-dot']" v-for="(item, index) in spanList" :key="index">{{item.text}}</view>
+					<view :class="[item.type == 0 ? 'time-span-text' : 'time-span-dot']"
+						v-for="(item, index) in spanList" :key="index">{{item.text}}</view>
 					<view style="width: 7rpx;"></view>
 				</view>
 
 				<view class="timeline-line-container">
 					<view class="timeline-line-item" v-for="(item, index) in timelineColorList" :key="index"
-						:style="{background: item.bg, width: item.width + 'rpx', height: '100%', color: item.textColor}">{{item.text}}</view>
+						:style="{background: item.bg, width: item.width + 'rpx', height: '100%', color: item.textColor}">
+						{{item.text}}</view>
 				</view>
 				<view class="timeline-line-container" style="margin-top: 5rpx;">
-					<view class="timeline-line-entry" :style="{width: item.width + 'rpx', height: '100%'}" v-for="(item, index) in timelineColorList" :key="index">
+					<view class="timeline-line-entry" :style="{width: item.width + 'rpx', height: '100%'}"
+						v-for="(item, index) in timelineColorList" :key="index">
 						<text class="timeline-line-item tl-item-ec">{{item.name}}</text>
 					</view>
 				</view>
@@ -68,7 +74,7 @@
 				</view>
 			</view>
 		</view>
-		
+
 		<view class="popup-setting" v-if="showSetting">
 			<input class="popup-input" v-model="_roomId" placeholder='{{$t("message.alert_code")}}' />
 			<view class="popup-sure" @click="onSetRoomId">{{$t('message.sure')}}</view>
@@ -82,7 +88,7 @@
 	} from '@/modules/config.js'
 
 	export default {
-		
+
 		interval: null,
 		name: 'App',
 		data() {
@@ -99,7 +105,19 @@
 				roomId: 2,
 				value: 0,
 				isEnglish: false,
-				datasource: [{value: 0,text: '中文',key:'zh'},{value: 1,text: 'English',key:'en'},{value: 2,text: '한국인',key:'ko'}],
+				datasource: [{
+					value: 0,
+					text: '中文',
+					key: 'zh'
+				}, {
+					value: 1,
+					text: 'English',
+					key: 'en'
+				}, {
+					value: 2,
+					text: '한국인',
+					key: 'ko'
+				}],
 			}
 		},
 		onLoad() {
@@ -116,7 +134,7 @@
 					clearInterval(this.interval)
 					this.interval = null
 				}
-				
+
 				this.syncRoom()
 				this.interval = setInterval(() => {
 					this.syncRoom()
@@ -157,11 +175,13 @@
 						data.now_time = data.now_time.slice(0, -2)
 						if (data.entries) {
 							for (let e of data.entries) {
-								e.start_end = this.formatTime(e['start_time']) + '-' + this.formatTime(e['end_time'])
+								e.start_end = this.formatTime(e['start_time']) + '-' + this.formatTime(e[
+									'end_time'])
 							}
 						}
 						if (data.now_entry) {
-							data.now_entry.start_end = this.formatTime(data.now_entry['start_time']) + '-' + this.formatTime(data.now_entry['end_time'])
+							data.now_entry.start_end = this.formatTime(data.now_entry['start_time']) + '-' +
+								this.formatTime(data.now_entry['end_time'])
 						}
 						// this.syncData = data
 						this.initTimeLine(data)
@@ -280,7 +300,8 @@
 						if (idleStartTime == 0) {
 							idleStartTime = tempTime
 						} else {
-							if (idleStartTime < nowTime && tempTime < nowTime && tempTime + this.timelineInterval > nowTime) {
+							if (idleStartTime < nowTime && tempTime < nowTime && tempTime + this.timelineInterval >
+								nowTime) {
 								timelineColorList.push({
 									text: '',
 									textColor: 'black',
@@ -308,7 +329,8 @@
 						})
 					} else {
 						timelineColorList.push({
-							text: this.hideTimelineText(tempTime - idleStartTime - this.timelineInterval, this.$t('message.canBook')),
+							text: this.hideTimelineText(tempTime - idleStartTime - this.timelineInterval, this.$t(
+								'message.canBook')),
 							bg: '#08D50A',
 							textColor: 'white',
 							width: (tempTime - idleStartTime - this.timelineInterval) / totalSeconds * totalWidth
@@ -339,17 +361,29 @@
 				return hours + ':' + minutes;
 			},
 			changeLang(index) {
-				console.log('lang index',index)
-				console.log('lang selected item',this.datasource[index])
+				console.log('lang index', index)
+				console.log('lang selected item', this.datasource[index])
 				var lang = this.datasource[index].key
-				if(lang == 'en') {
+				if (lang == 'en') {
 					this.isEnglish = true
-				}else {
+				} else {
 					this.isEnglish = false
 				}
-				console.log('lang selected lang',lang)
+				console.log('lang selected lang', lang)
 				this.$i18n.locale = lang
-			}
+			},
+			dateDisplay() {
+				// 获取年、月、日、星期
+				
+				// syncData.display_day
+				// 获取当前时间的时间戳
+				// 2024年8月8日星期四、
+				// 英文：Wednesday,September.7,2024
+				// 韩文：
+				let mydate = this.syncData
+
+
+			},
 		}
 	}
 </script>
@@ -426,6 +460,7 @@
 		text-align: center;
 		line-height: 27rpx;
 	}
+
 	.room-icon-cir {
 		position: absolute;
 		top: 46rpx;
@@ -572,7 +607,7 @@
 		flex-direction: row;
 		align-items: center;
 	}
-	
+
 	.timeline-line-entry {
 		display: flex;
 		justify-content: center;
@@ -610,7 +645,7 @@
 		width: 177rpx;
 		height: 18.7rpx;
 	}
-	
+
 	.popup-setting {
 		width: 250rpx;
 		height: 150rpx;
@@ -623,7 +658,7 @@
 		left: 250rpx;
 		top: 100rpx;
 	}
-	
+
 	.popup-input {
 		width: 200rpx;
 		height: 60rpx;
@@ -632,7 +667,7 @@
 		border: 1rpx solid royalblue;
 		margin-top: 20rpx;
 	}
-	
+
 	.popup-sure {
 		width: 80rpx;
 		height: 40rpx;

@@ -40,7 +40,7 @@ const messages = {
 			"meeting_theme": '컨퍼런스 주제',
 			"booker": '부커',
 			"in_meeting": '회 의 중',
-			"no_meeting": '여유 있음',
+			"no_meeting": '여유있음',
 			"upcoming_meetings": '곧 시작됩니다',
 			"alert_code": '내장코드를 입력해주세요',
 			"sure": '확인',
