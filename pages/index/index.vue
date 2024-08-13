@@ -493,15 +493,18 @@
 	}
 	
 	.uni-select {
-		border-radius: 8rpx !important;
+		border: none !important;
+		/* border-radius: 8rpx !important; */
 	}
 	
 	.uni-select__input-text {
-		color: #4f4f4f !important;
+		color: white !important;
+		border: none !important;
 	}
 	
 	.uni-select-item {
 		color: #4f4f4f;
+		border: none !important;
 	}
 	
 	/* 针对下拉菜单的样式 */
