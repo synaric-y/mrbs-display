@@ -7,7 +7,7 @@
 
 ![demo.png](doc/img/2.png?t=1723515608897)
 
-当前项目为展示端，基于uni-app开发，主体项目与介绍详见[mrbs-app](https://github.com/synaric-y/mrbs-server)。
+当前项目为展示端，基于uni-app开发，主体项目与介绍详见[mrbs-server](https://github.com/synaric-y/mrbs-server)。
 
 # 特性
 
