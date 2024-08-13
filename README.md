@@ -34,6 +34,8 @@ npm install
 
 使用uni-app通用基座或自定义基座均可以运行，详见[uni-app打包](https://nativesupport.dcloud.net.cn/AppDocs/)。
 
+长按"会议室"可进入调试，输入会议室id即可更改所显示的会议室。
+
 # 支持单位
 
 ![BCCGloballogo.jpg](doc/img/1.jpg?t=1723515608897)
