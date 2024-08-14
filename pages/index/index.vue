@@ -463,12 +463,12 @@
 		top: 41rpx;
 		height: 68rpx;
 		line-height: 68rpx;
-		font-size: 52rpx;
+		font-size: 50rpx;
 		color: white;
 	}
 
 	.now-time-tail {
-		font-size: 25rpx;
+		font-size: 28rpx;
 		color: white;
 		margin-left: -7rpx;
 	}
@@ -504,7 +504,6 @@
 	
 	.uni-select-item {
 		color: #4f4f4f;
-		/* height: 60rpx !important; */
 		border: none !important;
 	}
 	
