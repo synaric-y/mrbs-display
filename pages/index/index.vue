@@ -2,8 +2,8 @@
 	<view class="container" id="app">
 		<image class="bg" src="/static/home_bg.png"></image>
 		<view class="container-inner">
-			<text class="now-time">{{syncData.now_time}}
-				<text class="now-time-tail">{{syncData.now_ap}}</text>
+			<text class="now-time">{{this.currenHM}}
+				<text class="now-time-tail">{{this.currenAM}}</text>
 			</text>
 			<text class="now-date">{{this.currenlanguageTime}}</text>
 			<view class="divider-one"></view>
@@ -111,7 +111,9 @@
 					key: 'ko'
 				}],
 				currenLanguageTime: '',
-				tempData: null
+				tempData: null,
+				currenAM: 'AM',
+				currenHM: '',
 			}
 		},
 		onLoad() {
@@ -180,6 +182,7 @@
 						// this.syncData = data
 						this.initTimeLine(data)
 						this.dateDisplay()
+						this.displayHM(data.now_timestamp)
 
 					},
 					fail: (e) => {
@@ -345,6 +348,24 @@
 			hideTimelineText(width, text) {
 				return width <= this.timelineInterval ? '' : text
 			},
+			
+			displayHM(timestamp) {
+				let dateFormat = 'hh:mm A';
+				const koDate = this.formatDate(timestamp, 'Asia/Seoul', 'ko',dateFormat);
+				const enDate = this.formatDate(timestamp, 'America/New_York', 'en',dateFormat);
+				const zhDate = this.formatDate(timestamp, 'Asia/Shanghai', 'zh-cn',dateFormat);
+				let parts = null;
+				if (this.$i18n.locale == 'en') {
+					parts = enDate.split(' ');
+				} else if (this.$i18n.locale == 'ko') {
+					parts = koDate.split(' ');
+				} else {
+					parts = zhDate.split(' ');
+				}
+				// 提取星期几
+				this.currenAM = parts[1];
+				this.currenHM = parts[0];
+			},
 			formatTime(timestamp) {
 				// 将10位时间戳转换为Date对象
 				var date = new Date(timestamp * 1000);
@@ -368,15 +389,7 @@
 				this.dateDisplay()
 				this.initTimeLine(this.tempData)
 			},
-			formatDate(timestamp, timeZone, locale) {
-				let dateFormat = 'YYYY年MM月DD日 dddd';
-				if (this.$i18n.locale == 'en') {
-					dateFormat = 'dddd, MMMM D, YYYY';
-				} else if (this.$i18n.locale == 'ko') {
-					dateFormat = 'YYYY년MM월DD일 dddd';
-				} else {
-					dateFormat = 'YYYY年MM月DD日 dddd';
-				}
+			formatDate(timestamp, timeZone, locale,dateFormat) {
 				return moment.unix(timestamp)
 					.tz(timeZone)
 					.locale(locale)
@@ -388,14 +401,25 @@
 				// 韩文：2024년 8월 8일 목요일
 				const timestamp = this.syncData.now_timestamp;
 				// 格式化日期为中文、英文、韩文，并考虑时区
-				const koDate = this.formatDate(timestamp, 'Asia/Seoul', 'ko');
-				const enDate = this.formatDate(timestamp, 'America/New_York', 'en');
-				const zhDate = this.formatDate(timestamp, 'Asia/Shanghai', 'zh-cn');
+				let dateFormat = 'YYYY年MM月DD日 dddd';
 				if (this.$i18n.locale == 'en') {
-					console.log('英文日期:', enDate); // 英文输出
+					dateFormat = 'dddd, MMMM D, YYYY';
+				} else if (this.$i18n.locale == 'ko') {
+					dateFormat = 'YYYY년MM월DD일 dddd';
+				} else {
+					dateFormat = 'YYYY年MM月DD日 dddd';
+				}
+				if(this.tempData) {
+					this.displayHM(this.tempData.now_timestamp)
+				}
+				const koDate = this.formatDate(timestamp, 'Asia/Seoul', 'ko',dateFormat);
+				const enDate = this.formatDate(timestamp, 'America/New_York', 'en',dateFormat);
+				const zhDate = this.formatDate(timestamp, 'Asia/Shanghai', 'zh-cn',dateFormat);
+				if (this.$i18n.locale == 'en') {
+					// console.log('英文日期:', enDate); // 英文输出
 					this.currenlanguageTime = enDate
 				} else if (this.$i18n.locale == 'ko') {
-					console.log('韩文日期:', koDate); // 韩文输出
+					// console.log('韩文日期:', koDate); // 韩文输出
 					// 使用 split 方法分隔字符串
 					const parts = koDate.split(' ');
 					// 提取星期几
@@ -403,7 +427,7 @@
 					const tempday = this.translateDay(dayOfWeek);
 					this.currenlanguageTime = parts[0] + ' ' + tempday;
 				} else {
-					console.log('中文日期:', zhDate); // 中文输出
+					// console.log('中文日期:', zhDate); // 中文输出
 					const parts = zhDate.split(' ');
 					const dayOfWeek = parts[1];
 					const tempday = this.translateDay(dayOfWeek);
