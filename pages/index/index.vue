@@ -388,6 +388,7 @@
 				this.$i18n.locale = lang
 				this.dateDisplay()
 				this.initTimeLine(this.tempData)
+				this.syncRoom()
 			},
 			formatDate(timestamp, timeZone, locale,dateFormat) {
 				return moment.unix(timestamp)

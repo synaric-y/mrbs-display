@@ -44,7 +44,7 @@ const messages = {
 			"upcoming_meetings": '곧 시작됩니다',
 			"alert_code": '내장코드를 입력해주세요',
 			"sure": '확인',
-			"booked": '이미 예약됨',
+			"booked": '예약하다',
 			"over_meeting":'종료됨',
 			"small_in_meeting": '회의 중',
 			"alert_error_code": '올바른 내장 코드를 입력하세요.',
