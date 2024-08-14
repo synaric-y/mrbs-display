@@ -468,7 +468,7 @@
 	}
 
 	.now-time-tail {
-		font-size: 30rpx;
+		font-size: 25rpx;
 		color: white;
 		margin-left: -7rpx;
 	}
@@ -479,7 +479,7 @@
 		top: 93rpx;
 		height: 43rpx;
 		line-height: 43rpx;
-		font-size: 19rpx;
+		font-size: 16rpx;
 		color: white;
 	}
 
@@ -504,7 +504,12 @@
 	
 	.uni-select-item {
 		color: #4f4f4f;
+		/* height: 60rpx !important; */
 		border: none !important;
+	}
+	
+	.uni-select__selector-item {
+		line-height: 28rpx !important;
 	}
 	
 	/* 针对下拉菜单的样式 */
@@ -574,7 +579,7 @@
 	}
 
 	.room-status {
-		width: 393rpx;
+		width: 450rpx;
 		height: 168rpx;
 		line-height: 168rpx;
 		font-size: 100rpx;
@@ -588,6 +593,7 @@
 
 	.room-status-idle {
 		color: #00FF02;
+		text-align: center;
 	}
 
 	.room-content-container {
@@ -598,7 +604,7 @@
 	}
 
 	.room-space {
-		width: 46rpx;
+		/* width: 46rpx; */
 		height: 100rpx;
 	}
 

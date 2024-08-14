@@ -23,7 +23,7 @@ const messages = {
 			"meeting_theme": 'Conference Theme',
 			"booker": 'Booker',
 			"in_meeting": 'Meeting',
-			"no_meeting": 'FreeTime',
+			"no_meeting": 'Free',
 			"upcoming_meetings": 'Upcoming Meetings',
 			"alert_code": 'Please enter the built-in code',
 			"sure": 'Sure',
