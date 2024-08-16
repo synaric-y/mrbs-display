@@ -13,10 +13,11 @@
 		
 			<!-- <image class="room-icon-cir" src="/static/room_circle.png"></image> -->
 			<image class="room-icon" v-if="syncData.room" :src="syncData.room.icon"></image>
-			<text class="room-tail" @longpress="onSetting">{{$t('message.meeting')}}</text>
+			<text class="room-tail" @longpress="onSetting">{{this.$t('message.meeting')}}</text>
 
 			<view class="content-container" v-if="syncData && syncData.current">
-				<view class="room-space"></view>
+				<view :class="[this.meeting?'room-space':'no-room-space']"></view>
+				<!-- <view class="room-space"></view> -->
 				<view class="room-content-container">
 					<text class="room-name">{{$t('message.meeting_theme')}}：<text
 							style="font-size: 26rpx;">{{syncData.current.name}}</text></text>
@@ -26,7 +27,8 @@
 				<view class="room-status room-status-using">{{$t('message.in_meeting')}}</view>
 			</view>
 			<view class="content-container" v-else-if="foundNextEntry">
-				<view class="room-space"></view>
+				<view :class="[this.meeting?'room-space':'no-room-space']"></view>
+				<!-- <view class="room-space"></view> -->
 				<view class="room-status room-status-idle">{{$t('message.no_meeting')}}</view>
 				<view class="room-content-container" v-if="foundNextEntry && foundNextEntry.name">
 					<text class="room-name">{{$t('message.upcoming_meetings')}}：<text
@@ -68,7 +70,7 @@
 		</view>
 
 		<view class="popup-setting" v-if="showSetting">
-			<input class="popup-input" v-model="_roomId" placeholder='{{$t("message.alert_code")}}' />
+			<input class="popup-input" v-model="_roomId" :placeholder="$t('message.alert_code')" />
 			<view class="popup-sure" @click="onSetRoomId">{{$t('message.sure')}}</view>
 		</view>
 	</view>
@@ -114,6 +116,7 @@
 				tempData: null,
 				currenAM: 'AM',
 				currenHM: '',
+				meeting: false,
 			}
 		},
 		onLoad() {
@@ -275,10 +278,12 @@
 								bg = '#FFFF00'
 								textColor = 'black'
 								data.current = entry
+								this.meeting = true
 							} else if (nowTime > entry['end_time']) {
 								text = this.$t('message.over_meeting')
 								bg = '#585757'
 								textColor = 'white'
+								this.meeting = false
 							}
 							timelineColorList.push({
 								text: this.hideTimelineText(entry['end_time'] - entry['start_time'], text),
@@ -519,7 +524,6 @@
 	
 	.uni-select {
 		border: none !important;
-		/* border-radius: 8rpx !important; */
 	}
 	
 	.uni-select__input-text {
@@ -536,10 +540,9 @@
 		line-height: 28rpx !important;
 	}
 	
-	/* 针对下拉菜单的样式 */
 	.uni-select-menu {
-	  background-color: #fff; /* 修改下拉菜单的背景颜色 */
-	  border: 1px solid #ccc; /* 修改下拉菜单的边框 */
+	  background-color: #fff;
+	  border: 1px solid #ccc;
 	}
 
 	.select-language {
@@ -603,7 +606,7 @@
 	}
 
 	.room-status {
-		width: 450rpx;
+		width: 396rpx;
 		height: 168rpx;
 		line-height: 168rpx;
 		font-size: 100rpx;
@@ -628,8 +631,13 @@
 	}
 
 	.room-space {
-		/* width: 46rpx; */
+		width: 46rpx;
 		height: 100rpx;
+	}
+	
+	.no-room-space {
+		/* width: 46rpx;
+		height: 100rpx; */
 	}
 
 	.room-name {
