@@ -1,41 +1,41 @@
-# 商霖会议室预约系统MRBS
+# BCC MRBS
 
-一款基于PHP开发的会议室预约系统，具有网页端管理后台与展示端Android平板。
+A conference room reservation system developed based on PHP, with a web management backend and a conference room tablet display.
+
 
 ![](https://scrutinizer-ci.com/g/synaric-y/mrbs-server/badges/build.png?b=main)
 ![](https://scrutinizer-ci.com/g/synaric-y/mrbs-server/badges/code-intelligence.svg?b=main)
 
 ![demo.png](doc/img/2.png?t=1723515608897)
 
-当前项目为展示端，基于uni-app开发，主体项目与介绍详见[mrbs-server](https://github.com/synaric-y/mrbs-server)。
+The current project is a display end, developed based on uni-app. Please see the main project and introduction for details [mrbs-server](https://github.com/synaric-y/mrbs-server)。
 
-# 特性
+# Features
 
-- 平板大屏展示会议室状态与预约信息
-- 多语言支持，中文/英文/韩文...
-- 跨端支持Android/iOS平板
-- 自适应界面，推荐8-11寸平板
+- Area/Meeting/Room Management
+- Tablet screen displays conference room status and reservation information
+- Sync Calendar with Microsoft Exchange, extensible third-party Calendar support
+- I18n support, Chinese/English/Korean...
 
-# 环境与依赖
+# Environment And Dependencies
 
 - uni-app SDK 4.24
 - HbuilderX 4.24
-- 8-11寸Android平板，系统具备屏幕固定功能（可选）
+- 8-11 inch Android tablet, the system has screen fixing function (optional)
 
-> 推荐Google原生系统或华为鸿蒙系统，具备系统级评估固定功能。
+> Recommend Google native system, which has fixed system-level evaluation functions.
 
-# 安装
+# Install
 
 ```
 npm install
 ```
 
-# 运行
+# Run
 
-使用uni-app通用基座或自定义基座均可以运行，详见[uni-app打包](https://nativesupport.dcloud.net.cn/AppDocs/)。
+It can be run using the uni-app universal base or a custom base. For details, see[uni-app](https://nativesupport.dcloud.net.cn/AppDocs/)。
 
-长按"会议室"可进入调试，输入会议室id即可更改所显示的会议室。
 
-# 支持单位
+# Support
 
 ![BCCGloballogo.jpg](doc/img/1.jpg?t=1723515608897)
