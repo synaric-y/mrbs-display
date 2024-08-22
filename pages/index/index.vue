@@ -14,7 +14,7 @@
 								<!-- 当前有会议 -->
 								<template v-if="index % 4 == 0">
 									<view class="scroll-item-right extention-height">
-										<text class="scroll-item-meeting">Sales meeting</text>
+										<text class="scroll-item-meeting">09:00am -11:00am\nSales meeting</text>
 										<image class="in-meeting-icon" src="../../static/in-meeting.png" mode="aspectFit"></image>
 									</view>
 								</template>
@@ -64,17 +64,17 @@
 				
 				<view class="meeting-title-type">
 					<image class="meeting-msg-icon" src="../../static/meeting-msg.png" mode=""></image>
-					<text class="meeting-msg-title">Sales meeting</text>
+					<text class="meeting-msg-title reverse-title">Sales meeting</text>
 				</view>
 				
-				<view class="meeting-title-type reversr-time">
+				<view class="meeting-title-type">
 					<image class="meeting-msg-icon" src="../../static/reverse-time.png" mode=""></image>
-					<text class="meeting-msg-title">09:00am -11:00am</text>
+					<text class="meeting-msg-title reverse-time">09:00am -11:00am</text>
 				</view>
 				
-				<view class="meeting-title-type reverse-person">
+				<view class="meeting-title-type">
 					<image class="meeting-msg-icon" src="../../static/reverse-person.png" mode=""></image>
-					<text class="meeting-msg-title">April Ren</text>
+					<text class="meeting-msg-title reverse-person">April Ren</text>
 				</view>
 				
 			</view>
@@ -149,7 +149,8 @@
 
 	.meeting-scroll-view {
 		width: 250rpx;
-		height: 407rpx;
+		height: 397rpx;
+		padding-top: 10rpx;
 		/* height: calc(100vw-65rpx); */
 	}
 
@@ -175,6 +176,7 @@
 		width: 50rpx;
 		position: absolute;
 		left: 8rpx;
+		font-family: PingFangSC-light;
 	}
 
 	.scroll-item-right {
@@ -194,6 +196,7 @@
 		position: absolute;
 		top: 0;
 		left: 8rpx;
+		font-family: PingFangSC-light;
 	}
 	
 	.in-meeting-icon {
@@ -215,7 +218,8 @@
 		flex-direction: column;
 		height: 63rpx;
 		width: 250rpx;
-		border-top: 1rpx solid rgba(0,0,0,0.4);
+		border-top: 1rpx solid rgba(230,241,252,0.25);
+		font-family: PingFangSC-regular;
 		/* background-color: bisque; */
 		position: absolute;
 		left: 0;
@@ -243,7 +247,7 @@
 		font-size: 14rpx;
 		text-align: center;
 		box-shadow: 0rpx 2rpx 6rpx 0rpx rgba(0,0,0,0.4);
-		font-family: Roboto;
+		font-family: PingFangSC-regular;
 	}
 
 	.right-meeting-info {
@@ -269,12 +273,14 @@
 	.room-title {
 		font-size: 20rpx;
 		color: white;
+		font-family: PingFangSC-regular;
 	}
 	
 	.room-number {
 		margin-left: 8rpx;
 		font-size: 38rpx;
 		color: white;
+		font-family: PingFangSC-regular;
 	}
 	
 	.change-language {
@@ -311,14 +317,15 @@
 	.right-meeting-detail {
 		padding: 0;
 		margin: 0;
-		width: 100%;
+		/* width: 100%; */
 		flex: 1;
 		flex-direction: column;
 		/* background-color: aqua; */
 	}
 	
 	.meeting-status {
-		width: 100%;
+		width: 423rpx;
+		/* width: auto; */
 		height: 108rpx;
 		margin-top: 26rpx;
 		margin-left: 37rpx;
@@ -326,8 +333,7 @@
 		text-align: left;
 		color: white;
 		font-family: PingFangSC-medium;
-		
-		/* background-color: red; */
+		/* box-shadow: 0rpx 2rpx 6rpx 0rpx rgba(0,0,0,0.4); */
 	}
 	
 	.meeting-title-type {
@@ -335,8 +341,33 @@
 		height: 37rpx;
 	}
 	
-	.reversr-time {
+	.reverse-title {
+		line-height: 23rpx;
+		color: rgb(255,255,255);
+		font-size: 28rpx;
+		text-align: left;
+		font-family: PingFangSC-regular;
+	}
+	
+	.reverse-time {
 		margin-left: 37rpx;
+		height: 47rpx;
+		line-height: 23rpx;
+		color: white;
+		font-size: 18rpx;
+		text-align: left;
+		/* box-shadow: 0rpx 2rpx 6rpx 0rpx rgba(0,0,0,0.4); */
+		font-family: PingFangSC-extraLight;
+	}
+	
+	.reverse-person {
+		height: 47rpx;
+		line-height: 23rpx;
+		color: rgb(255,255,255);
+		font-size: 18rpx;
+		text-align: left;
+		/* box-shadow: 0rpx 2rpx 6rpx 0rpx rgba(0,0,0,0.4); */
+		font-family: PingFangSC-extraLight;
 	}
 	
 	.meeting-msg-icon {
@@ -346,18 +377,17 @@
 	
 	.meeting-msg-title {
 		margin-left: 17rpx;
-		height: 47rpx;
+		/* height: 47rpx;
 		line-height: 23rpx;
 		color: rgb(255,255,255);
 		font-size: 28rpx;
 		text-align: left;
-		font-family: PingFangSC-regular;
+		font-family: PingFangSC-regular; */
 	}
 	
 	.right-meeting-logo {
 		width: 100%;
 		height: 50rpx;
-		/* background-color: #591BB7; */
 	}
 	
 	.company-logo {
