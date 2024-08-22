@@ -176,7 +176,8 @@
 		width: 50rpx;
 		position: absolute;
 		left: 8rpx;
-		font-family: PingFangSC-light;
+		/* font-family: PingFangSC-light; */
+		font-family: 'Noto Sans CJK SC Light', 'Source Han Sans CN Light', 'Droid Sans Fallback', sans-serif;
 	}
 
 	.scroll-item-right {
@@ -196,7 +197,8 @@
 		position: absolute;
 		top: 0;
 		left: 8rpx;
-		font-family: PingFangSC-light;
+		/* font-family: PingFangSC-light; */
+		font-family: 'Noto Sans CJK SC Light', 'Source Han Sans CN Light', 'Droid Sans Fallback', sans-serif;
 	}
 	
 	.in-meeting-icon {
@@ -219,8 +221,9 @@
 		height: 63rpx;
 		width: 250rpx;
 		border-top: 1rpx solid rgba(230,241,252,0.25);
-		font-family: PingFangSC-regular;
+		/* font-family: PingFangSC-regular; */
 		/* background-color: bisque; */
+		font-family: 'Noto Sans CJK SC', 'Source Han Sans CN', 'Droid Sans', sans-serif;
 		position: absolute;
 		left: 0;
 		bottom: 0;
@@ -247,7 +250,8 @@
 		font-size: 14rpx;
 		text-align: center;
 		box-shadow: 0rpx 2rpx 6rpx 0rpx rgba(0,0,0,0.4);
-		font-family: PingFangSC-regular;
+		/* font-family: PingFangSC-regular; */
+		font-family: 'Noto Sans CJK SC', 'Source Han Sans CN', 'Droid Sans', sans-serif;
 	}
 
 	.right-meeting-info {
@@ -313,7 +317,8 @@
 		margin-left: 37rpx;
 		font-size: 18rpx;
 		text-align: left;
-		font-family: PingFangSC-light;
+		/* font-family: PingFangSC-light; */
+		font-family: 'Noto Sans CJK SC Light', 'Source Han Sans CN Light', 'Droid Sans Fallback', sans-serif;
 		color: white;
 	}
 	
