@@ -1,5 +1,9 @@
 <template>
 	<view class="container" id="app">
+		<view class="popup-setting" v-if="showSetting">
+			<input class="popup-input" v-model="_roomId" :placeholder="$t('message.alert_code')" />
+			<view class="popup-sure" @click="onSetRoomId">{{$t('message.sure')}}</view>
+		</view>
 		<!-- 会议部分 -->
 		<view class="left-time-view">
 			<!-- 会议时间 -->
@@ -43,7 +47,7 @@
 				<view >
 					<view class="room-group">
 						<text class="room-title">Room</text>
-						<text class="room-number">A</text>
+						<text class="room-number" @longpress="onSetting">A</text>
 					</view>
 					<view class="change-language">
 						language
@@ -98,6 +102,7 @@
 				timeRange: ['09:00am', 'ㆍ', '10:00am', 'ㆍ', '11:00am', 'ㆍ', '12:00pm', 'ㆍ', '01:00pm', 'ㆍ', '02:00pm', 'ㆍ',
 					'03:00pm', 'ㆍ', '04:00pm', 'ㆍ', '05:00pm', 'ㆍ', '06:00pm', 'ㆍ', '07:00pm', 'ㆍ'
 				],
+				showSetting: false,
 			}
 		},
 		onLoad() {
@@ -106,6 +111,23 @@
 
 		},
 		methods: {
+			
+			onSetting() {
+				this.showSetting = true
+			},
+			onSetRoomId() {
+				// console.log('set room', this._roomId)
+				// if (isNaN(this._roomId)) {
+				// 	uni.showToast({
+				// 		title: this.$t('message.alert_error_code')
+				// 	})
+				// 	return
+				// }
+				// this.roomId = this._roomId
+				this.showSetting = false
+				// uni.setStorageSync("ROOM_ID", this.roomId)
+				// this.startSync()
+			},
 
 			lower() {
 
@@ -410,5 +432,39 @@
 		margin-left: 37rpx;
 		width: 150rpx;
 		height: 17rpx;
+	}
+	
+	.popup-setting {
+		width: 250rpx;
+		height: 150rpx;
+		background-color: white;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		z-index: 9;
+		position: fixed;
+		left: 250rpx;
+		top: 100rpx;
+	}
+	
+	.popup-input {
+		width: 200rpx;
+		height: 60rpx;
+		line-height: 60rpx;
+		font-size: 30rpx;
+		border: 1rpx solid royalblue;
+		margin-top: 20rpx;
+	}
+	
+	.popup-sure {
+		width: 80rpx;
+		height: 40rpx;
+		background-color: royalblue;
+		line-height: 40rpx;
+		margin-top: 10rpx;
+		text-align: center;
+		font-size: 22rpx;
+		color: white;
+		border-radius: 6rpx;
 	}
 </style>
