@@ -273,14 +273,17 @@
 	.room-title {
 		font-size: 20rpx;
 		color: white;
-		font-family: PingFangSC-regular;
+		/* font-family: PingFangSC-regular; */
+		font-family: 'Noto Sans CJK SC', 'Source Han Sans CN', 'Droid Sans', sans-serif;
+		
 	}
 	
 	.room-number {
 		margin-left: 8rpx;
 		font-size: 38rpx;
 		color: white;
-		font-family: PingFangSC-regular;
+		/* font-family: PingFangSC-regular; */
+		font-family: 'Noto Sans CJK SC', 'Source Han Sans CN', 'Droid Sans', sans-serif;
 	}
 	
 	.change-language {
@@ -332,7 +335,9 @@
 		font-size: 80rpx;
 		text-align: left;
 		color: white;
-		font-family: PingFangSC-medium;
+		/* font-family: PingFangSC-medium; */
+		font-family: 'Noto Sans CJK SC', 'Source Han Sans CN', 'Droid Sans', sans-serif;
+
 		/* box-shadow: 0rpx 2rpx 6rpx 0rpx rgba(0,0,0,0.4); */
 	}
 	
@@ -346,7 +351,9 @@
 		color: rgb(255,255,255);
 		font-size: 28rpx;
 		text-align: left;
-		font-family: PingFangSC-regular;
+		/* font-family: PingFangSC-regular; */
+		font-family: 'Noto Sans CJK SC', 'Source Han Sans CN', 'Droid Sans', sans-serif;
+		
 	}
 	
 	.reverse-time {
@@ -357,7 +364,9 @@
 		font-size: 18rpx;
 		text-align: left;
 		/* box-shadow: 0rpx 2rpx 6rpx 0rpx rgba(0,0,0,0.4); */
-		font-family: PingFangSC-extraLight;
+		/* font-family: PingFangSC-extraLight; */
+		font-family: 'Noto Sans CJK SC ExtraLight', 'Source Han Sans CN ExtraLight', 'Droid Sans Fallback', sans-serif;
+
 	}
 	
 	.reverse-person {
@@ -367,7 +376,9 @@
 		font-size: 18rpx;
 		text-align: left;
 		/* box-shadow: 0rpx 2rpx 6rpx 0rpx rgba(0,0,0,0.4); */
-		font-family: PingFangSC-extraLight;
+		/* font-family: PingFangSC-extraLight; */
+		font-family: 'Noto Sans CJK SC ExtraLight', 'Source Han Sans CN ExtraLight', 'Droid Sans Fallback', sans-serif;
+
 	}
 	
 	.meeting-msg-icon {
