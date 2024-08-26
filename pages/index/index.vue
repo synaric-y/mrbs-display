@@ -26,7 +26,7 @@
 								<!-- 当前无会议 -->
 								<template v-else>
 									<view class="scroll-item-right">
-										<!-- <text class="scroll-item-meeting">Sales meeting</text> -->
+										<!-- <text class="scroll-item-meeting">Sales meeting</text> --> 
 									</view>
 								</template>
 							</view>
@@ -37,7 +37,7 @@
 			<!-- 预约会议 -->
 			<view class="reserve-meeting">
 				<view class="reserve-title">30-minute quick meeting can be booked</view>
-				<view class="reserve-button">Book</view>
+				<view class="reserve-button" @click="quickMeet">Book</view>
 			</view>
 		</view>
 		<!-- 会议基本信息 -->
@@ -50,8 +50,11 @@
 						<text class="room-number" @longpress="onSetting">A</text>
 					</view>
 					<view class="change-language">
-						language
+						<!-- language -->
+						<uni-data-select style="width: 49rpx;color:#4f4f4f" class="select-language" placeholder="language"  :localdata="datasource"
+							@change="changeLang" :clear="false"></uni-data-select>
 					</view>
+					
 				</view>
 				<!-- 分割线 -->
 				<view class="room-devide-line"></view>
@@ -110,6 +113,20 @@
 				meetArangeList: [],
 				currenMeetStart: 0,
 				currenMeetEnd: 0,
+				value: -10,
+				datasource: [{
+					value: 0,
+					text: '中文',
+					key: 'zh'
+				}, {
+					value: 1,
+					text: 'English',
+					key: 'en'
+				}, {
+					value: 2,
+					text: '한국인',
+					key: 'ko'
+				}],
 			}
 		},
 		onLoad() {
@@ -147,7 +164,7 @@
 				this.roomId = this._roomId
 				this.showSetting = false
 				uni.setStorageSync("ROOM_ID", this.roomId)
-				this.startSync()
+				this.syncRoom()
 			},
 
 			formatTime(timestamp) {
@@ -365,6 +382,22 @@
 				this.timeRange = allTimeList;
 				console.log('initTimeline拼接的会议数据allTimeList：', this.timeRange)
 			},
+			
+			changeLang(index) {
+				console.log('lang index', index)
+				console.log('lang selected item', this.datasource[index])
+				var lang = this.datasource[index].key
+				if (lang == 'en') {
+					this.isEnglish = true
+				} else {
+					this.isEnglish = false
+				}
+				console.log('lang selected lang', lang)
+				// this.$i18n.locale = lang
+				// this.dateDisplay()
+				// this.initTimeLine(this.tempData)
+				// this.syncRoom()
+			},
 
 			syncRoom() {
 				console.log('syncRoom 进入同步接口');
@@ -372,6 +405,7 @@
 					url: `${HOST}/web/appapi/api.php?act=sync_room`,
 					method: "POST",
 					header: {
+						// 'Content-type': 'application/json',
 						'Content-type': 'application/x-www-form-urlencoded',
 						'Accept-Language': 'zh-CN,zh;q=0.9'
 						//根据要求来配置
@@ -383,6 +417,43 @@
 						let data = res.data.data;
 						console.log('syncRoom返回数据成功data:', data);
 						this.initTimeline(data);
+					},
+					fail: (e) => {
+						console.error(e)
+					}
+				})
+			},
+			
+			// 快速会议
+			quickMeet() {
+				if(isNaN(this.roomId)) {
+					uni.showToast({
+						title: '请选择正确的房间号!',
+						icon: 'none'
+					})
+					return
+				}
+				console.log('this.roomId:',this.roomId)
+				uni.request({
+					url: `${HOST}/web/appapi/api.php?act=book_fast_meeting`,
+					method: "POST",
+					header: { 
+						// 'Content-type': 'application/x-www-form-urlencoded',
+						'Content-type': 'application/json',
+						'Accept-Language': 'zh-CN,zh;q=0.9'
+						//根据要求来配置
+					},
+					data: {
+						room_id: this.roomId
+					},
+					success: (res) => {
+						let data = res.data;
+						console.log('quickMeet返回数据成功data:', data);
+						let msg = data.msg
+						uni.showToast({
+							title: data.msg,
+							icon: 'none'
+						})
 					},
 					fail: (e) => {
 						console.error(e)
@@ -580,6 +651,45 @@
 		width: 66rpx;
 		height: 22rpx;
 		text-align: center;
+		/* position: relative; */
+	}
+	
+	.select-language {
+		position: absolute;
+		top: -1rpx;
+		left: 6rpx;
+		right: 0rpx;
+		bottom: 0rpx;
+		width: 100%;
+		background-color: clean;
+	}
+	
+	.uni-select {
+		border: none !important;
+	}
+	
+	.uni-select__input-text {
+		color: white !important;
+		border: none !important;
+	}
+	
+	.uni-select__input-placeholder {
+		color: white !important;
+		font-size: 11rpx !important;
+	}
+	
+	.uni-select-item {
+		color: #4f4f4f;
+		border: none !important;
+	}
+	
+	.uni-select__selector-item {
+		line-height: 28rpx !important;
+	}
+	
+	.uni-select-menu {
+	  background-color: #fff;
+	  border: 1px solid #ccc;
 	}
 
 	.room-devide-line {
