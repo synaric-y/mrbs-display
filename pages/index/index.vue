@@ -17,9 +17,6 @@
 								</view>
 								<!-- 当前有会议 -->
 								<template v-if="item.meetHeight > 0">
-									<!-- <view class="scroll-item-right">
-										
-									</view> -->
 									<view class="scroll-item-right extention-height"
 										:style="{height:item.height + 'rpx'}">
 										<text class="scroll-item-meeting">{{item.meetRange}}\n{{item.title}}</text>
@@ -31,7 +28,6 @@
 								<!-- 当前无会议 -->
 								<template v-else>
 									<view class="scroll-item-right">
-										<!-- <text class="scroll-item-meeting">Sales meeting</text> -->
 									</view>
 								</template>
 							</view>
@@ -41,8 +37,8 @@
 			</view>
 			<!-- 预约会议 -->
 			<view class="reserve-meeting">
-				<view class="reserve-title">30-minute quick meeting can be booked</view>
-				<view class="reserve-button" @click="quickMeet">Book</view>
+				<view class="reserve-title">{{$t('message.quickMeeting')}}</view>
+				<view class="reserve-button" @click="quickMeet">{{$t('message.book')}}</view>
 			</view>
 		</view>
 		<!-- 会议基本信息 -->
@@ -64,14 +60,12 @@
 							placeholder="language" :localdata="datasource" @change="changeLang"
 							:clear="false"></uni-data-select>
 					</view>
-
 				</view>
 				<!-- 分割线 -->
 				<view class="room-devide-line"></view>
 				<!-- 当前时间 -->
 				<view class="curren-time" v-if="roomData && roomData.display_day">
 					{{roomData.display_day}}
-					<!-- 09:06AM August 23, 2024 -->
 				</view>
 			</view>
 			<!-- 会议详情 -->
@@ -86,7 +80,6 @@
 						{{$t('message.no_meeting')}}
 					</view>
 				</template>
-
 				<template v-if="roomData && roomData.now_entry">
 					<view class="meeting-title-type" v-if="roomData && roomData.now_entry">
 						<image class="meeting-msg-icon" src="@/static/meeting-msg.png" mode=""></image>
@@ -97,7 +90,7 @@
 						<text v-if="roomData && roomData.now_entry"
 							class="meeting-msg-title reverse-time">{{roomData.now_entry.timestamp}}</text>
 						<!-- <text v-else class="meeting-msg-title reverse-time">{{roomData.room.}}</text> -->
-						<text v-else class="meeting-msg-title reverse-time">空闲中</text>
+						<text v-else class="meeting-msg-title reverse-time">{{$t('message.no_meeting')}}</text>
 						<!-- <text class="meeting-msg-title reverse-time">{{ nowMeetTime() }}</text> -->
 					</view>
 					<view class="meeting-title-type" v-if="roomData && roomData.now_entry">
@@ -557,8 +550,9 @@
 
 	.meeting-scroll-view {
 		width: 250rpx;
+		height: 377rpx;
 		/* height: 397rpx; */
-		max-height: 397rpx;
+		/* max-height: 397rpx; */
 		padding-top: 10rpx;
 		/* padding-bottom: 10rpx; */
 		/* height: calc(100vw-65rpx); */

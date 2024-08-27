@@ -18,6 +18,8 @@ const messages = {
 			"createRoomFail": '创建快速会议失败',
 			"nextMeet": '下一次会议',
 			"room": '会议室',
+			"book": '预定',
+			"quickMeeting": '预定30分钟快速会议',
 		}
 	},
 	"en":{
@@ -37,6 +39,8 @@ const messages = {
 			"canBook": 'Available',
 			"nextMeet": 'Next meet',
 			"room": 'Room',
+			"book": 'Book',
+			"quickMeeting": '30-minute quick meeting can be booked',
 		}	
 	},
 	"ko": {
@@ -56,6 +60,8 @@ const messages = {
 			"canBook": '예약 가능',
 			"nextMeet": '다음 회의',
 			"room": '방',
+			"book": '예약하다',
+			"quickMeeting": '빠른 30분 회의 예약',
 		}
 	}
 }
