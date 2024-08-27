@@ -10,7 +10,7 @@
 			<view class="meeting-time">
 				<view class="meeting-scroll">
 					<scroll-view scroll-y="true"
-						:class="[largeScreenHeight <= 870?'meeting-scroll-view':'ext-scroll-view']"
+						:class="[largeScreenHeight > 670?'meeting-scroll-view':'ext-scroll-view']"
 						@scrolltolower="lower" @scroll="scroll">
 						<template v-for="(item,index) in timeRange" :key="index">
 							<view class="scroll-view-item">
