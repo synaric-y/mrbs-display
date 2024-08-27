@@ -204,11 +204,10 @@
 					clearInterval(this.interval)
 					this.interval = null
 				}
-
 				this.syncRoom()
-				// this.interval = setInterval(() => {
-				// 	this.syncRoom()
-				// }, 5000)
+				this.interval = setInterval(() => {
+					this.syncRoom()
+				}, 5000)
 			},
 
 			onSetting() {
