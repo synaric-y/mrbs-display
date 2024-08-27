@@ -18,7 +18,7 @@
 								<!-- 当前有会议 -->
 								<template v-if="item.meetHeight > 0">
 									<view class="scroll-item-right extention-height"
-										:style="{height:item.height + 'rpx'}">
+										:style="{height:item.meetHeight + 'rpx'}">
 										<text class="scroll-item-meeting">{{item.meetRange}}\n{{item.title}}</text>
 										<image v-if="item.isCurrentMeet" class="in-meeting-icon"
 											src="@/static/in-meeting.png" mode="aspectFit">
@@ -89,9 +89,7 @@
 						<image class="meeting-msg-icon" src="@/static/reverse-time.png" mode=""></image>
 						<text v-if="roomData && roomData.now_entry"
 							class="meeting-msg-title reverse-time">{{roomData.now_entry.timestamp}}</text>
-						<!-- <text v-else class="meeting-msg-title reverse-time">{{roomData.room.}}</text> -->
 						<text v-else class="meeting-msg-title reverse-time">{{$t('message.no_meeting')}}</text>
-						<!-- <text class="meeting-msg-title reverse-time">{{ nowMeetTime() }}</text> -->
 					</view>
 					<view class="meeting-title-type" v-if="roomData && roomData.now_entry">
 						<image class="meeting-msg-icon" src="@/static/reverse-person.png" mode=""></image>
@@ -111,17 +109,13 @@
 						<image class="meeting-msg-icon" src="@/static/reverse-time.png" mode=""></image>
 						<text v-if="roomData && roomData.now_entry"
 							class="meeting-msg-title reverse-time">{{nextMeetData.timestamp}}</text>
-						<!-- <text v-else class="meeting-msg-title reverse-time">{{roomData.room.}}</text> -->
 						<text v-else class="meeting-msg-title reverse-time">无</text>
-						<!-- <text class="meeting-msg-title reverse-time">{{ nowMeetTime() }}</text> -->
 					</view>
 					<view class="meeting-title-type">
 						<image class="meeting-msg-icon" src="@/static/reverse-person.png" mode=""></image>
 						<text class="meeting-msg-title reverse-person">{{nextMeetData.book_by}}</text>
 					</view>
 				</template>
-
-
 			</view>
 			<view class="right-meeting-logo">
 				<image class="company-logo" src="@/static/bcc-logo-en.png" mode="aspectFit"></image>
@@ -143,9 +137,6 @@
 				value: 0,
 				meeting: false,
 				timeRange: [],
-				// timeRange: ['09:00am', 'ㆍ', '10:00am', 'ㆍ', '11:00am', 'ㆍ', '12:00pm', 'ㆍ', '01:00pm', 'ㆍ', '02:00pm', 'ㆍ',
-				// 	'03:00pm', 'ㆍ', '04:00pm', 'ㆍ', '05:00pm', 'ㆍ', '06:00pm', 'ㆍ', '07:00pm', 'ㆍ'
-				// ],
 				showSetting: false,
 				_roomId: 2,
 				roomId: 2,
@@ -156,7 +147,7 @@
 				meetArangeList: [],
 				currenMeetStart: 0,
 				currenMeetEnd: 0,
-				value: -10,
+				value: 0,
 				datasource: [{
 					value: 0,
 					text: '中文',
@@ -183,7 +174,6 @@
 			this.startSync()
 		},
 		methods: {
-
 			// 获取会议时间
 			nowMeetTime() {
 				const start_time = this.roomData.now_entry.start_time;
@@ -339,10 +329,10 @@
 							}
 						}
 						if (foundEntry) {
-							console.log('timestampline foundEntry',this.formatTime(timestampline));
-							console.log('timestampline this.currenMeetStart',this.formatTime(this.currenMeetStart));
-							console.log('timestampline currenMeetStart',timestampline,this.currenMeetStart)
-							console.log('timestampline foundEntry',foundEntry);
+							console.log('timestampline foundEntry', this.formatTime(timestampline));
+							console.log('timestampline this.currenMeetStart', this.formatTime(this.currenMeetStart));
+							console.log('timestampline currenMeetStart', timestampline, this.currenMeetStart)
+							console.log('timestampline foundEntry', foundEntry);
 							let meetStartRange = this.formatTime(foundEntry['start_time']);
 							let meetEndRange = this.formatTime(foundEntry['end_time']);
 							let meetRange = meetStartRange + '-' + meetEndRange;
@@ -359,7 +349,7 @@
 								isCurrentMeet: isCurrentMeet,
 								title: foundEntry['name'],
 								meetRange: meetRange,
-								meetHeight: (foundEntry['end_time'] - foundEntry['start_time']) / 1800 * 50
+								meetHeight: (foundEntry['end_time'] - foundEntry['start_time']) / 1800 * 25
 							})
 						} else {
 							allTimeList.push({
@@ -403,7 +393,7 @@
 								isCurrentMeet: currentMeet,
 								title: allFounfEntry['name'],
 								meetRange: meetTimeRange,
-								meetHeight: (allFounfEntry['end_time'] - allFounfEntry['start_time']) / 1800 * 50
+								meetHeight: (allFounfEntry['end_time'] - allFounfEntry['start_time']) / 1800 * 25
 							})
 						} else {
 							allTimeList.push({
@@ -530,7 +520,6 @@
 		padding: 0;
 		width: 250rpx;
 		background-color: #333333;
-		/* position: relative; */
 	}
 
 	.meeting-time {
@@ -544,18 +533,15 @@
 
 	.meeting-scroll {
 		width: 250rpx;
-		/* height: calc(100%-64rpx); */
 		height: 470rpx;
 	}
 
 	.meeting-scroll-view {
 		width: 250rpx;
-		height: 377rpx;
-		/* height: 397rpx; */
+		/* height: 377rpx; */
+		height: 397rpx;
 		/* max-height: 397rpx; */
 		padding-top: 10rpx;
-		/* padding-bottom: 10rpx; */
-		/* height: calc(100vw-65rpx); */
 	}
 
 	.scroll-view-item {
@@ -615,7 +601,6 @@
 	.scroll-item-meeting {
 		font-size: 9rpx;
 		color: white;
-		/* text-align: center; */
 	}
 
 	.reserve-meeting {
@@ -767,15 +752,12 @@
 	.right-meeting-detail {
 		padding: 0;
 		margin: 0;
-		/* width: 100%; */
 		flex: 1;
 		flex-direction: column;
-		/* background-color: aqua; */
 	}
 
 	.meeting-status {
 		width: 423rpx;
-		/* width: auto; */
 		height: 108rpx;
 		margin-top: 26rpx;
 		margin-left: 37rpx;
@@ -784,14 +766,12 @@
 		color: white;
 		/* font-family: PingFangSC-medium; */
 		font-family: 'Noto Sans CJK SC', 'Source Han Sans CN', 'Droid Sans', sans-serif;
-
-		/* box-shadow: 0rpx 2rpx 6rpx 0rpx rgba(0,0,0,0.4); */
 	}
-	
+
 	.nextMeet {
 		margin-left: 37rpx;
 		line-height: 20px;
-		color: rgb(255,255,255);
+		color: rgb(255, 255, 255);
 		font-size: 14px;
 		text-align: left;
 		font-style: italic;
@@ -836,9 +816,7 @@
 		text-align: left;
 		font-style: italic;
 		/* box-shadow: 0rpx 2rpx 6rpx 0rpx rgba(0,0,0,0.4); */
-		/* font-family: PingFangSC-extraLight; */
 		font-family: 'Noto Sans CJK SC ExtraLight', 'Source Han Sans CN ExtraLight', 'Droid Sans Fallback', sans-serif;
-
 	}
 
 	.meeting-msg-icon {
@@ -848,12 +826,6 @@
 
 	.meeting-msg-title {
 		margin-left: 17rpx;
-		/* height: 47rpx;
-		line-height: 23rpx;
-		color: rgb(255,255,255);
-		font-size: 28rpx;
-		text-align: left;
-		font-family: PingFangSC-regular; */
 	}
 
 	.right-meeting-logo {
