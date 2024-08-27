@@ -9,7 +9,7 @@
 			<!-- 会议时间 -->
 			<view class="meeting-time">
 				<view class="meeting-scroll">
-					<scroll-view scroll-y="true" class="meeting-scroll-view" @scrolltolower="lower" @scroll="scroll">
+					<scroll-view scroll-y="true" :class="[largeScreenHeight >= 868?'meeting-scroll-view':'ext-scroll-view']" @scrolltolower="lower" @scroll="scroll">
 						<template v-for="(item,index) in timeRange" :key="index">
 							<view class="scroll-view-item">
 								<view class="scroll-item-left">
@@ -165,6 +165,7 @@
 				timezore: 'Asia/Shanghai',
 				meetTimeZore: '',
 				meetTimeString: 'am-pm',
+				largeScreenHeight: 0,
 			}
 		},
 		onLoad() {
@@ -173,7 +174,10 @@
 				this.roomId = Number(roomId)
 				this._roomId = Number(roomId)
 			}
-			this.startSync()
+			const windowInfo = uni.getWindowInfo();          
+			this.startSync();
+			this.largeScreenHeight = windowInfo.windowHeight;
+			console.log('getWindowInfo windowHeight:',this.largeScreenHeight)
 		},
 		methods: {
 			// 获取会议时间
@@ -187,7 +191,7 @@
 					start_time = this.nextMeetData.start_time;
 					end_time = this.nextMeetData.end_time;
 				} else {
-					retun '';
+					return '';
 				} 
 				let dateFormat = 'hh:mm A';
 				const startTime = this.formatDate(start_time, 'Asia/Shanghai', 'zh-cn', dateFormat);
@@ -598,8 +602,12 @@
 	.meeting-scroll-view {
 		width: 250rpx;
 		height: 377rpx;
-		/* height: 397rpx; */
-		/* max-height: 397rpx; */
+		padding-top: 10rpx;
+	}
+	
+	.ext-scroll-view {
+		width: 250rpx;
+		height: 397rpx;
 		padding-top: 10rpx;
 	}
 
