@@ -342,7 +342,11 @@
 								break;
 							}
 						}
-						if (isfoundEntry) {
+						if (foundEntry) {
+							console.log('timestampline foundEntry',this.formatTime(timestampline));
+							console.log('timestampline this.currenMeetStart',this.formatTime(this.currenMeetStart));
+							console.log('timestampline currenMeetStart',timestampline,this.currenMeetStart)
+							console.log('timestampline foundEntry',foundEntry);
 							let meetStartRange = this.formatTime(foundEntry['start_time']);
 							let meetEndRange = this.formatTime(foundEntry['end_time']);
 							let meetRange = meetStartRange + '-' + meetEndRange;
@@ -550,8 +554,10 @@
 
 	.meeting-scroll-view {
 		width: 250rpx;
-		height: 397rpx;
+		/* height: 397rpx; */
+		max-height: 397rpx;
 		padding-top: 10rpx;
+		/* padding-bottom: 10rpx; */
 		/* height: calc(100vw-65rpx); */
 	}
 
@@ -601,7 +607,7 @@
 
 	.in-meeting-icon {
 		position: absolute;
-		top: 10rpx;
+		top: 5rpx;
 		right: 10rpx;
 		width: 14rpx;
 		height: 14rpx;
