@@ -25,7 +25,8 @@
 											<text class="scroll-item-meeting">{{item.meetRange}}\n{{item.title}}</text>
 										</template>
 										<template v-else>
-											<text class="scroll-item-meeting-more">{{item.meetRange}}\n{{item.title}}</text>
+											<text
+												class="scroll-item-meeting-more">{{item.meetRange}}\n{{item.title}}</text>
 										</template>
 
 										<image v-if="item.isCurrentMeet" class="in-meeting-icon"
@@ -47,7 +48,8 @@
 			<view class="reserve-meeting">
 				<view class="reserve-title">{{$t('message.quickMeeting')}}</view>
 				<view :class="[roomData.now_entry != null?'reserve-button':'reserve-button-free']" @click="quickMeet">
-					{{$t('message.book')}}</view>
+					{{$t('message.book')}}
+				</view>
 			</view>
 		</view>
 		<!-- 会议基本信息 -->
@@ -91,6 +93,7 @@
 					<view class="meeting-title-type" v-if="roomData && roomData.now_entry">
 						<image class="meeting-msg-icon" src="@/static/meeting-msg.png" mode=""></image>
 						<text class="meeting-msg-title reverse-title">{{roomData.now_entry.name}}</text>
+						<!-- <text class="meeting-msg-title reverse-title">临时会议临时会议临时会议临临时会议临时会议时会议临时会议临时会议</text> -->
 					</view>
 					<view class="meeting-title-type">
 						<image class="meeting-msg-icon" src="@/static/reverse-time.png" mode=""></image>
@@ -115,7 +118,7 @@
 					<view class="meeting-title-type">
 						<image class="meeting-msg-icon" src="@/static/reverse-time.png" mode=""></image>
 						<text v-if="roomData && roomData.now_entry"
-							class="meeting-msg-title reverse-time">{{nextMeetData.timestamp}}</text>
+							class="meeting-msg-title reverse-time">{{this.meetTimeString}}</text>
 						<text v-else class="meeting-msg-title reverse-time"></text>
 					</view>
 					<view class="meeting-title-type">
@@ -515,7 +518,7 @@
 					},
 					success: (res) => {
 						let data = res.data.data;
-						// console.log('syncRoom返回数据成功data:', data);
+						console.log('syncRoom返回数据成功data:', data);
 						this.roomData = data;
 						this.initTimeline(data);
 						this.foundNextMeet();
@@ -670,7 +673,7 @@
 		width: 160rpx;
 		top: 2rpx;
 		left: 8rpx;
-		color: rgb(255,255,255);
+		color: rgb(255, 255, 255);
 		font-size: 9rpx;
 		-webkit-line-clamp: 3;
 		display: -webkit-box;
@@ -881,12 +884,20 @@
 	}
 
 	.reverse-title {
-		line-height: 23rpx;
+		line-height: 28rpx;
 		color: rgb(255, 255, 255);
 		font-size: 28rpx;
-		text-align: left;
-		font-style: italic;
 		font-family: 'Noto Sans CJK SC', 'Source Han Sans CN', 'Droid Sans', sans-serif;
+		margin-top: -30rpx;
+		padding-left: 20rpx;
+		width: 400rpx;
+		-webkit-line-clamp: 1;
+		display: -webkit-box;
+		overflow: hidden;
+		text-align: left;
+		text-overflow: ellipsis;
+		word-wrap: break-word;
+		-webkit-box-orient: vertical;
 	}
 
 	.reverse-time {
