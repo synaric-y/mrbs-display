@@ -438,10 +438,10 @@
 					this.isEnglish = false
 				}
 				console.log('lang selected lang', lang)
-				// this.$i18n.locale = lang
+				this.$i18n.locale = lang
 				// this.dateDisplay()
 				// this.initTimeLine(this.tempData)
-				// this.syncRoom()
+				this.syncRoom()
 			},
 
 			syncRoom() {
