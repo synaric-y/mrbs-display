@@ -109,7 +109,7 @@
 						<image class="meeting-msg-icon" src="@/static/reverse-time.png" mode=""></image>
 						<text v-if="roomData && roomData.now_entry"
 							class="meeting-msg-title reverse-time">{{nextMeetData.timestamp}}</text>
-						<text v-else class="meeting-msg-title reverse-time">无</text>
+						<text v-else class="meeting-msg-title reverse-time"></text>
 					</view>
 					<view class="meeting-title-type">
 						<image class="meeting-msg-icon" src="@/static/reverse-person.png" mode=""></image>
@@ -261,12 +261,12 @@
 						"repeat_id": null,
 						"room_id": this.roomId,
 						"timestamp": "",
-						"create_by": "无",
+						"create_by": "",
 						"modified_by": "",
-						"name": "无",
+						"name": "",
 						"type": "I",
-						"description": "无",
-						"book_by": "无",
+						"description": "",
+						"book_by": "",
 					};
 				}
 
@@ -437,7 +437,6 @@
 					method: "POST",
 					header: {
 						'Content-type': 'application/json',
-						// 'Content-type': 'application/x-www-form-urlencoded',
 						'Accept-Language': 'zh-CN,zh;q=0.9'
 						//根据要求来配置
 					},
