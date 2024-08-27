@@ -10,7 +10,7 @@
 			<view class="meeting-time">
 				<view class="meeting-scroll">
 					<scroll-view scroll-y="true"
-						:class="[largeScreenHeight >= 868?'meeting-scroll-view':'ext-scroll-view']"
+						:class="[largeScreenHeight <= 870?'meeting-scroll-view':'ext-scroll-view']"
 						@scrolltolower="lower" @scroll="scroll">
 						<template v-for="(item,index) in timeRange" :key="index">
 							<view class="scroll-view-item">
@@ -175,6 +175,7 @@
 				roomFree: false,
 				nowlanguageTime: '',
 				timezore: 'Asia/Shanghai',
+				languageSet: 'zh-CN,zh;q=0.9',
 				meetTimeZore: '',
 				meetTimeString: 'am-pm',
 				largeScreenHeight: 0,
@@ -491,12 +492,15 @@
 				if (lang == 'en') {
 					this.isEnglish = true
 					this.timezore = 'America/New_York'
+					this.languageSet = 'en-US,en;q=0.9'
 				} else if (lang == 'ko') {
 					this.isEnglish = false
 					this.timezore = 'Asia/Seoul'
+					this.languageSet = 'ko-KR,ko;q=0.9'
 				} else {
 					this.isEnglish = false
 					this.timezore = 'Asia/Shanghai'
+					this.languageSet = 'zh-CN,zh;q=0.9'
 				}
 				console.log('lang selected lang', lang)
 				this.$i18n.locale = lang
@@ -510,7 +514,7 @@
 					method: "POST",
 					header: {
 						'Content-type': 'application/json',
-						'Accept-Language': 'zh-CN,zh;q=0.9'
+						'Accept-Language': this.languageSet
 					},
 					data: {
 						room_id: this.roomId,
@@ -545,7 +549,7 @@
 					method: "POST",
 					header: {
 						'Content-type': 'application/json',
-						'Accept-Language': 'zh-CN,zh;q=0.9'
+						'Accept-Language': this.languageSet
 					},
 					data: {
 						room_id: this.roomId,
