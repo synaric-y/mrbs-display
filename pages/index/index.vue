@@ -654,7 +654,13 @@
 		width: 160rpx;
 		top: 2rpx;
 		left: 8rpx;
-		line-height: 12rpx;
+		-webkit-line-clamp: 2;
+		display: -webkit-box;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		word-wrap: break-word;
+		-webkit-box-orient: vertical;
+		/* line-height: 12rpx; */
 		/* font-family: PingFangSC-light; */
 		font-family: 'Noto Sans CJK SC Light', 'Source Han Sans CN Light', 'Droid Sans Fallback', sans-serif;
 	}

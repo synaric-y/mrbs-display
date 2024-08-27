@@ -20,7 +20,7 @@ const messages = {
 			"room": '会议室',
 			"book": '预定',
 			"quickMeeting": '预定30分钟快速会议',
-			"language":'中文',
+			"language":'语言',
 			"roomNumberError":'请选择正确的房间号',
 			"noRoom": '没有可用的房间',
 			"noFreeRoom": '当前时间已有会议',
