@@ -483,8 +483,8 @@
 					url: `${HOST}/web/appapi/api.php?act=book_fast_meeting`,
 					method: "POST",
 					header: {
-						'Content-type': 'application/x-www-form-urlencoded',
-						// 'Content-type': 'application/json',
+						// 'Content-type': 'application/x-www-form-urlencoded',
+						'Content-type': 'application/json',
 						'Accept-Language': 'zh-CN,zh;q=0.9'
 						//根据要求来配置
 					},
@@ -790,6 +790,7 @@
 		color: rgb(255,255,255);
 		font-size: 14px;
 		text-align: left;
+		font-style: italic;
 		font-family: Helvetica Neue-thin;
 	}
 
@@ -803,6 +804,7 @@
 		color: rgb(255, 255, 255);
 		font-size: 28rpx;
 		text-align: left;
+		font-style: italic;
 		/* font-family: PingFangSC-regular; */
 		font-family: 'Noto Sans CJK SC', 'Source Han Sans CN', 'Droid Sans', sans-serif;
 
@@ -815,6 +817,7 @@
 		color: white;
 		font-size: 18rpx;
 		text-align: left;
+		font-style: italic;
 		/* box-shadow: 0rpx 2rpx 6rpx 0rpx rgba(0,0,0,0.4); */
 		/* font-family: PingFangSC-extraLight; */
 		font-family: 'Noto Sans CJK SC ExtraLight', 'Source Han Sans CN ExtraLight', 'Droid Sans Fallback', sans-serif;
@@ -827,6 +830,7 @@
 		color: rgb(255, 255, 255);
 		font-size: 18rpx;
 		text-align: left;
+		font-style: italic;
 		/* box-shadow: 0rpx 2rpx 6rpx 0rpx rgba(0,0,0,0.4); */
 		/* font-family: PingFangSC-extraLight; */
 		font-family: 'Noto Sans CJK SC ExtraLight', 'Source Han Sans CN ExtraLight', 'Droid Sans Fallback', sans-serif;
