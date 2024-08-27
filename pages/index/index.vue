@@ -660,7 +660,6 @@
 		text-overflow: ellipsis;
 		word-wrap: break-word;
 		-webkit-box-orient: vertical;
-		/* line-height: 12rpx; */
 		/* font-family: PingFangSC-light; */
 		font-family: 'Noto Sans CJK SC Light', 'Source Han Sans CN Light', 'Droid Sans Fallback', sans-serif;
 	}
