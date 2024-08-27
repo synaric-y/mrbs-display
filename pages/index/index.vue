@@ -48,8 +48,12 @@
 			<view class="right-meeting-top">
 				<view>
 					<view class="room-group" v-if="roomData&&roomData.room">
-						<text class="room-title">{{roomData.room.room_name}}</text>
-						<text class="room-number" @longpress="onSetting">{{roomData.room.sort_key}}</text>
+						<text class="room-title">Room</text>
+						<text class="room-number" @longpress="onSetting">{{roomData.room.room_name}}</text>
+					</view>
+					<view class="room-group" v-else>
+						<text class="room-title">Room</text>
+						<text class="room-number" @longpress="onSetting">A</text>
 					</view>
 					<view class="change-language">
 						<!-- language -->
@@ -76,23 +80,52 @@
 				</template>
 				<template v-else>
 					<view class="meeting-status">
-						No meeting
+						Free
 					</view>
 				</template>
 
-				<view class="meeting-title-type" v-if="roomData && roomData.now_entry">
-					<image class="meeting-msg-icon" src="@/static/meeting-msg.png" mode=""></image>
-					<text class="meeting-msg-title reverse-title">{{roomData.now_entry.name}}</text>
-				</view>
-				<view class="meeting-title-type">
-					<image class="meeting-msg-icon" src="@/static/reverse-time.png" mode=""></image>
-					<text class="meeting-msg-title reverse-time">{{roomData.now_entry.timestamp}}</text>
-					<!-- <text class="meeting-msg-title reverse-time">{{ nowMeetTime() }}</text> -->
-				</view>
-				<view class="meeting-title-type" v-if="roomData && roomData.now_entry">
-					<image class="meeting-msg-icon" src="@/static/reverse-person.png" mode=""></image>
-					<text class="meeting-msg-title reverse-person">{{roomData.now_entry.book_by}}</text>
-				</view>
+				<template v-if="roomData && roomData.now_entry">
+					<view class="meeting-title-type" v-if="roomData && roomData.now_entry">
+						<image class="meeting-msg-icon" src="@/static/meeting-msg.png" mode=""></image>
+						<text class="meeting-msg-title reverse-title">{{roomData.now_entry.name}}</text>
+					</view>
+					<view class="meeting-title-type">
+						<image class="meeting-msg-icon" src="@/static/reverse-time.png" mode=""></image>
+						<text v-if="roomData && roomData.now_entry"
+							class="meeting-msg-title reverse-time">{{roomData.now_entry.timestamp}}</text>
+						<!-- <text v-else class="meeting-msg-title reverse-time">{{roomData.room.}}</text> -->
+						<text v-else class="meeting-msg-title reverse-time">空闲中</text>
+						<!-- <text class="meeting-msg-title reverse-time">{{ nowMeetTime() }}</text> -->
+					</view>
+					<view class="meeting-title-type" v-if="roomData && roomData.now_entry">
+						<image class="meeting-msg-icon" src="@/static/reverse-person.png" mode=""></image>
+						<text class="meeting-msg-title reverse-person">{{roomData.now_entry.book_by}}</text>
+					</view>
+				</template>
+
+				<template v-else>
+					<view class="nextMeet">
+						下一次会议
+					</view>
+					<view class="meeting-title-type">
+						<image class="meeting-msg-icon" src="@/static/meeting-msg.png" mode=""></image>
+						<text class="meeting-msg-title reverse-title">{{nextMeetData.name}}</text>
+					</view>
+					<view class="meeting-title-type">
+						<image class="meeting-msg-icon" src="@/static/reverse-time.png" mode=""></image>
+						<text v-if="roomData && roomData.now_entry"
+							class="meeting-msg-title reverse-time">{{nextMeetData.timestamp}}</text>
+						<!-- <text v-else class="meeting-msg-title reverse-time">{{roomData.room.}}</text> -->
+						<text v-else class="meeting-msg-title reverse-time">空闲中</text>
+						<!-- <text class="meeting-msg-title reverse-time">{{ nowMeetTime() }}</text> -->
+					</view>
+					<view class="meeting-title-type">
+						<image class="meeting-msg-icon" src="@/static/reverse-person.png" mode=""></image>
+						<text class="meeting-msg-title reverse-person">{{nextMeetData.book_by}}</text>
+					</view>
+				</template>
+
+
 			</view>
 			<view class="right-meeting-logo">
 				<image class="company-logo" src="@/static/bcc-logo-en.png" mode="aspectFit"></image>
@@ -142,6 +175,7 @@
 					key: 'ko'
 				}],
 				roomData: null,
+				nextMeetData: null,
 			}
 		},
 		onLoad() {
@@ -221,6 +255,38 @@
 			//   return Math.floor(timestamp / 1000); // 将毫秒转为秒
 			// },
 
+			foundNextMeet() {
+				this.nextMeetData = null;
+				let foundNextMeet = false;
+				let entryList = this.roomData.entries;
+				let nowTime = this.roomData.now_timestamp || (new Date().getTime() / 1000);
+				for (let entry of entryList) {
+					if (nowTime < entry['start_time']) {
+						foundNextMeet = entry;
+						break;
+					}
+				}
+				if (foundNextMeet) {
+					this.nextMeetData = foundNextMeet;
+				} else {
+					this.nextMeetData = {
+						"start_time": 0,
+						"end_time": 0,
+						"entry_type": 0,
+						"repeat_id": null,
+						"room_id": this.roomId,
+						"timestamp": "",
+						"create_by": "无",
+						"modified_by": "",
+						"name": "无",
+						"type": "I",
+						"description": "无",
+						"book_by": "无",
+					};
+				}
+
+			},
+
 			initTimeline(data) {
 				// 当前会议开始、结束时间
 				const now = new Date();
@@ -237,14 +303,17 @@
 					this.currenMeetEnd = 0;
 				}
 				let allMeetList = [];
-				if (data.area && data.area.morningstarts) {
+				if (data && data.area) {
 					this.meetStartTime = data.area.morningstarts
 					this.meetStartMinute = data.area.morningstarts_minutes
 					this.meetEndTime = data.area.eveningends
 					this.meetEndMinute = data.area.eveningends_minutes
+				} else {
+					this.meetStartTime = 8;
+					this.meetEndTime = 21;
 				}
 				let tempStartTime = Number(this.meetStartTime);
-				let tempEndTime = Number(data.area.eveningends);
+				let tempEndTime = Number(this.meetEndTime);
 				let allTimeList = [];
 				let isFirst = true;
 				// console.log('initTimeline enter tempStartTime tempEndTime:',tempStartTime,tempEndTime); 
@@ -384,13 +453,15 @@
 						//根据要求来配置
 					},
 					data: {
-						room_id: this.roomId
+						room_id: this.roomId,
+						// room_id: 2
 					},
 					success: (res) => {
 						let data = res.data.data;
 						console.log('syncRoom返回数据成功data:', data);
 						this.roomData = data;
 						this.initTimeline(data);
+						this.foundNextMeet();
 					},
 					fail: (e) => {
 						console.error(e)
@@ -418,7 +489,8 @@
 						//根据要求来配置
 					},
 					data: {
-						room_id: this.roomId
+						room_id: this.roomId,
+						// room_id: 2
 					},
 					success: (res) => {
 						let data = res.data;
@@ -495,9 +567,6 @@
 	.scroll-item-left {
 		width: 50rpx;
 		height: 30rpx;
-		/* background-color: red; */
-		/* text-align: center;
-		line-height: 30rpx; */
 	}
 
 	.scroll-item-time {
@@ -713,6 +782,15 @@
 		font-family: 'Noto Sans CJK SC', 'Source Han Sans CN', 'Droid Sans', sans-serif;
 
 		/* box-shadow: 0rpx 2rpx 6rpx 0rpx rgba(0,0,0,0.4); */
+	}
+	
+	.nextMeet {
+		margin-left: 37rpx;
+		line-height: 20px;
+		color: rgb(255,255,255);
+		font-size: 14px;
+		text-align: left;
+		font-family: Helvetica Neue-thin;
 	}
 
 	.meeting-title-type {
