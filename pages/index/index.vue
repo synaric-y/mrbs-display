@@ -75,12 +75,12 @@
 			<view class="right-meeting-detail">
 				<template v-if="roomData && roomData.now_entry">
 					<view class="meeting-status">
-						In meeting
+						{{$t('message.in_meeting')}}
 					</view>
 				</template>
 				<template v-else>
 					<view class="meeting-status">
-						Free
+						{{$t('message.no_meeting')}}
 					</view>
 				</template>
 
@@ -105,7 +105,7 @@
 
 				<template v-else>
 					<view class="nextMeet">
-						下一次会议
+						{{$t('message.nextMeet')}}
 					</view>
 					<view class="meeting-title-type">
 						<image class="meeting-msg-icon" src="@/static/meeting-msg.png" mode=""></image>
@@ -334,7 +334,7 @@
 						let isfoundEntry = false
 						let foundEntry = null;
 						let isCurrentMeet = false;
-						const timestampline = this.getTimestamp(year, month, day, tempStartTime, 30);
+						const timestampline = this.getTimestamp(year, month, day, tempStartTime - 1, 30);
 						for (let meet of data.entries) {
 							if (timestampline === meet['start_time']) {
 								isfoundEntry = true;
@@ -589,7 +589,9 @@
 	}
 
 	.extention-height {
+		margin-top: 10rpx;
 		height: 60rpx;
+		background-color: red;
 		width: 172rpx;
 		text-align: start;
 		margin-left: 13rpx;

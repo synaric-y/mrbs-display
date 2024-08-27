@@ -15,7 +15,8 @@ const messages = {
 			"small_in_meeting": '会议中',
 			"alert_error_code": '请输入正确的内置码',
 			"canBook": '可预定',
-			"createRoomFail": '创建快速会议失败'
+			"createRoomFail": '创建快速会议失败',
+			"nextMeet": '下一次会议',
 		}
 	},
 	"en":{
@@ -32,7 +33,8 @@ const messages = {
 			"over_meeting":'Over',
 			"small_in_meeting": 'Meeting',
 			"alert_error_code": 'Please enter the correct built-in code',
-			"canBook": 'Available'
+			"canBook": 'Available',
+			"nextMeet": 'Next meet',
 		}	
 	},
 	"ko": {
@@ -49,7 +51,8 @@ const messages = {
 			"over_meeting":'종료됨',
 			"small_in_meeting": '회의 중',
 			"alert_error_code": '올바른 내장 코드를 입력하세요.',
-			"canBook": '예약 가능'
+			"canBook": '예약 가능',
+			"nextMeet": '다음 회의',
 		}
 	}
 }
