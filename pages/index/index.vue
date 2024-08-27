@@ -62,7 +62,7 @@
 				<!-- 分割线 -->
 				<view class="room-devide-line"></view>
 				<!-- 当前时间 -->
-				<view class="curren-time" v-if="roomData&&roomData.display_day">
+				<view class="curren-time" v-if="roomData && roomData.display_day">
 					{{roomData.display_day}}
 					<!-- 09:06AM August 23, 2024 -->
 				</view>
@@ -76,19 +76,20 @@
 				</template>
 				<template v-else>
 					<view class="meeting-status">
-						In meeting
+						No meeting
 					</view>
 				</template>
 
-				<view class="meeting-title-type" v-if="roomData&&roomData.now_entry">
+				<view class="meeting-title-type" v-if="roomData && roomData.now_entry">
 					<image class="meeting-msg-icon" src="@/static/meeting-msg.png" mode=""></image>
 					<text class="meeting-msg-title reverse-title">{{roomData.now_entry.name}}</text>
 				</view>
 				<view class="meeting-title-type">
 					<image class="meeting-msg-icon" src="@/static/reverse-time.png" mode=""></image>
-					<text class="meeting-msg-title reverse-time">{{this.nowMeetTime}}</text>
+					<text class="meeting-msg-title reverse-time">{{roomData.now_entry.timestamp}}</text>
+					<!-- <text class="meeting-msg-title reverse-time">{{ nowMeetTime() }}</text> -->
 				</view>
-				<view class="meeting-title-type" v-if="roomData&&roomData.now_entry">
+				<view class="meeting-title-type" v-if="roomData && roomData.now_entry">
 					<image class="meeting-msg-icon" src="@/static/reverse-person.png" mode=""></image>
 					<text class="meeting-msg-title reverse-person">{{roomData.now_entry.book_by}}</text>
 				</view>
@@ -304,7 +305,6 @@
 							})
 						}
 						isFirst = true;
-
 					} else {
 						let isAllFoundEntry = false
 						let allFounfEntry = null;
@@ -384,7 +384,7 @@
 						//根据要求来配置
 					},
 					data: {
-						room_id: 2
+						room_id: this.roomId
 					},
 					success: (res) => {
 						let data = res.data.data;
