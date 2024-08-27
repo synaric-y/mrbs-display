@@ -25,6 +25,7 @@ const messages = {
 			"noRoom": '没有可用的房间',
 			"noFreeRoom": '当前时间已有会议',
 			"createMeetSuccess": '创建快速会议成功',
+			"netDataError": '接口返回数据异常',
 		}
 	},
 	"en":{
@@ -51,6 +52,7 @@ const messages = {
 			"noRoom": 'No rooms available',
 			"noFreeRoom": 'There is already a meeting at the current time',
 			"createMeetSuccess": 'Create a quick meeting successfully',
+			"netDataError": 'The interface returns abnormal data',
 		}	
 	},
 	"ko": {
@@ -77,6 +79,7 @@ const messages = {
 			"noRoom": '이용 가능한 객실이 없습니다.',
 			"noFreeRoom": '지금 시간에 회의가 있습니다',
 			"createMeetSuccess": '빠른 회의가 성공적으로 생성되었습니다.',
+			"netDataError": '인터페이스가 데이터 예외를 반환합니다.',
 		}
 	}
 }

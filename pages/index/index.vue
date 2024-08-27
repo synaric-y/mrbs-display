@@ -522,6 +522,13 @@
 					},
 					success: (res) => {
 						let data = res.data.data;
+						if(data == null) {
+							uni.showToast({
+								title: this.$t('message.netDataError'),
+								icon: 'none'
+							})
+							return;
+						}
 						console.log('syncRoom返回数据成功data:', data);
 						this.roomData = data;
 						this.initTimeline(data);
