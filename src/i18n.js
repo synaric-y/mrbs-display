@@ -14,7 +14,8 @@ const messages = {
 			"over_meeting":'已结束',
 			"small_in_meeting": '会议中',
 			"alert_error_code": '请输入正确的内置码',
-			"canBook": '可预定'
+			"canBook": '可预定',
+			"createRoomFail": '创建快速会议失败'
 		}
 	},
 	"en":{

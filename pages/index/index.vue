@@ -17,16 +17,17 @@
 								</view>
 								<!-- 当前有会议 -->
 								<template v-if="item.meetHeight > 0">
-									<view class="scroll-item-right extention-height" :style="{height:item.height + 'rpx'}">
+									<view class="scroll-item-right extention-height"
+										:style="{height:item.height + 'rpx'}">
 										<text class="scroll-item-meeting">{{item.meetRange}}\n{{item.title}}</text>
-										<image class="in-meeting-icon" src="@/static/in-meeting.png"
-											mode="aspectFit"></image>
+										<image class="in-meeting-icon" src="@/static/in-meeting.png" mode="aspectFit">
+										</image>
 									</view>
 								</template>
 								<!-- 当前无会议 -->
 								<template v-else>
 									<view class="scroll-item-right">
-										<!-- <text class="scroll-item-meeting">Sales meeting</text> --> 
+										<!-- <text class="scroll-item-meeting">Sales meeting</text> -->
 									</view>
 								</template>
 							</view>
@@ -45,44 +46,54 @@
 			<!-- 房间 时间 切换语言 -->
 			<view class="right-meeting-top">
 				<view>
-					<view class="room-group">
-						<text class="room-title">Room</text>
-						<text class="room-number" @longpress="onSetting">A</text>
+					<view class="room-group" v-if="roomData&&roomData.room">
+						<text class="room-title">{{roomData.room.room_name}}</text>
+						<text class="room-number" @longpress="onSetting">{{roomData.room.sort_key}}</text>
 					</view>
 					<view class="change-language">
 						<!-- language -->
-						<uni-data-select style="width: 49rpx;color:#4f4f4f" class="select-language" placeholder="language"  :localdata="datasource"
-							@change="changeLang" :clear="false"></uni-data-select>
+						<uni-data-select style="width: 49rpx;color:#4f4f4f" class="select-language"
+							placeholder="language" :localdata="datasource" @change="changeLang"
+							:clear="false"></uni-data-select>
 					</view>
-					
+
 				</view>
 				<!-- 分割线 -->
 				<view class="room-devide-line"></view>
 				<!-- 当前时间 -->
-				<view class="curren-time">
-					09:06AM August 23, 2024
+				<view class="curren-time" v-if="roomData&&roomData.display_day">
+					{{roomData.display_day}}
+					<!-- 09:06AM August 23, 2024 -->
 				</view>
 			</view>
 			<!-- 会议详情 -->
 			<view class="right-meeting-detail">
-				<view class="meeting-status">
-					In meeting
+				<template v-if="roomData && roomData.now_entry">
+					<view class="meeting-status">
+						In meeting
+					</view>
+				</template>
+				<template v-else>
+					<view class="meeting-status">
+						In meeting
+					</view>
+				</template>
+
+				<view class="meeting-title-type" v-if="roomData&&roomData.now_entry">
+					<image class="meeting-msg-icon" src="@/static/meeting-msg.png" mode=""></image>
+					<text class="meeting-msg-title reverse-title">{{roomData.now_entry.name}}</text>
 				</view>
 				<view class="meeting-title-type">
-					<image class="meeting-msg-icon" src="../../static/meeting-msg.png" mode=""></image>
-					<text class="meeting-msg-title reverse-title">Sales meeting</text>
+					<image class="meeting-msg-icon" src="@/static/reverse-time.png" mode=""></image>
+					<text class="meeting-msg-title reverse-time">{{nowMeetTime}}</text>
 				</view>
-				<view class="meeting-title-type">
-					<image class="meeting-msg-icon" src="../../static/reverse-time.png" mode=""></image>
-					<text class="meeting-msg-title reverse-time">09:00am -11:00am</text>
-				</view>
-				<view class="meeting-title-type">
-					<image class="meeting-msg-icon" src="../../static/reverse-person.png" mode=""></image>
-					<text class="meeting-msg-title reverse-person">April Ren</text>
+				<view class="meeting-title-type" v-if="roomData&&roomData.now_entry">
+					<image class="meeting-msg-icon" src="@/static/reverse-person.png" mode=""></image>
+					<text class="meeting-msg-title reverse-person">{{roomData.now_entry.book_by}}</text>
 				</view>
 			</view>
 			<view class="right-meeting-logo">
-				<image class="company-logo" src="../../static/bcc-logo-en.png" mode="aspectFit"></image>
+				<image class="company-logo" src="@/static/bcc-logo-en.png" mode="aspectFit"></image>
 			</view>
 		</view>
 	</view>
@@ -92,6 +103,7 @@
 	import {
 		HOST
 	} from '@/modules/config.js'
+	import moment from 'moment-timezone';
 	export default {
 		name: 'App',
 		interval: null,
@@ -99,7 +111,7 @@
 			return {
 				value: 0,
 				meeting: false,
-				timeRange:[],
+				timeRange: [],
 				// timeRange: ['09:00am', 'ㆍ', '10:00am', 'ㆍ', '11:00am', 'ㆍ', '12:00pm', 'ㆍ', '01:00pm', 'ㆍ', '02:00pm', 'ㆍ',
 				// 	'03:00pm', 'ㆍ', '04:00pm', 'ㆍ', '05:00pm', 'ㆍ', '06:00pm', 'ㆍ', '07:00pm', 'ㆍ'
 				// ],
@@ -127,6 +139,7 @@
 					text: '한국인',
 					key: 'ko'
 				}],
+				roomData: null,
 			}
 		},
 		onLoad() {
@@ -138,6 +151,18 @@
 			this.startSync()
 		},
 		methods: {
+
+			// 获取会议时间
+			nowMeetTime() {
+				const start_time = this.roomData.now_entry.start_time;
+				const end_time = this.roomData.now_entry.end_time;
+				let dateFormat = 'hh:mm A';
+				const startTime = this.formatDate(start_time, 'Asia/Shanghai', 'zh-cn', dateFormat);
+				const endTime = this.formatDate(start_time, 'Asia/Shanghai', 'zh-cn', end_time);
+				const stampStr = startTime + '-' + endTime;
+				console.log('nowMeetTime stampStr', stampStr);
+				return stampStr;
+			},
 			startSync() {
 				if (this.interval) {
 					clearInterval(this.interval)
@@ -165,6 +190,13 @@
 				this.showSetting = false
 				uni.setStorageSync("ROOM_ID", this.roomId)
 				this.syncRoom()
+			},
+
+			formatDate(timestamp, timeZone, locale, dateFormat) {
+				return moment.unix(timestamp)
+					.tz(timeZone)
+					.locale(locale)
+					.format(dateFormat);
 			},
 
 			formatTime(timestamp) {
@@ -229,66 +261,36 @@
 					let tempMinute = 0;
 					timeTitle = timeTitle + ap;
 					if (!isFirst) {
+						let isfoundEntry = false
+						let foundEntry = null;
+						let isCurrentMeet = false;
 						const timestampline = this.getTimestamp(year, month, day, tempStartTime, 30);
-						// 判断当前是否时间是否有会议
-						if (data.entries && data.entries.length > 0) {
-							for (let meet of data.entries) {
-								let currentMeet = false;
-								let height = 0;
-								let meetStartRange = this.formatTime(meet['start_time']);
-								let meetEndRange = this.formatTime(meet['end_time']);
-								let meetRange = meetStartRange + '-' + meetEndRange;
-								// console.log('initTimeline currenMeetStart: start_time:', this.currenMeetStart,meet['start_time']);
-								console.log('initTimeline-1 当天会议 timestampline:', timestampline);
-								// 当前时间的会议信息
-								if (this.currenMeetStart === meet['start_time'] && timestampline === meet['start_time']) {
-									currentMeet = true;
-									// 计算会议时长是30分钟的几倍
-									const diftimestamp = meet['end_time'] - meet['start_time'];
-									height = diftimestamp / 1800 * 50;
-									allTimeList.push({
-										leftTitle: 'ㆍ',
-										startTime: meet['start_time'],
-										endTime: meet['end_time'],
-										isCurrentMeet: true,
-										title: meet['name'],
-										meetRange: meetRange,
-										meetHeight: height,
-									})
-									isFirst = true;
-									break;
-									// 时间线绘制	
-								} else if (timestampline === meet['start_time']) {
-									currentMeet = false;
-									const diftimestamp = meet['end_time'] - meet['start_time'];
-									height = diftimestamp / 1800 * 50;
-									allTimeList.push({
-										leftTitle: 'ㆍ',
-										startTime: meet['start_time'],
-										endTime: meet['end_time'],
-										isCurrentMeet: false,
-										title: meet['name'],
-										meetRange: meetRange,
-										meetHeight: height,
-									})
-									isFirst = true;
-									break;
-									// 时间线上无会议
-								} else {
-									allTimeList.push({
-										leftTitle: 'ㆍ',
-										startTime: 0,
-										endTime: 0,
-										isCurrentMeet: false,
-										title: '',
-										meetRange: '',
-										meetHeight: 0
-									})
-									isFirst = true;
-									break;
-								}
+						for (let meet of data.entries) {
+							if (timestampline === meet['start_time']) {
+								isfoundEntry = true;
+								foundEntry = meet;
+								break;
 							}
-							// 时间线上无会议信息
+						}
+						if (isfoundEntry) {
+							let meetStartRange = this.formatTime(foundEntry['start_time']);
+							let meetEndRange = this.formatTime(foundEntry['end_time']);
+							let meetRange = meetStartRange + '-' + meetEndRange;
+							// 当前时间的会议
+							if (foundEntry['start_time'] === this.currenMeetStart) {
+								isCurrentMeet = true;
+							} else {
+								isCurrentMeet = false;
+							}
+							allTimeList.push({
+								leftTitle: 'ㆍ',
+								startTime: foundEntry['start_time'],
+								endTime: foundEntry['end_time'],
+								isCurrentMeet: isCurrentMeet,
+								title: foundEntry['name'],
+								meetRange: meetRange,
+								meetHeight: (foundEntry['end_time'] - foundEntry['start_time']) / 1800 * 50
+							})
 						} else {
 							allTimeList.push({
 								leftTitle: 'ㆍ',
@@ -301,88 +303,215 @@
 							})
 						}
 						isFirst = true;
+
+					} else {
+						let isAllFoundEntry = false
+						let allFounfEntry = null;
+						let currentMeet = false;
+						const timestampline2 = this.getTimestamp(year, month, day, tempStartTime, 0);
+						for (let meet of data.entries) {
+							if (timestampline2 === meet['start_time']) {
+								isAllFoundEntry = true;
+								allFounfEntry = meet;
+								break;
+							}
+						}
+
+						if (isAllFoundEntry) {
+							// 当前时间的会议
+							if (allFounfEntry['start_time'] === this.currenMeetStart) {
+								currentMeet = true;
+							} else {
+								currentMeet = false;
+							}
+							allTimeList.push({
+								leftTitle: timeTitle,
+								startTime: allFounfEntry['start_time'],
+								endTime: allFounfEntry['end_time'],
+								isCurrentMeet: currentMeet,
+								title: allFounfEntry['name'],
+								meetRange: 'am-pm',
+								meetHeight: (allFounfEntry['end_time'] - allFounfEntry['start_time']) / 1800 * 50
+							})
+						} else {
+							allTimeList.push({
+								leftTitle: timeTitle,
+								startTime: 0,
+								endTime: 0,
+								isCurrentMeet: false,
+								title: '',
+								meetRange: '',
+								meetHeight: 0
+							})
+						}
+						isFirst = false;
+						tempStartTime += 1
 					}
 
-					// 当天有会议信息
-					if (data.entries && data.entries.length > 0) {
-						for (let meet of data.entries) {
-							let height = 0;
-							let meetStartRange = '';
-							meetStartRange = this.formatTime(meet['start_time']);
-							let meetEndRange = '';
-							meetEndRange = this.formatTime(meet['end_time']);
-							let meetRange = meetStartRange + '-' + meetEndRange;
-							// console.log('initTimeline 当天会议 currenMeetStart start_time:', this.currenMeetStart, meet[
-							// 'start_time']);
-							// console.log('initTimeline-2 获取当前时间的timeTitle: 时间戳:', timeTitle, timestampline)
-							const timestampline2 = this.getTimestamp(year, month, day, tempStartTime, 0);
-							// console.log('timestampline2:',timestampline2);
-							// 当前时间上有会议
-							if (this.currenMeetStart === meet['start_time'] && timestampline2 === meet['start_time']) {
-								currentMeet = true;
-								// 计算会议时长是30分钟的几倍 
-								const diftimestamp = meet['end_time'] - meet['start_time'];
-								height = diftimestamp / 1800 * 50;
-								allTimeList.push({
-									leftTitle: timeTitle,
-									startTime: meet['start_time'],
-									endTime: meet['end_time'],
-									isCurrentMeet: true,
-									title: meet['name'],
-									meetRange: meetRange,
-									meetHeight: height
-								})
-								// break;
-							}
-							// 时间线上会议信息
-							else if (timestampline2 === meet['start_time']) {
-								const diftimestamp = meet['end_time'] - meet['start_time'];
-								height = diftimestamp / 1800 * 50;
-								allTimeList.push({
-									leftTitle: timeTitle,
-									startTime: meet['start_time'],
-									endTime: meet['end_time'],
-									isCurrentMeet: false,
-									title: meet['name'],
-									meetRange: meetRange,
-									meetHeight: height
-								})
-								// break;
-							} else {
-								allTimeList.push({
-									leftTitle: timeTitle,
-									startTime: 0,
-									endTime: 0,
-									isCurrentMeet: false,
-									title: '',
-									meetRange: '',
-									meetHeight: 0
-								})
-							}
-							isFirst = false;
-							break;
-						}
-					}
-					// 当天无会议信息
-					else {
-						console.log('initTimeline当前无会议信息');
-						allTimeList.push({
-							leftTitle: timeTitle,
-							startTime: 0,
-							endTime: 0,
-							isCurrentMeet: false,
-							title: '',
-							meetRange: '',
-							meetHeight: 0
-						})
-						isFirst = false;
-					}
-					tempStartTime += 1
+					
+
+
+
+
+
+
+					// if (!isFirst) {
+					// 	const timestampline = this.getTimestamp(year, month, day, tempStartTime, 30);
+					// 判断当前是否时间是否有会议
+					// if (data.entries && data.entries.length > 0) {
+					// 	for (let meet of data.entries) {
+					// 		let currentMeet = false;
+					// 		let height = 0;
+					// 		let meetStartRange = this.formatTime(meet['start_time']);
+					// 		let meetEndRange = this.formatTime(meet['end_time']);
+					// 		let meetRange = meetStartRange + '-' + meetEndRange;
+					// 		// console.log('initTimeline currenMeetStart: start_time:', this.currenMeetStart,meet['start_time']);
+					// 		console.log('initTimeline-1 当天会议 timestampline:', timestampline);
+					// 		// 当前时间的会议信息
+					// 		if (this.currenMeetStart === meet['start_time'] && timestampline === meet['start_time']) {
+					// 			currentMeet = true;
+					// 			// 计算会议时长是30分钟的几倍
+					// 			const diftimestamp = meet['end_time'] - meet['start_time'];
+					// 			height = diftimestamp / 1800 * 50;
+					// 			allTimeList.push({
+					// 				leftTitle: 'ㆍ',
+					// 				startTime: meet['start_time'],
+					// 				endTime: meet['end_time'],
+					// 				isCurrentMeet: true,
+					// 				title: meet['name'],
+					// 				meetRange: meetRange,
+					// 				meetHeight: height,
+					// 			})
+					// 			isFirst = true;
+					// 			break;
+					// 			// 时间线绘制	
+					// 		} else if (timestampline === meet['start_time']) {
+					// 			currentMeet = false;
+					// 			const diftimestamp = meet['end_time'] - meet['start_time'];
+					// 			height = diftimestamp / 1800 * 50;
+					// 			allTimeList.push({
+					// 				leftTitle: 'ㆍ',
+					// 				startTime: meet['start_time'],
+					// 				endTime: meet['end_time'],
+					// 				isCurrentMeet: false,
+					// 				title: meet['name'],
+					// 				meetRange: meetRange,
+					// 				meetHeight: height,
+					// 			})
+					// 			isFirst = true;
+					// 			break;
+					// 			// 时间线上无会议
+					// 		} else {
+					// 			allTimeList.push({
+					// 				leftTitle: 'ㆍ',
+					// 				startTime: 0,
+					// 				endTime: 0,
+					// 				isCurrentMeet: false,
+					// 				title: '',
+					// 				meetRange: '',
+					// 				meetHeight: 0
+					// 			})
+					// 			isFirst = true;
+					// 			break;
+					// 		}
+					// 	}
+					// 	// 时间线上无会议信息
+					// } else {
+					// 	allTimeList.push({
+					// 		leftTitle: 'ㆍ',
+					// 		startTime: 0,
+					// 		endTime: 0,
+					// 		isCurrentMeet: false,
+					// 		title: '',
+					// 		meetRange: '',
+					// 		meetHeight: 0
+					// 	})
+					// }
+					// isFirst = true;
 				}
 				this.timeRange = allTimeList;
 				console.log('initTimeline拼接的会议数据allTimeList：', this.timeRange)
+
+				// 当天有会议信息
+				// if (data.entries && data.entries.length > 0) {
+				// 	for (let meet of data.entries) {
+				// 		let height = 0;
+				// 		let meetStartRange = '';
+				// 		meetStartRange = this.formatTime(meet['start_time']);
+				// 		let meetEndRange = '';
+				// 		meetEndRange = this.formatTime(meet['end_time']);
+				// 		let meetRange = meetStartRange + '-' + meetEndRange;
+				// 		// console.log('initTimeline 当天会议 currenMeetStart start_time:', this.currenMeetStart, meet[
+				// 		// 'start_time']);
+				// 		// console.log('initTimeline-2 获取当前时间的timeTitle: 时间戳:', timeTitle, timestampline)
+				// 		const timestampline2 = this.getTimestamp(year, month, day, tempStartTime, 0);
+				// 		// console.log('timestampline2:',timestampline2);
+				// 		// 当前时间上有会议
+				// 		if (this.currenMeetStart === meet['start_time'] && timestampline2 === meet['start_time']) {
+				// 			currentMeet = true;
+				// 			// 计算会议时长是30分钟的几倍 
+				// 			const diftimestamp = meet['end_time'] - meet['start_time'];
+				// 			height = diftimestamp / 1800 * 50;
+				// 			allTimeList.push({
+				// 				leftTitle: timeTitle,
+				// 				startTime: meet['start_time'],
+				// 				endTime: meet['end_time'],
+				// 				isCurrentMeet: true,
+				// 				title: meet['name'],
+				// 				meetRange: meetRange,
+				// 				meetHeight: height
+				// 			})
+				// 			// break;
+				// 		}
+				// 		// 时间线上会议信息
+				// 		else if (timestampline2 === meet['start_time']) {
+				// 			const diftimestamp = meet['end_time'] - meet['start_time'];
+				// 			height = diftimestamp / 1800 * 50;
+				// 			allTimeList.push({
+				// 				leftTitle: timeTitle,
+				// 				startTime: meet['start_time'],
+				// 				endTime: meet['end_time'],
+				// 				isCurrentMeet: false,
+				// 				title: meet['name'],
+				// 				meetRange: meetRange,
+				// 				meetHeight: height
+				// 			})
+				// 			// break;
+				// 		} else {
+				// 			allTimeList.push({
+				// 				leftTitle: timeTitle,
+				// 				startTime: 0,
+				// 				endTime: 0,
+				// 				isCurrentMeet: false,
+				// 				title: '',
+				// 				meetRange: '',
+				// 				meetHeight: 0
+				// 			})
+				// 		}
+				// 		isFirst = false;
+				// 		break;
+				// 	}
+				// }
+				// 当天无会议信息
+				// else {
+				// 	console.log('initTimeline当前无会议信息');
+				// 	allTimeList.push({
+				// 		leftTitle: timeTitle,
+				// 		startTime: 0,
+				// 		endTime: 0,
+				// 		isCurrentMeet: false,
+				// 		title: '',
+				// 		meetRange: '',
+				// 		meetHeight: 0
+				// 	})
+				// 	isFirst = false;
+				// }
+				// 	tempStartTime += 1
+				// }
+				// this.timeRange = allTimeList;
+				// console.log('initTimeline拼接的会议数据allTimeList：', this.timeRange)
 			},
-			
+
 			changeLang(index) {
 				console.log('lang index', index)
 				console.log('lang selected item', this.datasource[index])
@@ -405,17 +534,18 @@
 					url: `${HOST}/web/appapi/api.php?act=sync_room`,
 					method: "POST",
 					header: {
-						// 'Content-type': 'application/json',
-						'Content-type': 'application/x-www-form-urlencoded',
+						'Content-type': 'application/json',
+						// 'Content-type': 'application/x-www-form-urlencoded',
 						'Accept-Language': 'zh-CN,zh;q=0.9'
 						//根据要求来配置
 					},
 					data: {
-						room_id: this.roomId
+						room_id: 2
 					},
 					success: (res) => {
 						let data = res.data.data;
 						console.log('syncRoom返回数据成功data:', data);
+						this.roomData = data;
 						this.initTimeline(data);
 					},
 					fail: (e) => {
@@ -423,23 +553,23 @@
 					}
 				})
 			},
-			
+
 			// 快速会议
 			quickMeet() {
-				if(isNaN(this.roomId)) {
+				if (isNaN(this.roomId)) {
 					uni.showToast({
 						title: '请选择正确的房间号!',
 						icon: 'none'
 					})
 					return
 				}
-				console.log('this.roomId:',this.roomId)
+				console.log('this.roomId:', this.roomId)
 				uni.request({
 					url: `${HOST}/web/appapi/api.php?act=book_fast_meeting`,
 					method: "POST",
-					header: { 
-						// 'Content-type': 'application/x-www-form-urlencoded',
-						'Content-type': 'application/json',
+					header: {
+						'Content-type': 'application/x-www-form-urlencoded',
+						// 'Content-type': 'application/json',
 						'Accept-Language': 'zh-CN,zh;q=0.9'
 						//根据要求来配置
 					},
@@ -449,9 +579,16 @@
 					success: (res) => {
 						let data = res.data;
 						console.log('quickMeet返回数据成功data:', data);
-						let msg = data.msg
+						let msg = '';
+						if (data.code == -1) {
+							msg = '没有可用的房间';
+						} else if (data.code == -2) {
+							msg = '当前时间已有会议';
+						} else if (data.code == 0) {
+							msg = '创建快速会议成功'
+						}
 						uni.showToast({
-							title: data.msg,
+							title: msg,
 							icon: 'none'
 						})
 					},
@@ -653,7 +790,7 @@
 		text-align: center;
 		/* position: relative; */
 	}
-	
+
 	.select-language {
 		position: absolute;
 		top: -1rpx;
@@ -663,33 +800,33 @@
 		width: 100%;
 		background-color: clean;
 	}
-	
+
 	.uni-select {
 		border: none !important;
 	}
-	
+
 	.uni-select__input-text {
 		color: white !important;
 		border: none !important;
 	}
-	
+
 	.uni-select__input-placeholder {
 		color: white !important;
 		font-size: 11rpx !important;
 	}
-	
+
 	.uni-select-item {
 		color: #4f4f4f;
 		border: none !important;
 	}
-	
+
 	.uni-select__selector-item {
 		line-height: 28rpx !important;
 	}
-	
+
 	.uni-select-menu {
-	  background-color: #fff;
-	  border: 1px solid #ccc;
+		background-color: #fff;
+		border: 1px solid #ccc;
 	}
 
 	.room-devide-line {
