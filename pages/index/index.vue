@@ -117,7 +117,7 @@
 					</view>
 					<view class="meeting-title-type">
 						<image class="meeting-msg-icon" src="@/static/reverse-time.png" mode=""></image>
-						<text v-if="roomData && roomData.now_entry"
+						<text v-if="nextMeetData"
 							class="meeting-msg-title reverse-time">{{this.meetTimeString}}</text>
 						<text v-else class="meeting-msg-title reverse-time"></text>
 					</view>
@@ -210,8 +210,8 @@
 				const startTime = this.formatDate(start_time, 'Asia/Shanghai', 'zh-cn', dateFormat);
 				const endTime = this.formatDate(end_time, 'Asia/Shanghai', 'zh-cn', dateFormat);
 				let stampStr = startTime + '-' + endTime;
-				console.log('nowMeetTime start_time end_time', start_time, end_time);
-				console.log('nowMeetTime startTime', startTime);
+				// console.log('nowMeetTime start_time end_time', start_time, end_time);
+				console.log('nowMeetTime startTime endTime', startTime,endTime);
 				return stampStr;
 			},
 
@@ -317,7 +317,7 @@
 			},
 
 			foundNextMeet() {
-				this.nextMeetData = null;
+				// this.nextMeetData = null;
 				let foundNextMeet = false;
 				let entryList = this.roomData.entries;
 				let nowTime = this.roomData.now_timestamp || (new Date().getTime() / 1000);
@@ -895,7 +895,7 @@
 	}
 
 	.reverse-title {
-		line-height: 28rpx;
+		line-height: 30rpx;
 		color: rgb(255, 255, 255);
 		font-size: 28rpx;
 		font-family: 'Noto Sans CJK SC', 'Source Han Sans CN', 'Droid Sans', sans-serif;
