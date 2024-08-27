@@ -37,8 +37,9 @@
 			</view>
 			<!-- 预约会议 -->
 			<view class="reserve-meeting">
+				//:class="[item.type == 0 ? 'time-span-text' : 'time-span-dot']"
 				<view class="reserve-title">{{$t('message.quickMeeting')}}</view>
-				<view class="reserve-button" @click="quickMeet">{{$t('message.book')}}</view>
+				<view :class="[roomData.now_entry != null?'reserve-button':'reserve-button-free']reserve-button" @click="quickMeet">{{$t('message.book')}}</view>
 			</view>
 		</view>
 		<!-- 会议基本信息 -->
@@ -57,7 +58,7 @@
 					<view class="change-language">
 						<!-- language -->
 						<uni-data-select style="width: 49rpx;color:#4f4f4f" class="select-language"
-							placeholder="language" :localdata="datasource" @change="changeLang"
+							:placeholder="$t('message.language')" :localdata="datasource" @change="changeLang"
 							:clear="false"></uni-data-select>
 					</view>
 				</view>
@@ -163,6 +164,7 @@
 				}],
 				roomData: null,
 				nextMeetData: null,
+				roomFree: false,
 			}
 		},
 		onLoad() {
@@ -283,9 +285,11 @@
 					console.log('initTimeline enter now_entry');
 					this.currenMeetStart = data.now_entry['start_time'];
 					this.currenMeetEnd = data.now_entry['end_time'];
+					this.roomFree = false;
 				} else {
 					this.currenMeetStart = 0;
 					this.currenMeetEnd = 0;
+					this.roomFree = true;
 				}
 				let allMeetList = [];
 				if (data && data.area) {
@@ -349,7 +353,7 @@
 								isCurrentMeet: isCurrentMeet,
 								title: foundEntry['name'],
 								meetRange: meetRange,
-								meetHeight: (foundEntry['end_time'] - foundEntry['start_time']) / 1800 * 25
+								meetHeight: (foundEntry['end_time'] - foundEntry['start_time']) / 1800 * 30
 							})
 						} else {
 							allTimeList.push({
@@ -393,7 +397,7 @@
 								isCurrentMeet: currentMeet,
 								title: allFounfEntry['name'],
 								meetRange: meetTimeRange,
-								meetHeight: (allFounfEntry['end_time'] - allFounfEntry['start_time']) / 1800 * 25
+								meetHeight: (allFounfEntry['end_time'] - allFounfEntry['start_time']) / 1800 * 30
 							})
 						} else {
 							allTimeList.push({
@@ -438,11 +442,9 @@
 					header: {
 						'Content-type': 'application/json',
 						'Accept-Language': 'zh-CN,zh;q=0.9'
-						//根据要求来配置
 					},
 					data: {
 						room_id: this.roomId,
-						// room_id: 2
 					},
 					success: (res) => {
 						let data = res.data.data;
@@ -457,11 +459,10 @@
 				})
 			},
 
-			// 快速会议
 			quickMeet() {
 				if (isNaN(this.roomId)) {
 					uni.showToast({
-						title: '请选择正确的房间号!',
+						title: this.$t('message.roomNumberError'),
 						icon: 'none'
 					})
 					return
@@ -471,25 +472,22 @@
 					url: `${HOST}/web/appapi/api.php?act=book_fast_meeting`,
 					method: "POST",
 					header: {
-						// 'Content-type': 'application/x-www-form-urlencoded',
 						'Content-type': 'application/json',
 						'Accept-Language': 'zh-CN,zh;q=0.9'
-						//根据要求来配置
 					},
 					data: {
 						room_id: this.roomId,
-						// room_id: 2
 					},
 					success: (res) => {
 						let data = res.data;
 						console.log('quickMeet返回数据成功data:', data);
 						let msg = '';
 						if (data.code == -1) {
-							msg = '没有可用的房间';
+							msg = this.$t('message.noRoom');
 						} else if (data.code == -2) {
-							msg = '当前时间已有会议';
+							msg = this.$t('message.noFreeRoom');
 						} else if (data.code == 0) {
-							msg = '创建快速会议成功'
+							msg = this.$t('message.createMeetSuccess');
 						}
 						uni.showToast({
 							title: msg,
@@ -537,8 +535,8 @@
 
 	.meeting-scroll-view {
 		width: 250rpx;
-		/* height: 377rpx; */
-		height: 397rpx;
+		height: 377rpx;
+		/* height: 397rpx; */
 		/* max-height: 397rpx; */
 		padding-top: 10rpx;
 	}
@@ -583,6 +581,7 @@
 
 	.scroll-item-meeting {
 		position: absolute;
+		width: 120rpx;
 		top: 0;
 		left: 8rpx;
 		/* font-family: PingFangSC-light; */
@@ -633,6 +632,22 @@
 		border-radius: 4rpx 4rpx 4rpx 4rpx;
 		margin-left: 32rpx;
 		background-color: rgba(230, 241, 252, 0.25);
+		color: white;
+		font-size: 14rpx;
+		text-align: center;
+		box-shadow: 0rpx 2rpx 6rpx 0rpx rgba(0, 0, 0, 0.4);
+		/* font-family: PingFangSC-regular; */
+		font-family: 'Noto Sans CJK SC', 'Source Han Sans CN', 'Droid Sans', sans-serif;
+	}
+	
+	.reserve-button-free {
+		width: 187rpx;
+		height: 32rpx;
+		line-height: 32rpx;
+		border-radius: 4rpx 4rpx 4rpx 4rpx;
+		margin-left: 32rpx;
+		background-color: rgba(129,179,55,1);
+		/* background-color: rgba(230, 241, 252, 0.25); */
 		color: white;
 		font-size: 14rpx;
 		text-align: center;
