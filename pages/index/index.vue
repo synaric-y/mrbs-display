@@ -178,8 +178,17 @@
 		methods: {
 			// 获取会议时间
 			nowMeetTime() {
-				const start_time = this.roomData.now_entry.start_time;
-				const end_time = this.roomData.now_entry.end_time;
+				let start_time;
+				let end_time;
+				if(this.roomData && this.roomData.now_entry) {
+					start_time = this.roomData.now_entry.start_time;
+					end_time = this.roomData.now_entry.end_time;
+				} else if(this.nextMeetData) {
+					start_time = this.nextMeetData.start_time;
+					end_time = this.nextMeetData.end_time;
+				} else {
+					retun '';
+				} 
 				let dateFormat = 'hh:mm A';
 				const startTime = this.formatDate(start_time, 'Asia/Shanghai', 'zh-cn', dateFormat);
 				const endTime = this.formatDate(end_time, 'Asia/Shanghai', 'zh-cn', dateFormat);
