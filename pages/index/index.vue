@@ -20,7 +20,8 @@
 									<view class="scroll-item-right extention-height"
 										:style="{height:item.height + 'rpx'}">
 										<text class="scroll-item-meeting">{{item.meetRange}}\n{{item.title}}</text>
-										<image class="in-meeting-icon" src="@/static/in-meeting.png" mode="aspectFit">
+										<image v-if="item.isCurrentMeet" class="in-meeting-icon"
+											src="@/static/in-meeting.png" mode="aspectFit">
 										</image>
 									</view>
 								</template>
@@ -85,7 +86,7 @@
 				</view>
 				<view class="meeting-title-type">
 					<image class="meeting-msg-icon" src="@/static/reverse-time.png" mode=""></image>
-					<text class="meeting-msg-title reverse-time">{{nowMeetTime}}</text>
+					<text class="meeting-msg-title reverse-time">{{this.nowMeetTime}}</text>
 				</view>
 				<view class="meeting-title-type" v-if="roomData&&roomData.now_entry">
 					<image class="meeting-msg-icon" src="@/static/reverse-person.png" mode=""></image>
@@ -318,6 +319,9 @@
 						}
 
 						if (isAllFoundEntry) {
+							let startRange = this.formatTime(allFounfEntry['start_time']);
+							let endRange = this.formatTime(allFounfEntry['end_time']);
+							let meetTimeRange = startRange + '-' + endRange;
 							// 当前时间的会议
 							if (allFounfEntry['start_time'] === this.currenMeetStart) {
 								currentMeet = true;
@@ -330,7 +334,7 @@
 								endTime: allFounfEntry['end_time'],
 								isCurrentMeet: currentMeet,
 								title: allFounfEntry['name'],
-								meetRange: 'am-pm',
+								meetRange: meetTimeRange,
 								meetHeight: (allFounfEntry['end_time'] - allFounfEntry['start_time']) / 1800 * 50
 							})
 						} else {
@@ -347,169 +351,9 @@
 						isFirst = false;
 						tempStartTime += 1
 					}
-
-					
-
-
-
-
-
-
-					// if (!isFirst) {
-					// 	const timestampline = this.getTimestamp(year, month, day, tempStartTime, 30);
-					// 判断当前是否时间是否有会议
-					// if (data.entries && data.entries.length > 0) {
-					// 	for (let meet of data.entries) {
-					// 		let currentMeet = false;
-					// 		let height = 0;
-					// 		let meetStartRange = this.formatTime(meet['start_time']);
-					// 		let meetEndRange = this.formatTime(meet['end_time']);
-					// 		let meetRange = meetStartRange + '-' + meetEndRange;
-					// 		// console.log('initTimeline currenMeetStart: start_time:', this.currenMeetStart,meet['start_time']);
-					// 		console.log('initTimeline-1 当天会议 timestampline:', timestampline);
-					// 		// 当前时间的会议信息
-					// 		if (this.currenMeetStart === meet['start_time'] && timestampline === meet['start_time']) {
-					// 			currentMeet = true;
-					// 			// 计算会议时长是30分钟的几倍
-					// 			const diftimestamp = meet['end_time'] - meet['start_time'];
-					// 			height = diftimestamp / 1800 * 50;
-					// 			allTimeList.push({
-					// 				leftTitle: 'ㆍ',
-					// 				startTime: meet['start_time'],
-					// 				endTime: meet['end_time'],
-					// 				isCurrentMeet: true,
-					// 				title: meet['name'],
-					// 				meetRange: meetRange,
-					// 				meetHeight: height,
-					// 			})
-					// 			isFirst = true;
-					// 			break;
-					// 			// 时间线绘制	
-					// 		} else if (timestampline === meet['start_time']) {
-					// 			currentMeet = false;
-					// 			const diftimestamp = meet['end_time'] - meet['start_time'];
-					// 			height = diftimestamp / 1800 * 50;
-					// 			allTimeList.push({
-					// 				leftTitle: 'ㆍ',
-					// 				startTime: meet['start_time'],
-					// 				endTime: meet['end_time'],
-					// 				isCurrentMeet: false,
-					// 				title: meet['name'],
-					// 				meetRange: meetRange,
-					// 				meetHeight: height,
-					// 			})
-					// 			isFirst = true;
-					// 			break;
-					// 			// 时间线上无会议
-					// 		} else {
-					// 			allTimeList.push({
-					// 				leftTitle: 'ㆍ',
-					// 				startTime: 0,
-					// 				endTime: 0,
-					// 				isCurrentMeet: false,
-					// 				title: '',
-					// 				meetRange: '',
-					// 				meetHeight: 0
-					// 			})
-					// 			isFirst = true;
-					// 			break;
-					// 		}
-					// 	}
-					// 	// 时间线上无会议信息
-					// } else {
-					// 	allTimeList.push({
-					// 		leftTitle: 'ㆍ',
-					// 		startTime: 0,
-					// 		endTime: 0,
-					// 		isCurrentMeet: false,
-					// 		title: '',
-					// 		meetRange: '',
-					// 		meetHeight: 0
-					// 	})
-					// }
-					// isFirst = true;
 				}
 				this.timeRange = allTimeList;
 				console.log('initTimeline拼接的会议数据allTimeList：', this.timeRange)
-
-				// 当天有会议信息
-				// if (data.entries && data.entries.length > 0) {
-				// 	for (let meet of data.entries) {
-				// 		let height = 0;
-				// 		let meetStartRange = '';
-				// 		meetStartRange = this.formatTime(meet['start_time']);
-				// 		let meetEndRange = '';
-				// 		meetEndRange = this.formatTime(meet['end_time']);
-				// 		let meetRange = meetStartRange + '-' + meetEndRange;
-				// 		// console.log('initTimeline 当天会议 currenMeetStart start_time:', this.currenMeetStart, meet[
-				// 		// 'start_time']);
-				// 		// console.log('initTimeline-2 获取当前时间的timeTitle: 时间戳:', timeTitle, timestampline)
-				// 		const timestampline2 = this.getTimestamp(year, month, day, tempStartTime, 0);
-				// 		// console.log('timestampline2:',timestampline2);
-				// 		// 当前时间上有会议
-				// 		if (this.currenMeetStart === meet['start_time'] && timestampline2 === meet['start_time']) {
-				// 			currentMeet = true;
-				// 			// 计算会议时长是30分钟的几倍 
-				// 			const diftimestamp = meet['end_time'] - meet['start_time'];
-				// 			height = diftimestamp / 1800 * 50;
-				// 			allTimeList.push({
-				// 				leftTitle: timeTitle,
-				// 				startTime: meet['start_time'],
-				// 				endTime: meet['end_time'],
-				// 				isCurrentMeet: true,
-				// 				title: meet['name'],
-				// 				meetRange: meetRange,
-				// 				meetHeight: height
-				// 			})
-				// 			// break;
-				// 		}
-				// 		// 时间线上会议信息
-				// 		else if (timestampline2 === meet['start_time']) {
-				// 			const diftimestamp = meet['end_time'] - meet['start_time'];
-				// 			height = diftimestamp / 1800 * 50;
-				// 			allTimeList.push({
-				// 				leftTitle: timeTitle,
-				// 				startTime: meet['start_time'],
-				// 				endTime: meet['end_time'],
-				// 				isCurrentMeet: false,
-				// 				title: meet['name'],
-				// 				meetRange: meetRange,
-				// 				meetHeight: height
-				// 			})
-				// 			// break;
-				// 		} else {
-				// 			allTimeList.push({
-				// 				leftTitle: timeTitle,
-				// 				startTime: 0,
-				// 				endTime: 0,
-				// 				isCurrentMeet: false,
-				// 				title: '',
-				// 				meetRange: '',
-				// 				meetHeight: 0
-				// 			})
-				// 		}
-				// 		isFirst = false;
-				// 		break;
-				// 	}
-				// }
-				// 当天无会议信息
-				// else {
-				// 	console.log('initTimeline当前无会议信息');
-				// 	allTimeList.push({
-				// 		leftTitle: timeTitle,
-				// 		startTime: 0,
-				// 		endTime: 0,
-				// 		isCurrentMeet: false,
-				// 		title: '',
-				// 		meetRange: '',
-				// 		meetHeight: 0
-				// 	})
-				// 	isFirst = false;
-				// }
-				// 	tempStartTime += 1
-				// }
-				// this.timeRange = allTimeList;
-				// console.log('initTimeline拼接的会议数据allTimeList：', this.timeRange)
 			},
 
 			changeLang(index) {
