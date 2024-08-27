@@ -9,7 +9,9 @@
 			<!-- 会议时间 -->
 			<view class="meeting-time">
 				<view class="meeting-scroll">
-					<scroll-view scroll-y="true" :class="[largeScreenHeight >= 868?'meeting-scroll-view':'ext-scroll-view']" @scrolltolower="lower" @scroll="scroll">
+					<scroll-view scroll-y="true"
+						:class="[largeScreenHeight >= 868?'meeting-scroll-view':'ext-scroll-view']"
+						@scrolltolower="lower" @scroll="scroll">
 						<template v-for="(item,index) in timeRange" :key="index">
 							<view class="scroll-view-item">
 								<view class="scroll-item-left">
@@ -19,7 +21,13 @@
 								<template v-if="item.meetHeight > 0">
 									<view class="scroll-item-right extention-height"
 										:style="{height:item.meetHeight + 'rpx'}">
-										<text class="scroll-item-meeting">{{item.meetRange}}\n{{item.title}}</text>
+										<template v-if="item.meetHeight < 40">
+											<text class="scroll-item-meeting">{{item.meetRange}}\n{{item.title}}</text>
+										</template>
+										<template v-else>
+											<text class="scroll-item-meeting-more">{{item.meetRange}}\n{{item.title}}</text>
+										</template>
+
 										<image v-if="item.isCurrentMeet" class="in-meeting-icon"
 											src="@/static/in-meeting.png" mode="aspectFit">
 										</image>
@@ -38,7 +46,8 @@
 			<!-- 预约会议 -->
 			<view class="reserve-meeting">
 				<view class="reserve-title">{{$t('message.quickMeeting')}}</view>
-				<view :class="[roomData.now_entry != null?'reserve-button':'reserve-button-free']" @click="quickMeet">{{$t('message.book')}}</view>
+				<view :class="[roomData.now_entry != null?'reserve-button':'reserve-button-free']" @click="quickMeet">
+					{{$t('message.book')}}</view>
 			</view>
 		</view>
 		<!-- 会议基本信息 -->
@@ -161,7 +170,7 @@
 				roomData: null,
 				nextMeetData: null,
 				roomFree: false,
-				nowlanguageTime:'',
+				nowlanguageTime: '',
 				timezore: 'Asia/Shanghai',
 				meetTimeZore: '',
 				meetTimeString: 'am-pm',
@@ -174,33 +183,34 @@
 				this.roomId = Number(roomId)
 				this._roomId = Number(roomId)
 			}
-			const windowInfo = uni.getWindowInfo();          
+			const windowInfo = uni.getWindowInfo();
 			this.startSync();
 			this.largeScreenHeight = windowInfo.windowHeight;
-			console.log('getWindowInfo windowHeight:',this.largeScreenHeight)
+			console.log('getWindowInfo windowHeight:', this.largeScreenHeight)
 		},
 		methods: {
 			// 获取会议时间
 			nowMeetTime() {
 				let start_time;
 				let end_time;
-				if(this.roomData && this.roomData.now_entry) {
+				if (this.roomData && this.roomData.now_entry) {
 					start_time = this.roomData.now_entry.start_time;
 					end_time = this.roomData.now_entry.end_time;
-				} else if(this.nextMeetData) {
+				} else if (this.nextMeetData) {
 					start_time = this.nextMeetData.start_time;
 					end_time = this.nextMeetData.end_time;
 				} else {
 					return '';
-				} 
+				}
 				let dateFormat = 'hh:mm A';
 				const startTime = this.formatDate(start_time, 'Asia/Shanghai', 'zh-cn', dateFormat);
 				const endTime = this.formatDate(end_time, 'Asia/Shanghai', 'zh-cn', dateFormat);
 				let stampStr = startTime + '-' + endTime;
-				console.log('nowMeetTime start_time end_time',start_time,end_time);
-				console.log('nowMeetTime startTime',startTime);
+				console.log('nowMeetTime start_time end_time', start_time, end_time);
+				console.log('nowMeetTime startTime', startTime);
 				return stampStr;
 			},
+
 			startSync() {
 				if (this.interval) {
 					clearInterval(this.interval)
@@ -211,13 +221,13 @@
 					this.syncRoom()
 				}, 5000)
 			},
-			
+
 			dateDisplay() {
 				// 2024年8月8日星期四、
 				// 英文：Wednesday,September.7,2024
 				// 韩文：2024년 8월 8일 목요일
 				const timestamp = this.roomData.now_timestamp;
-				console.log('dateDisplay now_timestamp',timestamp);
+				console.log('dateDisplay now_timestamp', timestamp);
 				// 格式化日期为中文、英文、韩文，并考虑时区
 				let dateFormat = 'YYYY年MM月DD日';
 				if (this.$i18n.locale == 'en') {
@@ -228,9 +238,9 @@
 					dateFormat = 'YYYY年MM月DD日';
 				}
 				const displayAP = this.displayHM(timestamp);
-				const koDate = this.formatDate(timestamp, 'Asia/Seoul', 'ko',dateFormat);
-				const enDate = this.formatDate(timestamp, 'America/New_York', 'en',dateFormat);
-				const zhDate = this.formatDate(timestamp, 'Asia/Shanghai', 'zh-cn',dateFormat);
+				const koDate = this.formatDate(timestamp, 'Asia/Seoul', 'ko', dateFormat);
+				const enDate = this.formatDate(timestamp, 'America/New_York', 'en', dateFormat);
+				const zhDate = this.formatDate(timestamp, 'Asia/Shanghai', 'zh-cn', dateFormat);
 				if (this.$i18n.locale == 'en') {
 					// console.log('英文日期:', enDate); // 英文输出
 					this.nowlanguageTime = displayAP + '  ' + enDate;
@@ -239,14 +249,14 @@
 				} else {
 					this.nowlanguageTime = displayAP + '  ' + zhDate;
 				}
-				console.log('dateDisplay now_timestamp currenlanguageTime',this.nowlanguageTime);
+				console.log('dateDisplay now_timestamp currenlanguageTime', this.nowlanguageTime);
 			},
-			
+
 			displayHM(timestamp) {
 				let dateFormat = 'hh:mm A';
-				const koDate = this.formatDate(timestamp, 'Asia/Seoul', 'ko',dateFormat);
-				const enDate = this.formatDate(timestamp, 'America/New_York', 'en',dateFormat);
-				const zhDate = this.formatDate(timestamp, 'Asia/Shanghai', 'zh-cn',dateFormat);
+				const koDate = this.formatDate(timestamp, 'Asia/Seoul', 'ko', dateFormat);
+				const enDate = this.formatDate(timestamp, 'America/New_York', 'en', dateFormat);
+				const zhDate = this.formatDate(timestamp, 'Asia/Shanghai', 'zh-cn', dateFormat);
 				let parts = null;
 				if (this.$i18n.locale == 'en') {
 					parts = enDate.split(' ');
@@ -255,7 +265,7 @@
 				} else {
 					parts = zhDate.split(' ');
 				}
-				console.log('displayHM am pm :',parts);
+				console.log('displayHM am pm :', parts);
 				const timeMinute = parts[0];
 				const ap = parts[1];
 				return timeMinute + ap;
@@ -264,6 +274,7 @@
 			onSetting() {
 				this.showSetting = true
 			},
+
 			onSetRoomId() {
 				console.log('set room', this._roomId)
 				if (isNaN(this._roomId)) {
@@ -333,7 +344,6 @@
 			},
 
 			initTimeline(data) {
-				// 当前会议开始、结束时间
 				const now = new Date();
 				const year = now.getFullYear();
 				const month = now.getMonth() + 1;
@@ -365,7 +375,6 @@
 				let isFirst = true;
 				// console.log('initTimeline enter tempStartTime tempEndTime:',tempStartTime,tempEndTime); 
 				while (tempStartTime <= tempEndTime) {
-					// 判断当前时间是am还是pm
 					let ap = 'am'
 					let pmTime = tempStartTime
 					let timeTitle = '';
@@ -391,10 +400,6 @@
 							}
 						}
 						if (foundEntry) {
-							// console.log('timestampline foundEntry', this.formatTime(timestampline));
-							// console.log('timestampline this.currenMeetStart', this.formatTime(this.currenMeetStart));
-							// console.log('timestampline currenMeetStart', timestampline, this.currenMeetStart)
-							// console.log('timestampline foundEntry', foundEntry);
 							let meetStartRange = this.formatTime(foundEntry['start_time']);
 							let meetEndRange = this.formatTime(foundEntry['end_time']);
 							let meetRange = meetStartRange + '-' + meetEndRange;
@@ -483,7 +488,7 @@
 				if (lang == 'en') {
 					this.isEnglish = true
 					this.timezore = 'America/New_York'
-				} else if(lang == 'ko') {
+				} else if (lang == 'ko') {
 					this.isEnglish = false
 					this.timezore = 'Asia/Seoul'
 				} else {
@@ -493,12 +498,10 @@
 				console.log('lang selected lang', lang)
 				this.$i18n.locale = lang
 				this.dateDisplay()
-				// this.initTimeLine(this.tempData)
 				this.syncRoom()
 			},
 
 			syncRoom() {
-				// console.log('syncRoom 进入同步接口');
 				uni.request({
 					url: `${HOST}/web/appapi/api.php?act=sync_room`,
 					method: "POST",
@@ -604,7 +607,7 @@
 		height: 377rpx;
 		padding-top: 10rpx;
 	}
-	
+
 	.ext-scroll-view {
 		width: 250rpx;
 		height: 397rpx;
@@ -630,7 +633,6 @@
 		width: 50rpx;
 		position: absolute;
 		left: 8rpx;
-		/* font-family: PingFangSC-light; */
 		font-family: 'Noto Sans CJK SC Light', 'Source Han Sans CN Light', 'Droid Sans Fallback', sans-serif;
 	}
 
@@ -660,7 +662,22 @@
 		text-overflow: ellipsis;
 		word-wrap: break-word;
 		-webkit-box-orient: vertical;
-		/* font-family: PingFangSC-light; */
+		font-family: 'Noto Sans CJK SC Light', 'Source Han Sans CN Light', 'Droid Sans Fallback', sans-serif;
+	}
+
+	.scroll-item-meeting-more {
+		position: absolute;
+		width: 160rpx;
+		top: 2rpx;
+		left: 8rpx;
+		color: rgb(255,255,255);
+		font-size: 9rpx;
+		-webkit-line-clamp: 3;
+		display: -webkit-box;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		word-wrap: break-word;
+		-webkit-box-orient: vertical;
 		font-family: 'Noto Sans CJK SC Light', 'Source Han Sans CN Light', 'Droid Sans Fallback', sans-serif;
 	}
 
@@ -683,8 +700,6 @@
 		height: 63rpx;
 		width: 250rpx;
 		border-top: 1rpx solid rgba(230, 241, 252, 0.25);
-		/* font-family: PingFangSC-regular; */
-		/* background-color: bisque; */
 		font-family: 'Noto Sans CJK SC', 'Source Han Sans CN', 'Droid Sans', sans-serif;
 		position: absolute;
 		left: 0;
@@ -698,7 +713,6 @@
 		font-size: 10rpx;
 		text-align: center;
 		color: white;
-		/* background-color: aqua; */
 	}
 
 	.reserve-button {
@@ -712,23 +726,20 @@
 		font-size: 14rpx;
 		text-align: center;
 		box-shadow: 0rpx 2rpx 6rpx 0rpx rgba(0, 0, 0, 0.4);
-		/* font-family: PingFangSC-regular; */
 		font-family: 'Noto Sans CJK SC', 'Source Han Sans CN', 'Droid Sans', sans-serif;
 	}
-	
+
 	.reserve-button-free {
 		width: 187rpx;
 		height: 32rpx;
 		line-height: 32rpx;
 		border-radius: 4rpx 4rpx 4rpx 4rpx;
 		margin-left: 32rpx;
-		background-color: rgba(129,179,55,1);
-		/* background-color: rgba(230, 241, 252, 0.25); */
+		background-color: rgba(129, 179, 55, 1);
 		color: white;
 		font-size: 14rpx;
 		text-align: center;
 		box-shadow: 0rpx 2rpx 6rpx 0rpx rgba(0, 0, 0, 0.4);
-		/* font-family: PingFangSC-regular; */
 		font-family: 'Noto Sans CJK SC', 'Source Han Sans CN', 'Droid Sans', sans-serif;
 	}
 
@@ -755,16 +766,13 @@
 	.room-title {
 		font-size: 20rpx;
 		color: white;
-		/* font-family: PingFangSC-regular; */
 		font-family: 'Noto Sans CJK SC', 'Source Han Sans CN', 'Droid Sans', sans-serif;
-
 	}
 
 	.room-number {
 		margin-left: 8rpx;
 		font-size: 38rpx;
 		color: white;
-		/* font-family: PingFangSC-regular; */
 		font-family: 'Noto Sans CJK SC', 'Source Han Sans CN', 'Droid Sans', sans-serif;
 	}
 
@@ -780,7 +788,6 @@
 		width: 66rpx;
 		height: 22rpx;
 		text-align: center;
-		/* position: relative; */
 	}
 
 	.select-language {
@@ -836,8 +843,6 @@
 		text-align: left;
 		width: 100%;
 		height: 40rpx;
-		/* background-color: blue; */
-		/* font-family: PingFangSC-light; */
 		font-family: 'Noto Sans CJK SC Light', 'Source Han Sans CN Light', 'Droid Sans Fallback', sans-serif;
 		color: white;
 	}
@@ -857,7 +862,6 @@
 		font-size: 80rpx;
 		text-align: left;
 		color: white;
-		/* font-family: PingFangSC-medium; */
 		font-family: 'Noto Sans CJK SC', 'Source Han Sans CN', 'Droid Sans', sans-serif;
 	}
 
@@ -882,9 +886,7 @@
 		font-size: 28rpx;
 		text-align: left;
 		font-style: italic;
-		/* font-family: PingFangSC-regular; */
 		font-family: 'Noto Sans CJK SC', 'Source Han Sans CN', 'Droid Sans', sans-serif;
-
 	}
 
 	.reverse-time {
@@ -895,10 +897,7 @@
 		font-size: 18rpx;
 		text-align: left;
 		font-style: italic;
-		/* box-shadow: 0rpx 2rpx 6rpx 0rpx rgba(0,0,0,0.4); */
-		/* font-family: PingFangSC-extraLight; */
 		font-family: 'Noto Sans CJK SC ExtraLight', 'Source Han Sans CN ExtraLight', 'Droid Sans Fallback', sans-serif;
-
 	}
 
 	.reverse-person {
@@ -908,7 +907,6 @@
 		font-size: 18rpx;
 		text-align: left;
 		font-style: italic;
-		/* box-shadow: 0rpx 2rpx 6rpx 0rpx rgba(0,0,0,0.4); */
 		font-family: 'Noto Sans CJK SC ExtraLight', 'Source Han Sans CN ExtraLight', 'Droid Sans Fallback', sans-serif;
 	}
 
