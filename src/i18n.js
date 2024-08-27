@@ -17,6 +17,7 @@ const messages = {
 			"canBook": '可预定',
 			"createRoomFail": '创建快速会议失败',
 			"nextMeet": '下一次会议',
+			"room": '会议室',
 		}
 	},
 	"en":{
@@ -35,6 +36,7 @@ const messages = {
 			"alert_error_code": 'Please enter the correct built-in code',
 			"canBook": 'Available',
 			"nextMeet": 'Next meet',
+			"room": 'Room',
 		}	
 	},
 	"ko": {
@@ -53,6 +55,7 @@ const messages = {
 			"alert_error_code": '올바른 내장 코드를 입력하세요.',
 			"canBook": '예약 가능',
 			"nextMeet": '다음 회의',
+			"room": '방',
 		}
 	}
 }

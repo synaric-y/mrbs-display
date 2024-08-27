@@ -17,6 +17,9 @@
 								</view>
 								<!-- 当前有会议 -->
 								<template v-if="item.meetHeight > 0">
+									<!-- <view class="scroll-item-right">
+										
+									</view> -->
 									<view class="scroll-item-right extention-height"
 										:style="{height:item.height + 'rpx'}">
 										<text class="scroll-item-meeting">{{item.meetRange}}\n{{item.title}}</text>
@@ -48,11 +51,11 @@
 			<view class="right-meeting-top">
 				<view>
 					<view class="room-group" v-if="roomData&&roomData.room">
-						<text class="room-title">Room</text>
+						<text class="room-title">{{$t('message.room')}}</text>
 						<text class="room-number" @longpress="onSetting">{{roomData.room.room_name}}</text>
 					</view>
 					<view class="room-group" v-else>
-						<text class="room-title">Room</text>
+						<text class="room-title">{{$t('message.room')}}</text>
 						<text class="room-number" @longpress="onSetting">A</text>
 					</view>
 					<view class="change-language">
@@ -116,7 +119,7 @@
 						<text v-if="roomData && roomData.now_entry"
 							class="meeting-msg-title reverse-time">{{nextMeetData.timestamp}}</text>
 						<!-- <text v-else class="meeting-msg-title reverse-time">{{roomData.room.}}</text> -->
-						<text v-else class="meeting-msg-title reverse-time">空闲中</text>
+						<text v-else class="meeting-msg-title reverse-time">无</text>
 						<!-- <text class="meeting-msg-title reverse-time">{{ nowMeetTime() }}</text> -->
 					</view>
 					<view class="meeting-title-type">
