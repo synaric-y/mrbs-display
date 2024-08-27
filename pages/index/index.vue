@@ -64,9 +64,7 @@
 				<!-- 分割线 -->
 				<view class="room-devide-line"></view>
 				<!-- 当前时间 -->
-				<view class="curren-time">
-					{{this.currenLanguageTime}}
-				</view>
+				<view class="curren-time">{{this.nowlanguageTime}}</view>
 			</view>
 			<!-- 会议详情 -->
 			<view class="right-meeting-detail">
@@ -88,7 +86,7 @@
 					<view class="meeting-title-type">
 						<image class="meeting-msg-icon" src="@/static/reverse-time.png" mode=""></image>
 						<text v-if="roomData && roomData.now_entry"
-							class="meeting-msg-title reverse-time">{{roomData.now_entry.timestamp}}</text>
+							class="meeting-msg-title reverse-time">{{this.meetTimeString}}</text>
 						<text v-else class="meeting-msg-title reverse-time">{{$t('message.no_meeting')}}</text>
 					</view>
 					<view class="meeting-title-type" v-if="roomData && roomData.now_entry">
@@ -134,7 +132,6 @@
 		interval: null,
 		data() {
 			return {
-				value: 0,
 				meeting: false,
 				timeRange: [],
 				showSetting: false,
@@ -164,7 +161,10 @@
 				roomData: null,
 				nextMeetData: null,
 				roomFree: false,
-				currenLanguageTime: '',
+				nowlanguageTime:'',
+				timezore: 'Asia/Shanghai',
+				meetTimeZore: '',
+				meetTimeString: 'am-pm',
 			}
 		},
 		onLoad() {
@@ -182,9 +182,10 @@
 				const end_time = this.roomData.now_entry.end_time;
 				let dateFormat = 'hh:mm A';
 				const startTime = this.formatDate(start_time, 'Asia/Shanghai', 'zh-cn', dateFormat);
-				const endTime = this.formatDate(start_time, 'Asia/Shanghai', 'zh-cn', end_time);
-				const stampStr = startTime + '-' + endTime;
-				console.log('nowMeetTime stampStr', stampStr);
+				const endTime = this.formatDate(end_time, 'Asia/Shanghai', 'zh-cn', dateFormat);
+				let stampStr = startTime + '-' + endTime;
+				console.log('nowMeetTime start_time end_time',start_time,end_time);
+				console.log('nowMeetTime startTime',startTime);
 				return stampStr;
 			},
 			startSync() {
@@ -203,6 +204,7 @@
 				// 英文：Wednesday,September.7,2024
 				// 韩文：2024년 8월 8일 목요일
 				const timestamp = this.roomData.now_timestamp;
+				console.log('dateDisplay now_timestamp',timestamp);
 				// 格式化日期为中文、英文、韩文，并考虑时区
 				let dateFormat = 'YYYY年MM月DD日';
 				if (this.$i18n.locale == 'en') {
@@ -212,47 +214,38 @@
 				} else {
 					dateFormat = 'YYYY年MM月DD日';
 				}
-				if(this.roomData) {
-					this.displayHM(this.roomData.now_timestamp)
-				}
+				const displayAP = this.displayHM(timestamp);
 				const koDate = this.formatDate(timestamp, 'Asia/Seoul', 'ko',dateFormat);
 				const enDate = this.formatDate(timestamp, 'America/New_York', 'en',dateFormat);
 				const zhDate = this.formatDate(timestamp, 'Asia/Shanghai', 'zh-cn',dateFormat);
 				if (this.$i18n.locale == 'en') {
 					// console.log('英文日期:', enDate); // 英文输出
-					this.currenlanguageTime = enDate;
+					this.nowlanguageTime = displayAP + '  ' + enDate;
 				} else if (this.$i18n.locale == 'ko') {
-					this.currenlanguageTime = koDate;
-					// console.log('韩文日期:', koDate); // 韩文输出
-					// 使用 split 方法分隔字符串
-					// const parts = koDate.split(' ');
-					// 提取星期几
-					// const dayOfWeek = parts[1];
-					// const tempday = this.translateDay(dayOfWeek);
-					// this.currenlanguageTime = parts[0] + ' ' + tempday;
+					this.nowlanguageTime = displayAP + '  ' + koDate;
 				} else {
-					this.currenlanguageTime = zhDate;
-					// console.log('中文日期:', zhDate); // 中文输出
-					// const parts = zhDate.split(' ');
-					// const dayOfWeek = parts[1];
-					// const tempday = this.translateDay(dayOfWeek);
-					// this.currenlanguageTime = parts[0] + ' ' + tempday;
+					this.nowlanguageTime = displayAP + '  ' + zhDate;
 				}
+				console.log('dateDisplay now_timestamp currenlanguageTime',this.nowlanguageTime);
 			},
 			
-			translateDay(day) {
-				const lang = this.$i18n.locale;
-				const weekDays = {
-					zh: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'],
-					en: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-					ko: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일']
-				};
-				const index = weekDays.en.indexOf(day);
-				if (index !== -1) {
-					return weekDays[lang][index];
+			displayHM(timestamp) {
+				let dateFormat = 'hh:mm A';
+				const koDate = this.formatDate(timestamp, 'Asia/Seoul', 'ko',dateFormat);
+				const enDate = this.formatDate(timestamp, 'America/New_York', 'en',dateFormat);
+				const zhDate = this.formatDate(timestamp, 'Asia/Shanghai', 'zh-cn',dateFormat);
+				let parts = null;
+				if (this.$i18n.locale == 'en') {
+					parts = enDate.split(' ');
+				} else if (this.$i18n.locale == 'ko') {
+					parts = koDate.split(' ');
 				} else {
-					throw new Error(`Day "${day}" not found in English weekDays.`);
+					parts = zhDate.split(' ');
 				}
+				console.log('displayHM am pm :',parts);
+				const timeMinute = parts[0];
+				const ap = parts[1];
+				return timeMinute + ap;
 			},
 
 			onSetting() {
@@ -294,10 +287,6 @@
 				const date = new Date(year, month - 1, day, hour, minute, 0, 0); // 秒和毫秒设置为0
 				return Math.floor(date.getTime() / 1000); // 将毫秒转为秒
 			},
-			// getUTCTimestamp(year, month, day, hour, minute) {
-			//   const timestamp = Date.UTC(year, month - 1, day, hour, minute, 0, 0);
-			//   return Math.floor(timestamp / 1000); // 将毫秒转为秒
-			// },
 
 			foundNextMeet() {
 				this.nextMeetData = null;
@@ -328,7 +317,6 @@
 						"book_by": "",
 					};
 				}
-
 			},
 
 			initTimeline(data) {
@@ -390,10 +378,10 @@
 							}
 						}
 						if (foundEntry) {
-							console.log('timestampline foundEntry', this.formatTime(timestampline));
-							console.log('timestampline this.currenMeetStart', this.formatTime(this.currenMeetStart));
-							console.log('timestampline currenMeetStart', timestampline, this.currenMeetStart)
-							console.log('timestampline foundEntry', foundEntry);
+							// console.log('timestampline foundEntry', this.formatTime(timestampline));
+							// console.log('timestampline this.currenMeetStart', this.formatTime(this.currenMeetStart));
+							// console.log('timestampline currenMeetStart', timestampline, this.currenMeetStart)
+							// console.log('timestampline foundEntry', foundEntry);
 							let meetStartRange = this.formatTime(foundEntry['start_time']);
 							let meetEndRange = this.formatTime(foundEntry['end_time']);
 							let meetRange = meetStartRange + '-' + meetEndRange;
@@ -410,7 +398,7 @@
 								isCurrentMeet: isCurrentMeet,
 								title: foundEntry['name'],
 								meetRange: meetRange,
-								meetHeight: (foundEntry['end_time'] - foundEntry['start_time']) / 1800 * 30
+								meetHeight: (foundEntry['end_time'] - foundEntry['start_time']) / 1800 * 28
 							})
 						} else {
 							allTimeList.push({
@@ -454,7 +442,7 @@
 								isCurrentMeet: currentMeet,
 								title: allFounfEntry['name'],
 								meetRange: meetTimeRange,
-								meetHeight: (allFounfEntry['end_time'] - allFounfEntry['start_time']) / 1800 * 30
+								meetHeight: (allFounfEntry['end_time'] - allFounfEntry['start_time']) / 1800 * 28
 							})
 						} else {
 							allTimeList.push({
@@ -472,7 +460,7 @@
 					}
 				}
 				this.timeRange = allTimeList;
-				console.log('initTimeline拼接的会议数据allTimeList：', this.timeRange)
+				// console.log('initTimeline拼接的会议数据allTimeList：', this.timeRange)
 			},
 
 			changeLang(index) {
@@ -481,8 +469,13 @@
 				var lang = this.datasource[index].key
 				if (lang == 'en') {
 					this.isEnglish = true
+					this.timezore = 'America/New_York'
+				} else if(lang == 'ko') {
+					this.isEnglish = false
+					this.timezore = 'Asia/Seoul'
 				} else {
 					this.isEnglish = false
+					this.timezore = 'Asia/Shanghai'
 				}
 				console.log('lang selected lang', lang)
 				this.$i18n.locale = lang
@@ -492,7 +485,7 @@
 			},
 
 			syncRoom() {
-				console.log('syncRoom 进入同步接口');
+				// console.log('syncRoom 进入同步接口');
 				uni.request({
 					url: `${HOST}/web/appapi/api.php?act=sync_room`,
 					method: "POST",
@@ -502,14 +495,16 @@
 					},
 					data: {
 						room_id: this.roomId,
+						timezone: this.timezore,
 					},
 					success: (res) => {
 						let data = res.data.data;
-						console.log('syncRoom返回数据成功data:', data);
+						// console.log('syncRoom返回数据成功data:', data);
 						this.roomData = data;
 						this.initTimeline(data);
 						this.foundNextMeet();
 						this.dateDisplay();
+						this.meetTimeString = this.nowMeetTime();
 					},
 					fail: (e) => {
 						console.error(e)
@@ -640,15 +635,16 @@
 	.scroll-item-meeting {
 		position: absolute;
 		width: 120rpx;
-		top: 0;
+		top: 2rpx;
 		left: 8rpx;
+		line-height: 12rpx;
 		/* font-family: PingFangSC-light; */
 		font-family: 'Noto Sans CJK SC Light', 'Source Han Sans CN Light', 'Droid Sans Fallback', sans-serif;
 	}
 
 	.in-meeting-icon {
 		position: absolute;
-		top: 5rpx;
+		top: 8rpx;
 		right: 10rpx;
 		width: 14rpx;
 		height: 14rpx;
@@ -816,7 +812,9 @@
 		margin-left: 37rpx;
 		font-size: 18rpx;
 		text-align: left;
-		background-color: blue;
+		width: 100%;
+		height: 40rpx;
+		/* background-color: blue; */
 		/* font-family: PingFangSC-light; */
 		font-family: 'Noto Sans CJK SC Light', 'Source Han Sans CN Light', 'Droid Sans Fallback', sans-serif;
 		color: white;
