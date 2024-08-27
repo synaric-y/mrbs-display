@@ -37,9 +37,8 @@
 			</view>
 			<!-- 预约会议 -->
 			<view class="reserve-meeting">
-				//:class="[item.type == 0 ? 'time-span-text' : 'time-span-dot']"
 				<view class="reserve-title">{{$t('message.quickMeeting')}}</view>
-				<view :class="[roomData.now_entry != null?'reserve-button':'reserve-button-free']reserve-button" @click="quickMeet">{{$t('message.book')}}</view>
+				<view :class="[roomData.now_entry != null?'reserve-button':'reserve-button-free']" @click="quickMeet">{{$t('message.book')}}</view>
 			</view>
 		</view>
 		<!-- 会议基本信息 -->
@@ -47,7 +46,7 @@
 			<!-- 房间 时间 切换语言 -->
 			<view class="right-meeting-top">
 				<view>
-					<view class="room-group" v-if="roomData&&roomData.room">
+					<view class="room-group" v-if="roomData && roomData.room">
 						<text class="room-title">{{$t('message.room')}}</text>
 						<text class="room-number" @longpress="onSetting">{{roomData.room.room_name}}</text>
 					</view>
@@ -65,8 +64,8 @@
 				<!-- 分割线 -->
 				<view class="room-devide-line"></view>
 				<!-- 当前时间 -->
-				<view class="curren-time" v-if="roomData && roomData.display_day">
-					{{roomData.display_day}}
+				<view class="curren-time">
+					{{this.currenLanguageTime}}
 				</view>
 			</view>
 			<!-- 会议详情 -->
@@ -165,6 +164,7 @@
 				roomData: null,
 				nextMeetData: null,
 				roomFree: false,
+				currenLanguageTime: '',
 			}
 		},
 		onLoad() {
@@ -196,6 +196,63 @@
 				this.interval = setInterval(() => {
 					this.syncRoom()
 				}, 5000)
+			},
+			
+			dateDisplay() {
+				// 2024年8月8日星期四、
+				// 英文：Wednesday,September.7,2024
+				// 韩文：2024년 8월 8일 목요일
+				const timestamp = this.roomData.now_timestamp;
+				// 格式化日期为中文、英文、韩文，并考虑时区
+				let dateFormat = 'YYYY年MM月DD日';
+				if (this.$i18n.locale == 'en') {
+					dateFormat = 'MMMM D, YYYY';
+				} else if (this.$i18n.locale == 'ko') {
+					dateFormat = 'YYYY년MM월DD일';
+				} else {
+					dateFormat = 'YYYY年MM月DD日';
+				}
+				if(this.roomData) {
+					this.displayHM(this.roomData.now_timestamp)
+				}
+				const koDate = this.formatDate(timestamp, 'Asia/Seoul', 'ko',dateFormat);
+				const enDate = this.formatDate(timestamp, 'America/New_York', 'en',dateFormat);
+				const zhDate = this.formatDate(timestamp, 'Asia/Shanghai', 'zh-cn',dateFormat);
+				if (this.$i18n.locale == 'en') {
+					// console.log('英文日期:', enDate); // 英文输出
+					this.currenlanguageTime = enDate;
+				} else if (this.$i18n.locale == 'ko') {
+					this.currenlanguageTime = koDate;
+					// console.log('韩文日期:', koDate); // 韩文输出
+					// 使用 split 方法分隔字符串
+					// const parts = koDate.split(' ');
+					// 提取星期几
+					// const dayOfWeek = parts[1];
+					// const tempday = this.translateDay(dayOfWeek);
+					// this.currenlanguageTime = parts[0] + ' ' + tempday;
+				} else {
+					this.currenlanguageTime = zhDate;
+					// console.log('中文日期:', zhDate); // 中文输出
+					// const parts = zhDate.split(' ');
+					// const dayOfWeek = parts[1];
+					// const tempday = this.translateDay(dayOfWeek);
+					// this.currenlanguageTime = parts[0] + ' ' + tempday;
+				}
+			},
+			
+			translateDay(day) {
+				const lang = this.$i18n.locale;
+				const weekDays = {
+					zh: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'],
+					en: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+					ko: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일']
+				};
+				const index = weekDays.en.indexOf(day);
+				if (index !== -1) {
+					return weekDays[lang][index];
+				} else {
+					throw new Error(`Day "${day}" not found in English weekDays.`);
+				}
 			},
 
 			onSetting() {
@@ -429,7 +486,7 @@
 				}
 				console.log('lang selected lang', lang)
 				this.$i18n.locale = lang
-				// this.dateDisplay()
+				this.dateDisplay()
 				// this.initTimeLine(this.tempData)
 				this.syncRoom()
 			},
@@ -452,6 +509,7 @@
 						this.roomData = data;
 						this.initTimeline(data);
 						this.foundNextMeet();
+						this.dateDisplay();
 					},
 					fail: (e) => {
 						console.error(e)
@@ -758,6 +816,7 @@
 		margin-left: 37rpx;
 		font-size: 18rpx;
 		text-align: left;
+		background-color: blue;
 		/* font-family: PingFangSC-light; */
 		font-family: 'Noto Sans CJK SC Light', 'Source Han Sans CN Light', 'Droid Sans Fallback', sans-serif;
 		color: white;
