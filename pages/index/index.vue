@@ -634,7 +634,7 @@
 
 	.scroll-item-meeting {
 		position: absolute;
-		width: 120rpx;
+		width: 160rpx;
 		top: 2rpx;
 		left: 8rpx;
 		line-height: 12rpx;
