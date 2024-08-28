@@ -200,7 +200,7 @@
 				if (this.roomData && this.roomData.now_entry) {
 					start_time = this.roomData.now_entry.start_time;
 					end_time = this.roomData.now_entry.end_time;
-				} else if (this.nextMeetData) {
+				} else if (this.nextMeetData && this.nextMeetData.start_time) {
 					start_time = this.nextMeetData.start_time;
 					end_time = this.nextMeetData.end_time;
 				} else {
