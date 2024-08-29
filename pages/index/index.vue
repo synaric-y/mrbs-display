@@ -4,14 +4,13 @@
 			<input class="popup-input" v-model="_roomId" :placeholder="$t('message.alert_code')" />
 			<view class="popup-sure" @click="onSetRoomId">{{$t('message.sure')}}</view>
 		</view>
-
+		<!-- 快速会议弹窗 -->
 		<view class="popup-quick-meeting" v-if="showQuickMeeting">
 			<text class="quick-meeting-msg">{{quickMeetingMsg}}</text>
 			<view class="quick-meeting-btns">
 				<view class="quick-cancle-btn" @click="cancleQuickMeet">{{$t('message.cancle')}}</view>
 				<view class="quick-sure-btn" @click="sureQuickMeet">{{$t('message.confirm')}}</view>
 			</view>
-
 		</view>
 		<!-- 会议部分 -->
 		<view class="left-time-view">
@@ -592,7 +591,6 @@
 					success: (res) => {
 						let data = res.data;
 						console.log('quickMeet返回数据成功data:', data);
-						
 						if(confirm == 0 && data && data.data) {
 							this.showQuickMeeting = true;
 							this.quickMeetingMsg = data.data.time;
