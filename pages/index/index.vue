@@ -152,6 +152,7 @@
 	export default {
 		name: 'App',
 		interval: null,
+		batteryInterval: null,
 		data() {
 			return {
 				meeting: false,
@@ -192,7 +193,9 @@
 				largeScreenHeight: 0,
 				quickMeetingMsg: '接口未及时返回数据',
 				isEnglish: false,
-				itemHight: 31,
+				itemHight: 29.5,
+				batteryInfo: null,
+				deviceInfo: null,
 			}
 		},
 		onLoad() {
@@ -205,6 +208,17 @@
 			this.startSync();
 			this.largeScreenHeight = windowInfo.windowHeight;
 			console.log('getWindowInfo windowHeight:', this.largeScreenHeight)
+			
+			// 获取设备的信息
+			let localDeviceInfo = uni.getStorageSync("DEVICE_INFO")
+			if(localDeviceInfo) {
+				this.deviceInfo = localDeviceInfo
+			} else {
+				let deviceInfo = uni.getDeviceInfo();
+				uni.setStorageSync("DEVICE_INFO", deviceInfo);
+				this.deviceInfo = deviceInfo;
+			}
+			console.log('获取设备的信息deviceInfo:',deviceInfo);
 		},
 		methods: {
 			// 获取会议时间
@@ -237,6 +251,20 @@
 				this.interval = setInterval(() => {
 					this.syncRoom()
 				}, 5000)
+				
+				// 5分钟获取一次电量信息
+				if (this.batteryInterval) {
+					clearInterval(this.batteryInterval)
+					this.batteryInterval = null
+				}
+				this.batteryInterval = setInterval(() => {
+					uni.getBatteryInfo({
+					  success: (res) => {
+					    console.log('获取电量信息res:',res);
+						this.batteryInfo = res;
+					  }
+					})
+				},1000*300)
 			},
 
 			dateDisplay() {
@@ -261,7 +289,7 @@
 				} else {
 					this.nowlanguageTime = displayAP + '  ' + zhDate;
 				}
-				console.log('dateDisplay now_timestamp currenlanguageTime', this.nowlanguageTime);
+				// console.log('dateDisplay now_timestamp currenlanguageTime', this.nowlanguageTime);
 			},
 
 			displayHM(timestamp) {
@@ -398,6 +426,9 @@
 						timeTitle = tempStartTime.toString().padStart(2, '0') + ':00'
 					}
 					let tempMinute = 0;
+					if(timeTitle == '00:00') {
+						timeTitle = '12:00';
+					}
 					timeTitle = timeTitle + ap;
 					if (!isFirst) {
 						let isfoundEntry = false
@@ -527,6 +558,10 @@
 					data: {
 						room_id: this.roomId,
 						timezone: this.timezore,
+						device_id: this.deviceInfo.deviceId,
+						battery_level: this.batteryInfo.level,
+						battery_charge: this.batteryInfo.isCharging,
+						device_info: this.deviceInfo,
 					},
 					success: (res) => {
 						let data = res.data.data;
@@ -618,6 +653,18 @@
 					}
 				})
 			},
+		},
+		
+		onUnload() {
+			// 清除定时器
+			if(this.interval) {
+				clearInterval(this.interval)
+				this.interval = null
+			}
+			if(this.batteryInterval) {
+				clearInterval(this.batteryInterval)
+				this.batteryInterval = null
+			}
 		}
 	}
 </script>
