@@ -53,7 +53,7 @@
 			</view>
 		</view>
 		<!-- 会议基本信息 -->
-		<view class="right-meeting-info">
+		<view :class="[(roomData && roomData.now_entry)?'right-in-meeting-bg':'right-meeting-info']">
 			<!-- 房间 时间 切换语言 -->
 			<view class="right-meeting-top">
 				<view>
@@ -90,6 +90,7 @@
 					</view>
 				</template>
 				<template v-if="roomData && roomData.now_entry">
+					<view class="placehold-view"></view>
 					<view class="meeting-title-type" v-if="roomData && roomData.now_entry">
 						<image class="meeting-msg-icon" src="@/static/meeting-msg.png" mode=""></image>
 						<text class="meeting-msg-title reverse-title">{{roomData.now_entry.name}}</text>
@@ -111,6 +112,7 @@
 					<view class="nextMeet">
 						{{$t('message.nextMeet')}}
 					</view>
+					<view class="placehold-view"></view>
 					<view class="meeting-title-type">
 						<image class="meeting-msg-icon" src="@/static/meeting-msg.png" mode=""></image>
 						<text class="meeting-msg-title reverse-title">{{nextMeetData.name}}</text>
@@ -177,7 +179,7 @@
 				timezore: 'Asia/Shanghai',
 				languageSet: 'zh-CN,zh;q=0.9',
 				meetTimeZore: '',
-				meetTimeString: 'am-pm',
+				meetTimeString: '',
 				largeScreenHeight: 0,
 			}
 		},
@@ -379,11 +381,11 @@
 				let isFirst = true;
 				// console.log('initTimeline enter tempStartTime tempEndTime:',tempStartTime,tempEndTime); 
 				while (tempStartTime <= tempEndTime) {
-					let ap = 'am'
+					let ap = 'AM'
 					let pmTime = tempStartTime
 					let timeTitle = '';
 					if (tempStartTime >= 12) {
-						ap = 'pm'
+						ap = 'PM'
 						pmTime = tempStartTime - 12
 						timeTitle = pmTime.toString().padStart(2, '0') + ':00'
 					} else {
@@ -764,6 +766,14 @@
 		height: 100vh;
 		background-color: #591BB7;
 	}
+	
+	.right-in-meeting-bg {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		height: 100vh;
+		background-color: #BD3124;
+	}
 
 	.right-meeting-top {
 		width: 100%;
@@ -792,7 +802,7 @@
 
 	.change-language {
 		position: fixed;
-		top: 14rpx;
+		top: 24rpx;
 		right: 20rpx;
 		background-color: rgba(230, 241, 252, 0.25);
 		font-size: 12rpx;
@@ -893,13 +903,17 @@
 		margin-left: 37rpx;
 		height: 37rpx;
 	}
+	
+	.placehold-view {
+		margin-top: 10rpx !important;
+	}
 
 	.reverse-title {
 		line-height: 30rpx;
 		color: rgb(255, 255, 255);
 		font-size: 28rpx;
 		font-family: 'Noto Sans CJK SC', 'Source Han Sans CN', 'Droid Sans', sans-serif;
-		margin-top: -30rpx;
+		margin-top: -33rpx;
 		padding-left: 20rpx;
 		width: 400rpx;
 		-webkit-line-clamp: 1;
