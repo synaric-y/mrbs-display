@@ -192,6 +192,7 @@
 				largeScreenHeight: 0,
 				quickMeetingMsg: '接口未及时返回数据',
 				isEnglish: false,
+				itemHight: 31,
 			}
 		},
 		onLoad() {
@@ -427,7 +428,7 @@
 								isCurrentMeet: isCurrentMeet,
 								title: foundEntry['name'],
 								meetRange: meetRange,
-								meetHeight: (foundEntry['end_time'] - foundEntry['start_time']) / 1800 * 30
+								meetHeight: (foundEntry['end_time'] - foundEntry['start_time']) / 1800 * this.itemHight
 							})
 						} else {
 							allTimeList.push({
@@ -471,7 +472,7 @@
 								isCurrentMeet: currentMeet,
 								title: allFounfEntry['name'],
 								meetRange: meetTimeRange,
-								meetHeight: (allFounfEntry['end_time'] - allFounfEntry['start_time']) / 1800 * 30
+								meetHeight: (allFounfEntry['end_time'] - allFounfEntry['start_time']) / 1800 * this.itemHight
 							})
 						} else {
 							allTimeList.push({
@@ -673,6 +674,7 @@
 		color: white;
 		width: 50rpx;
 		position: absolute;
+		/* background-color: red; */
 		left: 8rpx;
 		font-family: 'Noto Sans CJK SC Light', 'Source Han Sans CN Light', 'Droid Sans Fallback', sans-serif;
 	}
@@ -682,7 +684,7 @@
 	}
 
 	.extention-height {
-		margin-top: 10rpx;
+		margin-top: 5rpx;
 		height: 60rpx;
 		background-color: red;
 		width: 172rpx;
