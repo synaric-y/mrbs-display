@@ -7,7 +7,7 @@
 		<!-- 快速会议弹窗 -->
 		<view class="popup-quick-meeting" v-if="showQuickMeeting">
 			<text class="quick-meeting-msg">{{quickMeetingMsg}}</text>
-			<view class="quick-meeting-btns">
+			<view :class="[isEnglish == true?'quick-meeting-btns-en':'quick-meeting-btns']">
 				<view class="quick-cancle-btn" @click="cancleQuickMeet">{{$t('message.cancle')}}</view>
 				<view class="quick-sure-btn" @click="sureQuickMeet">{{$t('message.confirm')}}</view>
 			</view>
@@ -190,7 +190,8 @@
 				meetTimeZore: '',
 				meetTimeString: '',
 				largeScreenHeight: 0,
-				quickMeetingMsg: '接口未及时返回数据'
+				quickMeetingMsg: '接口未及时返回数据',
+				isEnglish: false,
 			}
 		},
 		onLoad() {
@@ -1061,6 +1062,15 @@
 		justify-content: space-evenly;
 		width: 100%;
 		margin-top: 30rpx;
+	}
+	
+	.quick-meeting-btns-en {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-evenly;
+		height: 75rpx;
+		width: 100%;
+		margin-top: 10rpx;
 	}
 	
 	.quick-cancle-btn {
