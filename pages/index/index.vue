@@ -552,6 +552,14 @@
 
 			prepareQuickMeet() {
 				console.log('prepareQuickMeet');
+				if(this.roomFree == false) {
+					const msg = this.$t('message.noFreeRoom');
+					uni.showToast({
+						title: msg,
+						icon: 'none'
+					})
+					return;
+				}
 				this.quickMeet(0);
 			},
 			
