@@ -223,7 +223,6 @@
 				const startTime = this.formatDate(start_time, 'Asia/Shanghai', 'zh-cn', dateFormat);
 				const endTime = this.formatDate(end_time, 'Asia/Shanghai', 'zh-cn', dateFormat);
 				let stampStr = startTime + '-' + endTime;
-				// console.log('nowMeetTime start_time end_time', start_time, end_time);
 				console.log('nowMeetTime startTime endTime', startTime, endTime);
 				return stampStr;
 			},
@@ -240,12 +239,8 @@
 			},
 
 			dateDisplay() {
-				// 2024年8月8日星期四、
-				// 英文：Wednesday,September.7,2024
-				// 韩文：2024년 8월 8일 목요일
 				const timestamp = this.roomData.now_timestamp;
 				console.log('dateDisplay now_timestamp', timestamp);
-				// 格式化日期为中文、英文、韩文，并考虑时区
 				let dateFormat = 'YYYY年MM月DD日';
 				if (this.$i18n.locale == 'en') {
 					dateFormat = 'MMMM D, YYYY';
@@ -259,7 +254,6 @@
 				const enDate = this.formatDate(timestamp, 'America/New_York', 'en', dateFormat);
 				const zhDate = this.formatDate(timestamp, 'Asia/Shanghai', 'zh-cn', dateFormat);
 				if (this.$i18n.locale == 'en') {
-					// console.log('英文日期:', enDate); // 英文输出
 					this.nowlanguageTime = displayAP + '  ' + enDate;
 				} else if (this.$i18n.locale == 'ko') {
 					this.nowlanguageTime = displayAP + '  ' + koDate;
@@ -433,7 +427,7 @@
 								isCurrentMeet: isCurrentMeet,
 								title: foundEntry['name'],
 								meetRange: meetRange,
-								meetHeight: (foundEntry['end_time'] - foundEntry['start_time']) / 1800 * 28
+								meetHeight: (foundEntry['end_time'] - foundEntry['start_time']) / 1800 * 30
 							})
 						} else {
 							allTimeList.push({
@@ -477,7 +471,7 @@
 								isCurrentMeet: currentMeet,
 								title: allFounfEntry['name'],
 								meetRange: meetTimeRange,
-								meetHeight: (allFounfEntry['end_time'] - allFounfEntry['start_time']) / 1800 * 28
+								meetHeight: (allFounfEntry['end_time'] - allFounfEntry['start_time']) / 1800 * 30
 							})
 						} else {
 							allTimeList.push({
