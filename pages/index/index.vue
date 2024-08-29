@@ -280,7 +280,7 @@
 				console.log('displayHM am pm :', parts);
 				const timeMinute = parts[0];
 				const ap = parts[1];
-				return timeMinute + ap;
+				return timeMinute + ' ' + ap;
 			},
 
 			onSetting() {
@@ -1003,7 +1003,7 @@
 		z-index: 9;
 		position: fixed;
 		left: 250rpx;
-		top: 100rpx;
+		top: 225rpx;
 	}
 	
 	.popup-quick-meeting {
@@ -1016,8 +1016,8 @@
 		align-items: center;
 		z-index: 1000;
 		position: fixed;
-		left: 230rpx;
-		top: 100rpx;
+		left: 250rpx;
+		top: 225rpx;
 	}
 
 	.popup-input {
