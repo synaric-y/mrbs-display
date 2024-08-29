@@ -1011,7 +1011,7 @@
 		z-index: 9;
 		position: fixed;
 		left: 250rpx;
-		top: 225rpx;
+		top: 150rpx;
 	}
 	
 	.popup-quick-meeting {
@@ -1025,7 +1025,7 @@
 		z-index: 1000;
 		position: fixed;
 		left: 250rpx;
-		top: 225rpx;
+		top: 150rpx;
 	}
 
 	.popup-input {
