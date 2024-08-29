@@ -4,6 +4,15 @@
 			<input class="popup-input" v-model="_roomId" :placeholder="$t('message.alert_code')" />
 			<view class="popup-sure" @click="onSetRoomId">{{$t('message.sure')}}</view>
 		</view>
+
+		<view class="popup-quick-meeting" v-if="showQuickMeeting">
+			<text class="quick-meeting-msg">{{quickMeetingMsg}}</text>
+			<view class="quick-meeting-btns">
+				<view class="quick-cancle-btn" @click="cancleQuickMeet">{{$t('message.cancle')}}</view>
+				<view class="quick-sure-btn" @click="sureQuickMeet">{{$t('message.confirm')}}</view>
+			</view>
+
+		</view>
 		<!-- 会议部分 -->
 		<view class="left-time-view">
 			<!-- 会议时间 -->
@@ -47,7 +56,8 @@
 			<!-- 预约会议 -->
 			<view class="reserve-meeting">
 				<view class="reserve-title">{{$t('message.quickMeeting')}}</view>
-				<view :class="[roomData.now_entry != null?'reserve-button':'reserve-button-free']" @click="quickMeet">
+				<view :class="[roomData.now_entry != null?'reserve-button':'reserve-button-free']"
+					@click="prepareQuickMeet">
 					{{$t('message.book')}}
 				</view>
 			</view>
@@ -119,8 +129,7 @@
 					</view>
 					<view class="meeting-title-type">
 						<image class="meeting-msg-icon" src="@/static/reverse-time.png" mode=""></image>
-						<text v-if="nextMeetData"
-							class="meeting-msg-title reverse-time">{{this.meetTimeString}}</text>
+						<text v-if="nextMeetData" class="meeting-msg-title reverse-time">{{this.meetTimeString}}</text>
 						<text v-else class="meeting-msg-title reverse-time"></text>
 					</view>
 					<view class="meeting-title-type">
@@ -149,6 +158,7 @@
 				meeting: false,
 				timeRange: [],
 				showSetting: false,
+				showQuickMeeting: false,
 				_roomId: 2,
 				roomId: 2,
 				meetStartTime: 8,
@@ -181,6 +191,7 @@
 				meetTimeZore: '',
 				meetTimeString: '',
 				largeScreenHeight: 0,
+				quickMeetingMsg: '接口未及时返回数据'
 			}
 		},
 		onLoad() {
@@ -213,7 +224,7 @@
 				const endTime = this.formatDate(end_time, 'Asia/Shanghai', 'zh-cn', dateFormat);
 				let stampStr = startTime + '-' + endTime;
 				// console.log('nowMeetTime start_time end_time', start_time, end_time);
-				console.log('nowMeetTime startTime endTime', startTime,endTime);
+				console.log('nowMeetTime startTime endTime', startTime, endTime);
 				return stampStr;
 			},
 
@@ -524,7 +535,7 @@
 					},
 					success: (res) => {
 						let data = res.data.data;
-						if(data == null) {
+						if (data == null) {
 							uni.showToast({
 								title: this.$t('message.netDataError'),
 								icon: 'none'
@@ -544,7 +555,21 @@
 				})
 			},
 
-			quickMeet() {
+			prepareQuickMeet() {
+				console.log('prepareQuickMeet');
+				this.quickMeet(0);
+			},
+			
+			cancleQuickMeet() {
+				this.showQuickMeeting = false;
+			},
+			
+			sureQuickMeet() {
+				this.showQuickMeeting = false;
+				this.quickMeet(1);
+			},
+
+			quickMeet(confirm) {
 				if (isNaN(this.roomId)) {
 					uni.showToast({
 						title: this.$t('message.roomNumberError'),
@@ -562,10 +587,17 @@
 					},
 					data: {
 						room_id: this.roomId,
+						confirm: confirm
 					},
 					success: (res) => {
 						let data = res.data;
 						console.log('quickMeet返回数据成功data:', data);
+						
+						if(confirm == 0 && data && data.data) {
+							this.showQuickMeeting = true;
+							this.quickMeetingMsg = data.data.time;
+							return;
+						} 
 						let msg = '';
 						if (data.code == -1) {
 							msg = this.$t('message.noRoom');
@@ -766,7 +798,7 @@
 		height: 100vh;
 		background-color: #591BB7;
 	}
-	
+
 	.right-in-meeting-bg {
 		display: flex;
 		flex-direction: column;
@@ -903,7 +935,7 @@
 		margin-left: 37rpx;
 		height: 37rpx;
 	}
-	
+
 	.placehold-view {
 		margin-top: 10rpx !important;
 	}
@@ -978,6 +1010,20 @@
 		left: 250rpx;
 		top: 100rpx;
 	}
+	
+	.popup-quick-meeting {
+		width: 250rpx;
+		height: 130rpx;
+		background-color: #FCCA00;
+		border-radius: 5rpx;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		z-index: 1000;
+		position: fixed;
+		left: 230rpx;
+		top: 100rpx;
+	}
 
 	.popup-input {
 		width: 200rpx;
@@ -999,4 +1045,50 @@
 		color: white;
 		border-radius: 6rpx;
 	}
+	
+	.quick-meeting-msg {
+		padding-left: 20rpx;
+		padding-right: 20rpx;
+		margin-top: 15rpx;
+		line-height: 19rpx;
+		color: rgba(51,51,51,1);
+		font-size: 13rpx;
+		text-align: center;
+		font-family: PingFangSC-medium;
+	}
+	
+	.quick-meeting-btns {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-evenly;
+		width: 100%;
+		margin-top: 30rpx;
+	}
+	
+	.quick-cancle-btn {
+		height: 32rpx;
+		width: 72rpx;
+		line-height: 32rpx;
+		border-radius: 4rpx 4rpx 4rpx 4rpx;
+		background-color: #FCCA00;
+		color: rgba(0,0,0,1);
+		font-size: 14rpx;
+		text-align: center;
+		box-shadow: 0rpx 2rpx 6rpx 0rpx rgba(0,0,0,0.4);
+		font-family: Roboto;
+	}
+	
+	.quick-sure-btn {
+		height: 32rpx;
+		width: 72rpx;
+		line-height: 32rpx;
+		border-radius: 4rpx 4rpx 4rpx 4rpx;
+		background-color: #FCCA00;
+		color: rgba(0,0,0,1);
+		font-size: 14rpx;
+		text-align: center;
+		box-shadow: 0rpx 2rpx 6rpx 0rpx rgba(0,0,0,0.4);
+		font-family: Roboto;
+	}
+	
 </style>
