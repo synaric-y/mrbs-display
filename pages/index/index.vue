@@ -194,8 +194,8 @@
 				quickMeetingMsg: '接口未及时返回数据',
 				isEnglish: false,
 				itemHight: 29.5,
-				batteryInfo: null,
-				deviceInfo: null,
+				batteryInfo: {},
+				deviceInfo: {},
 			}
 		},
 		onLoad() {
@@ -548,6 +548,8 @@
 			},
 
 			syncRoom() {
+				console.log('syncRoom batteryInfo',this.batteryInfo);
+				console.log('syncRoom deviceInfo',this.deviceInfo);
 				uni.request({
 					url: `${HOST}/web/appapi/api.php?act=sync_room`,
 					method: "POST",
