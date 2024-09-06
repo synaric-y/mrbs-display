@@ -265,6 +265,12 @@
 					  }
 					})
 				},1000*300)
+				uni.getBatteryInfo({
+				  success: (res) => {
+				    console.log('获取电量信息res:',res);
+					this.batteryInfo = res;
+				  }
+				})
 			},
 
 			dateDisplay() {
