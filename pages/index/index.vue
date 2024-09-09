@@ -55,7 +55,7 @@
 			<!-- 预约会议 -->
 			<view class="reserve-meeting">
 				<view class="reserve-title">{{$t('message.quickMeeting')}}</view>
-				<view :class="[roomData.now_entry != null?'reserve-button':'reserve-button-free']"
+				<view :class="[(roomData && (roomData.now_entry != null))?'reserve-button':'reserve-button-free']"
 					@click="prepareQuickMeet">
 					{{$t('message.book')}}
 				</view>
@@ -124,7 +124,7 @@
 					<view class="placehold-view"></view>
 					<view class="meeting-title-type">
 						<image class="meeting-msg-icon" src="@/static/meeting-msg.png" mode=""></image>
-						<text class="meeting-msg-title reverse-title">{{nextMeetData.name}}</text>
+						<text v-if="nextMeetData" class="meeting-msg-title reverse-title">{{nextMeetData.name}}</text>
 					</view>
 					<view class="meeting-title-type">
 						<image class="meeting-msg-icon" src="@/static/reverse-time.png" mode=""></image>
@@ -133,7 +133,7 @@
 					</view>
 					<view class="meeting-title-type">
 						<image class="meeting-msg-icon" src="@/static/reverse-person.png" mode=""></image>
-						<text class="meeting-msg-title reverse-person">{{nextMeetData.book_by}}</text>
+						<text v-if="nextMeetData" class="meeting-msg-title reverse-person">{{nextMeetData.book_by}}</text>
 					</view>
 				</template>
 			</view>
@@ -205,7 +205,6 @@
 				this._roomId = Number(roomId)
 			}
 			const windowInfo = uni.getWindowInfo();
-			this.startSync();
 			this.largeScreenHeight = windowInfo.windowHeight;
 			console.log('getWindowInfo windowHeight:', this.largeScreenHeight)
 			
@@ -219,6 +218,7 @@
 				this.deviceInfo = deviceInfo;
 			}
 			console.log('获取设备的信息deviceInfo:',deviceInfo);
+			this.startSync();
 		},
 		methods: {
 			// 获取会议时间

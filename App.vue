@@ -3,7 +3,7 @@
 		onLaunch: function() {
 			console.log('App Launch')
 			// return
-			plus.screen.lockOrientation('landscape-primary')
+			plus.screen.lockOrientation('landscape')
 			plus.navigator.setFullscreen(true)
 
 			var ac = plus.android.runtimeMainActivity();
