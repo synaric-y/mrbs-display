@@ -257,6 +257,7 @@
 					clearInterval(this.batteryInterval)
 					this.batteryInterval = null
 				}
+				// #ifdef APP-PLUS
 				this.batteryInterval = setInterval(() => {
 					uni.getBatteryInfo({
 					  success: (res) => {
@@ -271,6 +272,7 @@
 					this.batteryInfo = res;
 				  }
 				})
+				 // #endif
 			},
 
 			dateDisplay() {
