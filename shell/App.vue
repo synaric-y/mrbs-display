@@ -3,6 +3,7 @@
 		onLaunch: function() {
 			console.log('App Launch')
 			// return
+			// #ifdef APP-PLUS
 			plus.screen.lockOrientation('landscape')
 			plus.navigator.setFullscreen(true)
 
@@ -13,6 +14,7 @@
 			plus.android.invoke(dv, "setSystemUiVisibility", 256 | 1024 | 512);
 			// WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
 			plus.android.invoke(win, "addFlags", 128);
+			// #endif
 		},
 		onShow: function() {
 			console.log('App Show')

@@ -16,6 +16,8 @@ The current project is a display end, developed based on uni-app. Please see the
 - Tablet screen displays conference room status and reservation information
 - Sync Calendar with Microsoft Exchange, extensible third-party Calendar support
 - I18n support, Chinese/English/Korean...
+- Booking Fast Meeting
+- Remote Update
 
 # Environment And Dependencies
 
