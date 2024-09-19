@@ -217,7 +217,7 @@
 				uni.setStorageSync("DEVICE_INFO", deviceInfo);
 				this.deviceInfo = deviceInfo;
 			}
-			console.log('获取设备的信息deviceInfo:',deviceInfo);
+			// console.log('获取设备的信息deviceInfo:',deviceInfo);
 			this.startSync();
 		},
 		methods: {
