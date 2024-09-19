@@ -1,12 +1,5 @@
-<!-- <template> -->
-	<!-- <App/> -->
-<!-- </template> -->
-
 <script>
-	// import App from './App.vue'
 	export default {
-		
-		// components: { App },
 		onLaunch: function() {
 			console.log('App Launch')
 			// return

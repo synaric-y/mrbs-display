@@ -1,10 +1,16 @@
 {
-  "name": "mrbs-display",
-  "lockfileVersion": 3,
-  "requires": true,
-  "packages": {},
-  "dependencies": {
-    "moment-timezone": "^0.5.45",
-    "vue-i18n": "^9.13.1"
-  }
+	"name": "mrbs-display",
+	"lockfileVersion": 3,
+	"requires": true,
+	"packages": {},
+	"scripts": {
+		"build:h5": "uni build:h5"
+	},
+	"dependencies": {
+		"@dcloudio/uni-h5": "^2.x",
+		"@vue/cli-service": "^4.x",
+		"@dcloudio/uni-cli-shared": "^2.0.2-4020420240722003",
+		"moment-timezone": "^0.5.45",
+		"vue-i18n": "^9.13.1"
+	}
 }

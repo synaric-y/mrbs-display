@@ -133,7 +133,8 @@
 					</view>
 					<view class="meeting-title-type">
 						<image class="meeting-msg-icon" src="@/static/reverse-person.png" mode=""></image>
-						<text v-if="nextMeetData" class="meeting-msg-title reverse-person">{{nextMeetData.book_by}}</text>
+						<text v-if="nextMeetData"
+							class="meeting-msg-title reverse-person">{{nextMeetData.book_by}}</text>
 					</view>
 				</template>
 			</view>
@@ -207,10 +208,10 @@
 			const windowInfo = uni.getWindowInfo();
 			this.largeScreenHeight = windowInfo.windowHeight;
 			console.log('getWindowInfo windowHeight:', this.largeScreenHeight)
-			
+
 			// 获取设备的信息
 			let localDeviceInfo = uni.getStorageSync("DEVICE_INFO")
-			if(localDeviceInfo) {
+			if (localDeviceInfo) {
 				this.deviceInfo = localDeviceInfo
 			} else {
 				let deviceInfo = uni.getDeviceInfo();
@@ -238,6 +239,12 @@
 				const startTime = this.formatDate(start_time, 'Asia/Shanghai', 'zh-cn', dateFormat);
 				const endTime = this.formatDate(end_time, 'Asia/Shanghai', 'zh-cn', dateFormat);
 				let stampStr = startTime + '-' + endTime;
+
+				// uni.postMessage({
+				// 	data: {
+				// 		msg: `nowMeetTime startTime endTime:${startTime}-${endTime}`
+				// 	}
+				// });
 				console.log('nowMeetTime startTime endTime', startTime, endTime);
 				return stampStr;
 			},
@@ -251,33 +258,55 @@
 				this.interval = setInterval(() => {
 					this.syncRoom()
 				}, 5000)
-				
+
 				// 5分钟获取一次电量信息
 				if (this.batteryInterval) {
 					clearInterval(this.batteryInterval)
 					this.batteryInterval = null
 				}
-				// #ifdef APP-PLUS
+				// // #ifdef APP-PLUS
 				this.batteryInterval = setInterval(() => {
 					uni.getBatteryInfo({
-					  success: (res) => {
-					    console.log('获取电量信息res:',res);
-						this.batteryInfo = res;
-					  }
+						success: (res) => {
+							console.log('获取电量信息res:', JSON.stringify(res));
+							// uni.postMessage({
+							// 	data: {
+							// 		msg: `获取电量信息res:${res}`
+							// 	}
+							// });
+							this.batteryInfo = res;
+						},
+						
+						fail:(error) => {
+							console.error('获取电量信息 error',JSON.stringify(error))
+						}
 					})
-				},1000*300)
+				}, 1000 * 300)
 				uni.getBatteryInfo({
-				  success: (res) => {
-				    console.log('获取电量信息res:',res);
-					this.batteryInfo = res;
-				  }
+					success: (res) => {
+						console.log('获取电量信息res:',JSON.stringify(res));
+						// uni.postMessage({
+						// 	data: {
+						// 		msg: `获取电量信息res::${res}`
+						// 	}
+						// });
+						this.batteryInfo = res;
+					},
+					fail:(error) => {
+						console.error('获取电量信息 error',JSON.stringify(error))
+					}
 				})
-				 // #endif
+				// // #endif
 			},
 
 			dateDisplay() {
 				const timestamp = this.roomData.now_timestamp;
 				console.log('dateDisplay now_timestamp', timestamp);
+				// uni.postMessage({
+				// 	data: {
+				// 		msg: `dateDisplay now_timestamp:${timestamp}`
+				// 	}
+				// });
 				let dateFormat = 'YYYY年MM月DD日';
 				if (this.$i18n.locale == 'en') {
 					dateFormat = 'MMMM D, YYYY';
@@ -313,7 +342,7 @@
 				} else {
 					parts = zhDate.split(' ');
 				}
-				console.log('displayHM am pm :', parts);
+				console.log('displayHM am pm :', JSON.stringify(parts));
 				const timeMinute = parts[0];
 				const ap = parts[1];
 				return timeMinute + ' ' + ap;
@@ -434,7 +463,7 @@
 						timeTitle = tempStartTime.toString().padStart(2, '0') + ':00'
 					}
 					let tempMinute = 0;
-					if(timeTitle == '00:00') {
+					if (timeTitle == '00:00') {
 						timeTitle = '12:00';
 					}
 					timeTitle = timeTitle + ap;
@@ -467,7 +496,8 @@
 								isCurrentMeet: isCurrentMeet,
 								title: foundEntry['name'],
 								meetRange: meetRange,
-								meetHeight: (foundEntry['end_time'] - foundEntry['start_time']) / 1800 * this.itemHight
+								meetHeight: (foundEntry['end_time'] - foundEntry['start_time']) / 1800 * this
+									.itemHight
 							})
 						} else {
 							allTimeList.push({
@@ -511,7 +541,8 @@
 								isCurrentMeet: currentMeet,
 								title: allFounfEntry['name'],
 								meetRange: meetTimeRange,
-								meetHeight: (allFounfEntry['end_time'] - allFounfEntry['start_time']) / 1800 * this.itemHight
+								meetHeight: (allFounfEntry['end_time'] - allFounfEntry['start_time']) / 1800 * this
+									.itemHight
 							})
 						} else {
 							allTimeList.push({
@@ -556,8 +587,8 @@
 			},
 
 			syncRoom() {
-				console.log('syncRoom batteryInfo',this.batteryInfo);
-				console.log('syncRoom deviceInfo',this.deviceInfo);
+				console.log('syncRoom batteryInfo', JSON.stringify(this.batteryInfo));
+				console.log('syncRoom deviceInfo', JSON.stringify(this.deviceInfo));
 				uni.request({
 					url: `${HOST}/web/appapi/api.php?act=sync_room`,
 					method: "POST",
@@ -582,7 +613,14 @@
 							})
 							return;
 						}
-						console.log('syncRoom返回数据成功data:', data);
+						console.log('syncRoom返回数据成功data:', JSON.stringify(data));
+						// uni.postMessage({
+						// 	data: {
+						// 		msg: `syncRoom返回数据成功data:${data}`
+						// 	}
+						// });
+						
+						// uni.$emit('syncRoom返回数据成功data', { msg: `syncRoom返回数据成功data:${data}` });
 						this.roomData = data;
 						this.initTimeline(data);
 						this.foundNextMeet();
@@ -597,7 +635,7 @@
 
 			prepareQuickMeet() {
 				console.log('prepareQuickMeet');
-				if(this.roomFree == false) {
+				if (this.roomFree == false) {
 					const msg = this.$t('message.noFreeRoom');
 					uni.showToast({
 						title: msg,
@@ -607,11 +645,11 @@
 				}
 				this.quickMeet(0);
 			},
-			
+
 			cancleQuickMeet() {
 				this.showQuickMeeting = false;
 			},
-			
+
 			sureQuickMeet() {
 				this.showQuickMeeting = false;
 				this.quickMeet(1);
@@ -639,12 +677,12 @@
 					},
 					success: (res) => {
 						let data = res.data;
-						console.log('quickMeet返回数据成功data:', data);
-						if(confirm == 0 && data && data.data) {
+						console.log('quickMeet返回数据成功data:', JSON.stringify(data));
+						if (confirm == 0 && data && data.data) {
 							this.showQuickMeeting = true;
 							this.quickMeetingMsg = data.data.time;
 							return;
-						} 
+						}
 						let msg = '';
 						if (data.code == -1) {
 							msg = this.$t('message.noRoom');
@@ -664,14 +702,14 @@
 				})
 			},
 		},
-		
+
 		onUnload() {
 			// 清除定时器
-			if(this.interval) {
+			if (this.interval) {
 				clearInterval(this.interval)
 				this.interval = null
 			}
-			if(this.batteryInterval) {
+			if (this.batteryInterval) {
 				clearInterval(this.batteryInterval)
 				this.batteryInterval = null
 			}
@@ -896,7 +934,7 @@
 		position: fixed;
 		top: 24rpx;
 		right: 20rpx;
-		background-color: rgba(230, 241, 252, 0.25);
+		/* background-color: rgba(230, 241, 252, 0.25); */
 		font-size: 12rpx;
 		color: white;
 		line-height: 22rpx;
@@ -1070,7 +1108,7 @@
 		left: 250rpx;
 		top: 150rpx;
 	}
-	
+
 	.popup-quick-meeting {
 		width: 250rpx;
 		height: 130rpx;
@@ -1105,18 +1143,18 @@
 		color: white;
 		border-radius: 6rpx;
 	}
-	
+
 	.quick-meeting-msg {
 		padding-left: 20rpx;
 		padding-right: 20rpx;
 		margin-top: 15rpx;
 		line-height: 19rpx;
-		color: rgba(51,51,51,1);
+		color: rgba(51, 51, 51, 1);
 		font-size: 13rpx;
 		text-align: center;
 		font-family: PingFangSC-medium;
 	}
-	
+
 	.quick-meeting-btns {
 		display: flex;
 		flex-direction: row;
@@ -1124,7 +1162,7 @@
 		width: 100%;
 		margin-top: 30rpx;
 	}
-	
+
 	.quick-meeting-btns-en {
 		display: flex;
 		flex-direction: row;
@@ -1133,31 +1171,30 @@
 		width: 100%;
 		margin-top: 10rpx;
 	}
-	
+
 	.quick-cancle-btn {
 		height: 32rpx;
 		width: 72rpx;
 		line-height: 32rpx;
 		border-radius: 4rpx 4rpx 4rpx 4rpx;
 		background-color: #FCCA00;
-		color: rgba(0,0,0,1);
+		color: rgba(0, 0, 0, 1);
 		font-size: 14rpx;
 		text-align: center;
-		box-shadow: 0rpx 2rpx 6rpx 0rpx rgba(0,0,0,0.4);
+		box-shadow: 0rpx 2rpx 6rpx 0rpx rgba(0, 0, 0, 0.4);
 		font-family: Roboto;
 	}
-	
+
 	.quick-sure-btn {
 		height: 32rpx;
 		width: 72rpx;
 		line-height: 32rpx;
 		border-radius: 4rpx 4rpx 4rpx 4rpx;
 		background-color: #FCCA00;
-		color: rgba(0,0,0,1);
+		color: rgba(0, 0, 0, 1);
 		font-size: 14rpx;
 		text-align: center;
-		box-shadow: 0rpx 2rpx 6rpx 0rpx rgba(0,0,0,0.4);
+		box-shadow: 0rpx 2rpx 6rpx 0rpx rgba(0, 0, 0, 0.4);
 		font-family: Roboto;
 	}
-	
 </style>
