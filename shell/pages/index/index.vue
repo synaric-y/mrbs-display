@@ -1,17 +1,20 @@
 <template>
+	
 	<view class="container" id="app">
 		<view class="popup-setting" v-if="showSetting">
 			<input class="popup-input" v-model="_roomId" :placeholder="$t('message.alert_code')" />
 			<view class="popup-sure" @click="onSetRoomId">{{$t('message.sure')}}</view>
 		</view>
 		<!-- 快速会议弹窗 -->
-		<view class="popup-quick-meeting" v-if="showQuickMeeting">
+		<!-- <view class="popup-quick-meeting" v-if="showQuickMeeting">
 			<text class="quick-meeting-msg">{{quickMeetingMsg}}</text>
 			<view :class="[isEnglish == true?'quick-meeting-btns-en':'quick-meeting-btns']">
 				<view class="quick-cancle-btn" @click="cancleQuickMeet">{{$t('message.cancle')}}</view>
 				<view class="quick-sure-btn" @click="sureQuickMeet">{{$t('message.confirm')}}</view>
 			</view>
-		</view>
+		</view> -->
+		
+		
 		<!-- 会议部分 -->
 		<view class="left-time-view">
 			<!-- 会议时间 -->
@@ -63,6 +66,7 @@
 		</view>
 		<!-- 会议基本信息 -->
 		<view :class="[(roomData && roomData.now_entry)?'right-in-meeting-bg':'right-meeting-info']">
+			<FastMeetingDialog v-if="showQuickMeeting" @close="showQuickMeeting=false"/>
 			<!-- 房间 时间 切换语言 -->
 			<view class="right-meeting-top">
 				<view>
@@ -75,10 +79,8 @@
 						<text class="room-number" @longpress="onSetting">A</text>
 					</view>
 					<view class="change-language">
-						<!-- language -->
-						<uni-data-select style="width: 49rpx;color:#4f4f4f" class="select-language"
-							:placeholder="$t('message.language')" :localdata="datasource" @change="changeLang"
-							:clear="false"></uni-data-select>
+						<!-- 切换语言按钮组件（手动实现） -->
+						<ocSelect :title="$t('message.language')" :localdata="datasource" @change="changeLang"/>
 					</view>
 				</view>
 				<!-- 分割线 -->
@@ -103,7 +105,7 @@
 					<view class="meeting-title-type" v-if="roomData && roomData.now_entry">
 						<image class="meeting-msg-icon" src="@/static/meeting-msg.png" mode=""></image>
 						<text class="meeting-msg-title reverse-title">{{roomData.now_entry.name}}</text>
-						<!-- <text class="meeting-msg-title reverse-title">临时会议临时会议临时会议临临时会议临时会议时会议临时会议临时会议</text> -->
+						<text class="meeting-msg-title reverse-title">临时会议临时会议临时会议临临时会议临时会议时会议临时会议临时会议</text>
 					</view>
 					<view class="meeting-title-type">
 						<image class="meeting-msg-icon" src="@/static/reverse-time.png" mode=""></image>
@@ -149,10 +151,16 @@
 		HOST
 	} from '@/modules/config.js'
 	import moment from 'moment-timezone';
+	import ocSelect from '../../components/oc-select.vue'
+	import FastMeetingDialog from '../../components/FastMeetingDialog.vue'
 	export default {
 		name: 'App',
 		interval: null,
 		batteryInterval: null,
+		components:{
+			ocSelect,
+			FastMeetingDialog
+		},
 		data() {
 			return {
 				meeting: false,
