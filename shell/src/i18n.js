@@ -2,6 +2,48 @@ import { createI18n } from "vue-i18n";
 const messages = {
 	"zh": {
 		"message": {
+			"activate":{ // 页面单独分开，防止命名冲突
+				"welcome":'欢迎使用xxx会议系统',
+				"request_url":'请求地址',
+				"placeholder":'扫描web端的二维码即可自动填写服务地址',
+				"verify":'验证',
+				"belong_to_area":'所属区域',
+				"please_select":'请选择',
+				"belong_to_meeting_room":'所属会议室',
+				"finish":'完成',
+			},
+			"login":{
+				"title":'请输入管理员密码',
+				"account_number":'请输入账号',
+				"password":'请输入密码',
+				"confirm":'确定',
+				"previous":'返回'
+			},
+			"setting":{
+				"left":{
+					"basic_info":'基本信息',
+					"unique_id":'设备唯一ID',
+					"equipment_type":'设备型号',
+					"battery":'电量',
+					"room_area":'所属房间&区域',
+					"online_status":'在线状态',
+					"about_us":'关于我们',
+				},
+				"right":{
+					"setting":'设置',
+					"brightness":'亮度',
+					"volume":'音量',
+					"area":'区域',
+					"meeting_room":'会议室',
+					"request_url":'请求地址',
+					"time_format":'时间格式',
+					"theme_color":'主题颜色',
+					"submit":'提交',
+					"cancel":'取消',
+				},
+
+			},
+
 			"meeting": '会议室',
 			"meeting_theme": '会议主题',
 			"booker": '预定人',
@@ -20,7 +62,7 @@ const messages = {
 			"createRoomFail": '创建快速会议失败',
 			"nextMeet": '下一次会议',
 			"room": '会议室',
-			"book": '预定',
+			"book": '创建快速会议',
 			"fast_meeting": '快速会议',
 			"quickMeeting": '预定30分钟快速会议',
 			"language":'语言',
@@ -33,6 +75,46 @@ const messages = {
 	},
 	"en":{
 		"message": {
+			"activate":{
+				"welcome":'Welcome to xxx Meeting Reservation System',
+				"request_url":'Request URL',
+				"placeholder":'Scan the QRCode from the Web platform to fill the blank automatically',
+				"verify":'Verify',
+				"belong_to_area":'Area',
+				"please_select":'Please Select',
+				"belong_to_meeting_room":'Room',
+				"finish":'Finish',
+			},
+			"login":{
+				"title":'Please enter the administrator password',
+				"account_number":'Account',
+				"password":'Password',
+				"confirm":'Confirm',
+				"previous":'Previous'
+			},
+			"setting":{
+				"left":{
+					"basic_info":'Basic Infomation',
+					"unique_id":'Device Unique ID',
+					"equipment_type":'Equipment Type',
+					"battery":'Battery',
+					"room_area":'Room & Area',
+					"online_status":'Online Status',
+					"about_us":'About',
+				},
+				"right":{
+					"setting":'Settings',
+					"brightness":'Brightness',
+					"volume":'Volume',
+					"area":'Area',
+					"meeting_room":'Meeting Room',
+					"request_url":'Request URL',
+					"time_format":'Time Format',
+					"theme_color":'Theme Color',
+					"submit":'Submit',
+					"cancel":'Cancel',
+				}
+			},
 			"meeting": 'Room',
 			"meeting_theme": 'Conference Theme',
 			"booker": 'Booker',
@@ -50,7 +132,7 @@ const messages = {
 			"canBook": 'Available',
 			"nextMeet": 'Next meet',
 			"room": 'Room',
-			"book": 'Book',
+			"book": 'Create Fast Meeting',
 			"fast_meeting": 'Fast Meeting',
 			"quickMeeting": '30-minute quick meeting can be booked',
 			"language":'English',
@@ -63,6 +145,46 @@ const messages = {
 	},
 	"ko": {
 		"message": {
+			"activate":{
+				"welcome": "xxx 회의 예약 시스템에 오신 것을 환영합니다",
+				"request_url": "요청 URL",
+				"placeholder":'웹 페이지의 QR코드를 스캔하면 자동으로 서비스 주소를 기입할 수 있다',
+				"verify": "검증",
+				"belong_to_area": "지역",
+				"please_select":'선택하십시오',
+				"belong_to_meeting_room": "회의실",
+				"finish": "완료"
+			},
+			"login":{
+				"title":'관리자 암호를 입력하십시오',
+				"account_number":'계정',
+				"password":'암호',
+				"confirm":'확인',
+				"previous":'반환'
+			},
+			"setting":{
+				"left":{
+					"basic_info":'프로파일',
+					"unique_id":'장치 고유 일련번호',
+					"equipment_type":'장치 모델',
+					"battery":'전력',
+					"room_area":'소속 공간 및 영역',
+					"online_status":'온라인 상태',
+					"about_us":'우리에 대해',
+				},
+				"right":{
+					"setting":'설정',
+					"brightness": "밝기",
+					"volume": "볼륨",
+					"area": "지역",
+					"meeting_room":'회의실',
+					"request_url":'요청 주소',
+					"time_format":'시간 형식',
+					"theme_color":'주제 색상',
+					"submit":'제출',
+					"cancel": "취소",
+				}
+			},
 			"meeting": '회의실',
 			"meeting_theme": '컨퍼런스 주제',
 			"booker": '부커',
@@ -80,7 +202,7 @@ const messages = {
 			"canBook": '예약 가능',
 			"nextMeet": '다음 회의',
 			"room": '방',
-			"book": '예약하다',
+			"book": '빠른 모임 만들기',
 			"fast_meeting": '빠른 회의',
 			"quickMeeting": '빠른 30분 회의 예약',
 			"language":'한국인',
@@ -93,7 +215,7 @@ const messages = {
 	}
 }
 const i18n = createI18n({
-	locale: 'zh',
+	locale: uni.getStorageSync('lang') || 'zh', // 先从本地缓存拿，没有就是中文
 	messages
 })
 export default i18n

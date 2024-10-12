@@ -20,6 +20,7 @@
 	export default {
 		name:"ocSelect",
 		props: ["title","localdata"],
+		emits:['change'],
 		mounted(){
 
 		},

@@ -1,7 +1,7 @@
 import Request from '@/utils/request.js'
 let request = new Request().http
 
-    function getQuickMeet(data,header) {
+    function quickMeetApi(data,header) {
         return request({
             url: "/web/appapi/api.php?act=book_fast_meeting", //请求头
             method: "POST", //请求方式
@@ -10,6 +10,16 @@ let request = new Request().http
         })
     }
 	
+	function syncRoomApi(data,header) {
+	    return request({
+	        url: "/web/appapi/api.php?act=sync_room", //请求头
+	        method: "POST", //请求方式
+	        data: data, //请求数据
+			header: header, // 请求头
+			hideLoading: true //隐藏加载
+	    })
+	}
+	
 	const quickMeetMessageMapping = {
 		'-1': 'message.noRoom',
 		'-2': 'message.noFreeRoom',
@@ -17,6 +27,7 @@ let request = new Request().http
 	}
 
 export {
-    getQuickMeet,
+    quickMeetApi,
+	syncRoomApi,
 	quickMeetMessageMapping
 }

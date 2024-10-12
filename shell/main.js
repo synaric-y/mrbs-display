@@ -20,6 +20,7 @@ import i18n from './src/i18n'
 // app.use(i18n)
 // app.mount('#app')
 
+
 export function createApp() {
   const app = createSSRApp(App)
   app.use(i18n)
