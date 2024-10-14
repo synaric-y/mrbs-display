@@ -116,8 +116,8 @@ const hrDiff=(leftHr,rightHr)=>{
     const hrFrac = hrFloat - hrInt
 
     let res = ''
-    if(hrInt>0) res += hrInt + i18n.global.t(hrInt>1?'time.hours':'time.hour')
-    if(hrFrac>0) res += hrFrac*60 + i18n.global.t(hrInt>1?'time.minutes':'time.minute')
+    if(hrInt>0) res += hrInt + i18n.global.t(hrInt>1?'message.time.hours':'message.time.hour')
+    if(hrFrac>0) res += hrFrac*60 + i18n.global.t(hrFrac>1?'message.time.minutes':'message.time.minute')
 
     return res
 }
@@ -136,8 +136,8 @@ const timestampDiff=(ts1,ts2)=>{
     const hrFrac = hrFloat - hrInt
 
     let res = ''
-    if(hrInt>0) res += hrInt + i18n.global.t(hrInt>1?'time.hours':'time.hour')
-    if(hrFrac>0) res += hrFrac*60 + i18n.global.t(hrInt>1?'time.minutes':'time.minute')
+    if(hrInt>0) res += hrInt + i18n.global.t('time.hour')
+    if(hrFrac>0) res += hrFrac*60 + i18n.global.t('time.minute')
 
     return res
 }

@@ -12,7 +12,7 @@ function displayHM(timestamp,locale) {
 	const enDate = formatDate(timestamp, 'America/New_York', 'en', dateFormat);
 	const zhDate = formatDate(timestamp, 'Asia/Shanghai', 'zh-cn', dateFormat);
 	let parts = null;
-	console.log(locale);
+	//console.log(locale);
 	if (locale == 'en') {
 		parts = enDate.split(' ');
 	} else if (locale == 'ko') {

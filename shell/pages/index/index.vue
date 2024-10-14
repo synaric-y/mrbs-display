@@ -3,6 +3,12 @@
 	<div class="container" id="app">
 		<GuideView v-if="needGuide" />
 		<SettingView v-if="settingViewShow" @close="settingViewShow=false" />
+		
+		<view class="popup-setting-room-number" v-if="showSettingRoomNumber">
+			<input class="popup-input" v-model="_roomId" :placeholder="$t('message.alert_code')" />
+			<view class="popup-sure" @click="onSetRoomId">{{$t('message.sure')}}</view>
+		</view>
+		
 		<div class="left-time-view">
 			<!-- 会议时间 -->
 			<view class="meeting-time">
@@ -23,8 +29,7 @@
 											<text class="scroll-item-meeting">{{item.meetRange}}\n{{item.title}}</text>
 										</template>
 										<template v-else>
-											<text
-												class="scroll-item-meeting-more">{{item.meetRange}}\n{{item.title}}</text>
+											<text class="scroll-item-meeting-more">{{item.meetRange}}\n{{item.title}}</text>
 										</template>
 
 										<image v-if="item.isCurrentMeet" class="in-meeting-icon"
@@ -53,11 +58,16 @@
 				</view>
 				<!-- 预约会议对话框 -->
 				<FastMeetingDialog v-if="showQuickMeeting" @close="showQuickMeeting=false" @confirm="quickMeet(1)"
-					:currentTime="roomData.now_timestamp? (new Date(roomData.now_timestamp*1000)) : (new Date())" />
+					:currentTime="roomData.now_timestamp || Math.trunc(new Date().getTime()/1000)"
+					:meetings="roomData.entries"
+					:avaliableHours="2"/>
 			</view>
 		</div>
 		<div :class="[(roomData?.now_entry)?'right-meeting-info right-meeting-info-busy':'right-meeting-info']">
 
+			<div class="battery">
+				<BatteryShow :battery="batteryInfo.level"/>
+			</div>
 			<div class="header">
 				<div class="header-left">
 					<div class="room-title">{{$t('message.room')}}</div>
@@ -78,39 +88,32 @@
 				<view class="meeting-status">
 					{{(roomData?.now_entry)?$t('message.in_meeting'):$t('message.no_meeting')}}
 				</view>
-				
-				<view class="placehold-view"></view>
-				
+			
 				<!-- 现在有会 -->
 				<template v-if="roomData?.now_entry">
-					<view class="meeting-title-type">
-						<text class="meeting-msg-title meeting-title">{{roomData?.now_entry?.name ?? '-'}}</text>
+					<text class="meeting-title">{{roomData?.now_entry?.name ?? '-'}}</text>
+					<view class="meeting-detail-item">
+						<image class="meeting-detail-item-icon" src="@/static/reverse-time.png" mode=""></image>
+						<text class="meeting-detail-item-desc">{{(roomData?.now_entry)?meetTimeString:'-'}}</text>
 					</view>
-					<view class="meeting-title-type">
-						<image class="meeting-msg-icon" src="@/static/reverse-time.png" mode=""></image>
-						<text class="meeting-msg-title reverse-time">
-							{{(roomData?.now_entry)?meetTimeString:'-'}}
-						</text>
-					</view>
-					<view class="meeting-title-type">
-						<image class="meeting-msg-icon" src="@/static/reverse-person.png" mode=""></image>
-						<text class="meeting-msg-title reverse-person">{{roomData?.now_entry?.book_by ?? '-'}}</text>
+					<view class="meeting-detail-item">
+						<image class="meeting-detail-item-icon" src="@/static/reverse-person.png" mode=""></image>
+						<text class="meeting-detail-item-desc">{{roomData?.now_entry?.book_by ?? '-'}}</text>
 					</view>
 				</template>
 				<!-- 现在无会 -->
 				<template v-else>
 					<view class="nextMeet">
-						{{$t('message.nextMeet')}}
+						{{$t('message.nextMeet')}}:
 					</view>
-					<view class="placehold-view"></view>
-					<text class="meeting-msg-title meeting-title">{{(nextMeetData?.name) ?? '-'}}</text>
-					<view class="meeting-title-type">
-						<image class="meeting-msg-icon" src="@/static/reverse-time.png" mode=""></image>
-						<text class="meeting-msg-title reverse-time">{{(nextMeetData)? meetTimeString:'-'}}</text>
+					<text class="meeting-title">{{(nextMeetData?.name) ?? '-'}}</text>
+					<view class="meeting-detail-item">
+						<image class="meeting-detail-item-icon" src="@/static/reverse-time.png" mode=""></image>
+						<text class="meeting-detail-item-desc">{{(nextMeetData)? meetTimeString:'-'}}</text>
 					</view>
-					<view class="meeting-title-type">
-						<image class="meeting-msg-icon" src="@/static/reverse-person.png" mode=""></image>
-						<text class="meeting-msg-title reverse-person">{{(nextMeetData?.book_by) ?? '-'}}</text>
+					<view class="meeting-detail-item">
+						<image class="meeting-detail-item-icon" src="@/static/reverse-person.png" mode=""></image>
+						<text class="meeting-detail-item-desc">{{(nextMeetData?.book_by) ?? '-'}}</text>
 					</view>
 				</template>
 				
@@ -139,11 +142,19 @@
 	import FastMeetingDialog from '../../components/FastMeetingDialog.vue'
 	import SettingView from '../../views/SettingView.vue';
 	import GuideView from '../../views/GuideView.vue'
+	import BatteryShow from '../../components/BatteryShow.vue'
+	// import {
+	// 	quickMeetApi,
+	// 	quickMeetMessageMapping,
+	// 	syncRoomApi
+	// } from '../../api/api.js'
+	
 	import {
 		quickMeetApi,
 		quickMeetMessageMapping,
 		syncRoomApi
-	} from '../../api/api.js'
+	} from '../../api/mockApi.js' // 模拟接口
+	
 	export default {
 		name: 'App',
 		interval: null,
@@ -152,7 +163,8 @@
 			FastMeetingDialog,
 			GuideView,
 			SettingView,
-			LanguageSelect
+			LanguageSelect,
+			BatteryShow
 		},
 		data() {
 			return {
@@ -160,7 +172,7 @@
 				settingViewShow: false,
 				meeting: false,
 				timeRange: [],
-				showSetting: false,
+				showSettingRoomNumber: false,
 				showQuickMeeting: false,
 				_roomId: 2,
 				roomId: 2,
@@ -193,6 +205,7 @@
 				this.roomId = Number(roomId)
 				this._roomId = Number(roomId)
 			}
+			console.log("Room ID: ",roomId);
 			const windowInfo = uni.getWindowInfo();
 			this.largeScreenHeight = windowInfo.windowHeight;
 			console.log('getWindowInfo windowHeight:', this.largeScreenHeight)
@@ -206,7 +219,7 @@
 				uni.setStorageSync("DEVICE_INFO", deviceInfo);
 				this.deviceInfo = deviceInfo;
 			}
-			// console.log('获取设备的信息deviceInfo:',deviceInfo);
+			console.log('获取设备的信息deviceInfo:',this.deviceInfo);
 			this.startSync();
 		},
 		methods: {
@@ -232,21 +245,25 @@
 			},
 
 			startSync() {
-				if (this.interval) {
-					clearInterval(this.interval)
-					this.interval = null
-				}
+				// 同步room（5s）
+				this.interval && clearInterval(this.interval)
+				
 				this.syncRoom()
 				this.interval = setInterval(() => {
 					this.syncRoom()
 				}, 5000)
 
-				// 5分钟获取一次电量信息
-				if (this.batteryInterval) {
-					clearInterval(this.batteryInterval)
-					this.batteryInterval = null
-				}
+
+				// 同步电量（5分钟，300s）
+				this.batteryInterval && clearInterval(this.batteryInterval)
+				
 				// #ifdef APP-PLUS
+				uni.getBatteryInfo({
+					success: (res) => {
+						console.log('获取电量信息res:',res);
+						this.batteryInfo = res;
+					}
+				})
 				this.batteryInterval = setInterval(() => {
 					uni.getBatteryInfo({
 						success: (res) => {
@@ -255,12 +272,6 @@
 						}
 					})
 				}, 1000 * 300)
-				uni.getBatteryInfo({
-					success: (res) => {
-						// console.log('获取电量信息res:',res);
-						this.batteryInfo = res;
-					}
-				})
 				// #endif
 			},
 
@@ -271,7 +282,7 @@
 
 
 			onSetting() {
-				this.showSetting = true
+				this.showSettingRoomNumber = true
 			},
 
 			onSetRoomId() {
@@ -283,7 +294,7 @@
 					return
 				}
 				this.roomId = this._roomId
-				this.showSetting = false
+				this.showSettingRoomNumber = false
 				uni.setStorageSync("ROOM_ID", this.roomId)
 				this.syncRoom()
 			},
@@ -326,6 +337,8 @@
 				const month = now.getMonth() + 1;
 				const day = now.getDate();
 				// console.log('initTimeline 进入初始化配置');
+				
+				// 获取当前正在进行的会议
 				if (data.now_entry) {
 					console.log('initTimeline enter now_entry');
 					this.currenMeetStart = data.now_entry['start_time'];
@@ -336,7 +349,10 @@
 					this.currenMeetEnd = 0;
 					this.roomFree = true;
 				}
+				
 				let allMeetList = [];
+				
+				// 获取区域最早时间和最晚时间
 				if (data && data.area) {
 					this.meetStartTime = data.area.morningstarts
 					this.meetStartMinute = data.area.morningstarts_minutes
@@ -346,12 +362,15 @@
 					this.meetStartTime = 8;
 					this.meetEndTime = 21;
 				}
+				
 				let tempStartTime = Number(this.meetStartTime);
 				let tempEndTime = Number(this.meetEndTime);
 				let allTimeList = [];
 				let isFirst = true;
 				// console.log('initTimeline enter tempStartTime tempEndTime:',tempStartTime,tempEndTime); 
 				while (tempStartTime <= tempEndTime) {
+					
+					// 解决小时浮点数转AM和PM
 					let ap = 'AM'
 					let pmTime = tempStartTime
 					let timeTitle = '';
@@ -367,6 +386,8 @@
 						timeTitle = '12:00';
 					}
 					timeTitle = timeTitle + ap;
+					
+					
 					if (!isFirst) {
 						let isfoundEntry = false
 						let foundEntry = null;
@@ -487,7 +508,7 @@
 					'Content-type': 'application/json',
 					'Accept-Language': this.languageSet
 				}, ).then(res => {
-					let data = res.data;
+					let data = res.data.data;
 					if (data == null) {
 						uni.showToast({
 							title: this.$t('message.netDataError'),
@@ -495,7 +516,7 @@
 						})
 						return;
 					}
-					console.log('syncRoom返回数据成功data:', data);
+					//console.log('syncRoom返回数据成功data:', data);
 					this.roomData = data;
 					this.initTimeline(data);
 					this.foundNextMeet();
@@ -535,8 +556,8 @@
 						'Content-type': 'application/json',
 						'Accept-Language': this.languageSet
 					}).then((res) => {
-						let data = res.data;
-						let code = res.code;
+						let data = res.data.data;
+						let code = res.data.code;
 
 						// this.showQuickMeeting = true;
 						console.log('quickMeet返回数据成功data:', data);
@@ -634,110 +655,96 @@
 					border: 1rpx solid #333333;
 					display: flex;
 					flex-direction: row;
-				}
-
-				.scroll-item-left {
-					width: 50rpx;
-					height: 30rpx;
-				}
-
-				.scroll-item-time {
-					font-size: 9rpx;
-					color: white;
-					width: 50rpx;
-					position: absolute;
-					/* background-color: red; */
-					left: 8rpx;
-					font-family: 'Noto Sans CJK SC Light', 'Source Han Sans CN Light', 'Droid Sans Fallback', sans-serif;
-				}
-
-				.scroll-item-right {
-					background-color: rgba(255, 255, 255, 0.12);
-				}
-
-				.extention-height {
-					margin-top: 5rpx;
-					height: 60rpx;
-					background-color: red;
-					width: 172rpx;
-					text-align: start;
-					margin-left: 13rpx;
-					background-color: rgba(255, 255, 255, 0.12);
-					position: relative;
-				}
-
-				.scroll-item-meeting {
-					position: absolute;
-					width: 160rpx;
-					top: 2rpx;
-					left: 8rpx;
-					-webkit-line-clamp: 2;
-					display: -webkit-box;
-					overflow: hidden;
-					text-overflow: ellipsis;
-					word-wrap: break-word;
-					-webkit-box-orient: vertical;
-					font-family: 'Noto Sans CJK SC Light', 'Source Han Sans CN Light', 'Droid Sans Fallback', sans-serif;
-				}
-
-				.scroll-item-meeting-more {
-					position: absolute;
-					width: 160rpx;
-					top: 2rpx;
-					left: 8rpx;
-					color: rgb(255, 255, 255);
-					font-size: 9rpx;
-					-webkit-line-clamp: 3;
-					display: -webkit-box;
-					overflow: hidden;
-					text-overflow: ellipsis;
-					word-wrap: break-word;
-					-webkit-box-orient: vertical;
-					font-family: 'Noto Sans CJK SC Light', 'Source Han Sans CN Light', 'Droid Sans Fallback', sans-serif;
-				}
-
-				.in-meeting-icon {
-					position: absolute;
-					top: 8rpx;
-					right: 10rpx;
-					width: 14rpx;
-					height: 14rpx;
-				}
-
-				.scroll-item-meeting {
-					font-size: 9rpx;
-					color: white;
+					
+					.scroll-item-left {
+						width: 50rpx;
+						height: 30rpx;
+						
+						.scroll-item-time {
+							font-size: 9rpx;
+							color: white;
+							width: 50rpx;
+							position: absolute;
+							/* background-color: red; */
+							left: 8rpx;
+							font-family: 'Noto Sans CJK SC Light', 'Source Han Sans CN Light', 'Droid Sans Fallback', sans-serif;
+						}
+					}
+					
+					.scroll-item-right {
+						background-color: rgba(255, 255, 255, 0.12);
+						
+						.scroll-item-meeting {
+							position: absolute;
+							width: 160rpx;
+							top: 2rpx;
+							left: 8rpx;
+							font-size: 9rpx;
+							color: white;
+							-webkit-line-clamp: 2;
+							display: -webkit-box;
+							overflow: hidden;
+							text-overflow: ellipsis;
+							word-wrap: break-word;
+							-webkit-box-orient: vertical;
+							font-family: 'Noto Sans CJK SC Light', 'Source Han Sans CN Light', 'Droid Sans Fallback', sans-serif;
+						}
+						
+						.scroll-item-meeting-more {
+							position: absolute;
+							width: 160rpx;
+							top: 2rpx;
+							left: 8rpx;
+							color: rgb(255, 255, 255);
+							font-size: 9rpx;
+							-webkit-line-clamp: 3;
+							display: -webkit-box;
+							overflow: hidden;
+							text-overflow: ellipsis;
+							word-wrap: break-word;
+							-webkit-box-orient: vertical;
+							font-family: 'Noto Sans CJK SC Light', 'Source Han Sans CN Light', 'Droid Sans Fallback', sans-serif;
+						}
+						
+						.in-meeting-icon {
+							position: absolute;
+							top: 8rpx;
+							right: 10rpx;
+							width: 14rpx;
+							height: 14rpx;
+						}
+					}
+					.extention-height {
+						margin-top: 5rpx;
+						height: 60rpx;
+						background-color: red;
+						width: 172rpx;
+						text-align: start;
+						margin-left: 13rpx;
+						background-color: rgba(255, 255, 255, 0.12);
+						position: relative;
+					}
 				}
 			}
 
 
 
 			.reserve-meeting {
-				display: flex;
-				flex-direction: column;
 				height: 63rpx;
 				width: 250rpx;
 				border-top: 1rpx solid rgba(230, 241, 252, 0.25);
-				font-family: 'Noto Sans CJK SC', 'Source Han Sans CN', 'Droid Sans', sans-serif;
 				position: absolute;
 				left: 0;
 				bottom: 0;
-
-				.reserve-title {
-					margin-top: 2rpx;
-					width: 250rpx;
-					height: 17rpx;
-					font-size: 10rpx;
-					text-align: center;
-					color: white;
-				}
+				display: flex;
+				justify-content: center;
+				align-items: center;
 
 				.reserve-button {
 					width: 187rpx;
 					height: 32rpx;
 					line-height: 32rpx;
-					border-radius: 4rpx 4rpx 4rpx 4rpx;
-					margin-left: 32rpx;
+					border-radius: 4rpx;
 					background-color: rgba(230, 241, 252, 0.25);
 					color: white;
 					font-size: 14rpx;
@@ -756,6 +763,7 @@
 
 
 		.right-meeting-info {
+			position: relative;
 			display: flex;
 			flex-direction: column;
 			flex: 1;
@@ -766,6 +774,16 @@
 			text-align: left;
 			color: #fff;
 			font-family: 'Noto Sans CJK SC', 'Source Han Sans CN', 'Droid Sans', sans-serif;
+			
+			.battery{
+				// position: absolute;
+				// top: 0;
+				// right: 0;
+				display: flex;
+				justify-content: flex-end;
+				width: 100%;
+				padding-right: 10rpx;
+			}
 			
 			.header {
 				width: 100%;
@@ -846,75 +864,56 @@
 			}
 			
 			.nextMeet {
-				line-height: 20px;
-				font-size: 16px;
+				line-height: 1.5;
+				font-size: 14rpx;
 			}
 			
 			.meeting-title {
-				line-height: 30rpx;
-				font-size: 28rpx;
+				line-height: 2;
+				font-size: 22rpx;
 				width: 100%;
+				font-weight: 500;
 				text-align: left;
 				text-overflow: ellipsis;
 				word-wrap: break-word;
+				margin-bottom: 5rpx;
+			}
+			
+			.meeting-detail-item{
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				gap: 10rpx;
+				
+				.meeting-detail-item-icon {
+					width: 17rpx;
+					height: 17rpx;
+				}
+				
+				.meeting-detail-item-desc {
+					line-height: 28rpx;
+					font-size: 14rpx;
+					text-align: left;
+					font-family: 'Noto Sans CJK SC ExtraLight', 'Source Han Sans CN ExtraLight', 'Droid Sans Fallback', sans-serif;
+				}
+				
+			}
+		}
+
+		
+		.right-meeting-logo {
+			width: 100%;
+			height: 50rpx;
+			
+			.company-logo {
+				width: 150rpx;
+				height: 17rpx;
 			}
 		}
 
 
 
-
-
-		.meeting-title-type {
-			height: 37rpx;
-		}
-
-		.placehold-view {
-			margin-top: 10rpx !important;
-		}
-
-
-
-		.reverse-time {
-			margin-left: 37rpx;
-			height: 47rpx;
-			line-height: 23rpx;
-			color: white;
-			font-size: 18rpx;
-			text-align: left;
-			font-style: italic;
-			font-family: 'Noto Sans CJK SC ExtraLight', 'Source Han Sans CN ExtraLight', 'Droid Sans Fallback', sans-serif;
-		}
-
-		.reverse-person {
-			height: 47rpx;
-			line-height: 23rpx;
-			color: rgb(255, 255, 255);
-			font-size: 18rpx;
-			text-align: left;
-			font-style: italic;
-			font-family: 'Noto Sans CJK SC ExtraLight', 'Source Han Sans CN ExtraLight', 'Droid Sans Fallback', sans-serif;
-		}
-
-		.meeting-msg-icon {
-			width: 17rpx;
-			height: 17rpx;
-		}
-
-		.meeting-msg-title {
-			margin-left: 17rpx;
-		}
-
-		.right-meeting-logo {
-			width: 100%;
-			height: 50rpx;
-		}
-
-		.company-logo {
-			width: 150rpx;
-			height: 17rpx;
-		}
-
-		.popup-setting {
+		.popup-setting-room-number {
 			width: 250rpx;
 			height: 150rpx;
 			background-color: white;
@@ -925,95 +924,27 @@
 			position: fixed;
 			left: 250rpx;
 			top: 150rpx;
-		}
-
-		.popup-quick-meeting {
-			width: 250rpx;
-			height: 130rpx;
-			background-color: #FCCA00;
-			border-radius: 5rpx;
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			z-index: 1000;
-			position: fixed;
-			left: 250rpx;
-			top: 150rpx;
-		}
-
-		.popup-input {
-			width: 200rpx;
-			height: 60rpx;
-			line-height: 60rpx;
-			font-size: 30rpx;
-			border: 1rpx solid royalblue;
-			margin-top: 20rpx;
-		}
-
-		.popup-sure {
-			width: 80rpx;
-			height: 40rpx;
-			background-color: royalblue;
-			line-height: 40rpx;
-			margin-top: 10rpx;
-			text-align: center;
-			font-size: 22rpx;
-			color: white;
-			border-radius: 6rpx;
-		}
-
-		.quick-meeting-msg {
-			padding-left: 20rpx;
-			padding-right: 20rpx;
-			margin-top: 15rpx;
-			line-height: 19rpx;
-			color: rgba(51, 51, 51, 1);
-			font-size: 13rpx;
-			text-align: center;
-			font-family: PingFangSC-medium;
-		}
-
-		.quick-meeting-btns {
-			display: flex;
-			flex-direction: row;
-			justify-content: space-evenly;
-			width: 100%;
-			margin-top: 30rpx;
-		}
-
-		.quick-meeting-btns-en {
-			display: flex;
-			flex-direction: row;
-			justify-content: space-evenly;
-			height: 75rpx;
-			width: 100%;
-			margin-top: 10rpx;
-		}
-
-		.quick-cancle-btn {
-			height: 32rpx;
-			width: 72rpx;
-			line-height: 32rpx;
-			border-radius: 4rpx 4rpx 4rpx 4rpx;
-			background-color: #FCCA00;
-			color: rgba(0, 0, 0, 1);
-			font-size: 14rpx;
-			text-align: center;
-			box-shadow: 0rpx 2rpx 6rpx 0rpx rgba(0, 0, 0, 0.4);
-			font-family: Roboto;
-		}
-
-		.quick-sure-btn {
-			height: 32rpx;
-			width: 72rpx;
-			line-height: 32rpx;
-			border-radius: 4rpx 4rpx 4rpx 4rpx;
-			background-color: #FCCA00;
-			color: rgba(0, 0, 0, 1);
-			font-size: 14rpx;
-			text-align: center;
-			box-shadow: 0rpx 2rpx 6rpx 0rpx rgba(0, 0, 0, 0.4);
-			font-family: Roboto;
+			
+			.popup-input {
+				width: 200rpx;
+				height: 60rpx;
+				line-height: 60rpx;
+				font-size: 30rpx;
+				border: 1rpx solid royalblue;
+				margin-top: 20rpx;
+			}
+			
+			.popup-sure {
+				width: 80rpx;
+				height: 40rpx;
+				background-color: royalblue;
+				line-height: 40rpx;
+				margin-top: 10rpx;
+				text-align: center;
+				font-size: 22rpx;
+				color: white;
+				border-radius: 6rpx;
+			}
 		}
 
 	}

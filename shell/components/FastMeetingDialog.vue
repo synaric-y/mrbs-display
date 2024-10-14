@@ -5,25 +5,29 @@
 		<view class="popup-quick-meeting">
 			
 			<div class="header">
-				<div class="title">{{$t('message.fast_meeting')}}</div>
+				<div class="title">{{$t('message.fast_meeting.title')}}</div>
 				<uni-icons type="closeempty" size="30" @click="closeDialog"></uni-icons>
+			</div>
+			<div class="info">{{$t('message.fast_meeting.tip_left')+avaliableHours+$t('message.fast_meeting.tip_right')}}</div>
+			<div class="tip">
+				
 			</div>
 			<TimeStepperScroll 
 			:lb="lb" 
 			:ub="ub" 
-			:meetings="[]"
+			:meetings="meetings"
 			v-model:leftHandle="leftHandle"
 			v-model:rightHandle="rightHandle"
-			:currentDate="currentTime"
+			:currentTime="currentTime"
 			v-model:disabled="disabled"
 			:isFirst="false"
-			:scale="15"/>
-			<input class="my-input" placeholder="Theme" v-model="theme"/>
-			<input class="my-input" placeholder="Booker" v-model="booker"/>
-			<div class="info">可预定当前1小时内的空闲时间</div>
+			:scale="scale"/>
+			<input class="my-input" :placeholder="$t('message.fast_meeting.theme')" v-model="theme"/>
+			<input class="my-input" :placeholder="$t('message.fast_meeting.name')" v-model="booker"/>
+			
 			<div class="btns">
-				<button class="btn btn-default" type="default" @click.stop="cancelReserve">Cancel</button>
-				<button class="btn btn-confirm" type="default" @click.stop="confirmReserve">Confirm</button>
+				<button class="btn btn-default" type="default" @click.stop="cancelReserve">{{$t('message.fast_meeting.cancel')}}</button>
+				<button class="btn btn-confirm" type="default" @click.stop="confirmReserve">{{$t('message.fast_meeting.confirm')}}</button>
 			</div>
 		</view>
 	</view>
@@ -32,30 +36,30 @@
 <script>
 	import TimeStepperScroll from './TimeStepperScroll.vue';
 	import {getNearestNextTime} from '@/utils/timeTool.js'
+	import {SEC_PER_HOUR,nextScaleTs} from '@/utils/timestampTool.js'
+
 	export default {
 		name:"FastMeetingDialog",
 		components:{
 			TimeStepperScroll
 		},
-		props:['currentTime'],
+		props:['currentTime','meetings','avaliableHours'], // 当前时间戳（10位），会议数组，可预约多少小时
 		emits:['close','confirm'],
 		data() {
 			return {
-				leftHandle: 8,
-				rightHandle: 12,
-				lb: getNearestNextTime(this.currentTime,15)-1,
-				ub: getNearestNextTime(this.currentTime,15)+2,
+				leftHandle: nextScaleTs(this.currentTime,15*60),
+				rightHandle: nextScaleTs(this.currentTime,15*60),
+				lb: nextScaleTs(this.currentTime,15*60) - SEC_PER_HOUR,
+				ub: nextScaleTs(this.currentTime,15*60) + (1+this.avaliableHours)*SEC_PER_HOUR,
 				disabled: false,
 				theme: "",
-				booker: ""
+				booker: "",
+				scale: 15,
 			};
 		},
 		methods:{
 			closeDialog(){
 				this.$emit('close')
-			},
-			dummy(){
-				// 取消冒泡
 			},
 			cancelReserve(){
 				this.theme = ''
@@ -69,53 +73,6 @@
 				this.booker = ''
 				this.$emit('close')
 				this.$emit('confirm')
-			},
-			quickMeet(confirm) {
-				if (isNaN(this.roomId)) {
-					uni.showToast({
-						title: this.$t('message.roomNumberError'),
-						icon: 'none'
-					})
-					return
-				}
-				console.log('this.roomId:', this.roomId)
-				uni.request({
-					url: `${HOST}/web/appapi/api.php?act=book_fast_meeting`,
-					method: "POST",
-					header: {
-						'Content-type': 'application/json',
-						'Accept-Language': this.languageSet
-					},
-					data: {
-						room_id: this.roomId,
-						confirm: confirm
-					},
-					success: (res) => {
-						let data = res.data;
-						console.log('quickMeet返回数据成功data:', data);
-						if(confirm == 0 && data && data.data) {
-							this.showQuickMeeting = true;
-							this.quickMeetingMsg = data.data.time;
-							console.log(this.quickMeetingMsg);
-							return;
-						} 
-						let msg = '';
-						if (data.code == -1) {
-							msg = this.$t('message.noRoom');
-						} else if (data.code == -2) {
-							msg = this.$t('message.noFreeRoom');
-						} else if (data.code == 0) {
-							msg = this.$t('message.createMeetSuccess');
-						}
-						uni.showToast({
-							title: msg,
-							icon: 'none'
-						})
-					},
-					fail: (e) => {
-						console.error(e)
-					}
-				})
 			},
 		}
 	}
@@ -140,23 +97,32 @@
 .popup-quick-meeting{
 
 	width: 80%;
-	height: 80%;
+	height: 90%;
 	padding: 20rpx 40rpx;
 	background-color: #fff;
 	border-radius: 4rpx;
 	box-shadow: 0 0 4rpx 2rpx rgba(0,0,0,.25);
 	
 	.header{
-		
 		display: flex;
 		justify-content: space-between;
+		align-items: center;
+		
 		
 		.title{
 			font-size: 15rpx;
 			font-weight: 700;
-			margin-bottom: 5rpx;
 			colot: #666666;
 		}
+		
+	}
+	
+	.info{
+		font-size: 14rpx;
+		color: #591bb7;
+		height: 30rpx;
+		line-height: 30rpx;
+		margin-bottom: 5rpx;
 	}
 	
 
@@ -169,12 +135,7 @@
 		margin-bottom: 10rpx;
 	}
 	
-	.info{
-		font-size: 10rpx;
-		color: #666666;
-		height: 30rpx;
-		line-height: 30rpx;
-	}
+	
 	
 	.btns{
 		margin-top: 20rpx;

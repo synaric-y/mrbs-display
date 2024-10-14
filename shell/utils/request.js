@@ -50,24 +50,16 @@ export default class Request {
                 method: method,
                 header: header,
                 success: (res) => {
-                    // 判断 请求api 格式是否正确
-                    if (res.statusCode && res.statusCode != 200) {
-                        uni.showToast({
-                            title: "api错误" + res.errMsg,
-                            icon: 'none'
-                        });
-                        return;
-                    }
                     // 将结果抛出
-                    resolve(res.data)
+                    resolve(res)
                 },
                 //请求失败
                 fail: (e) => {
                     uni.showToast({
-                        title: "" + e.data.msg,
+                        title: "请求失败" + e.msg,
                         icon: 'none'
                     });
-                    resolve(e.data);
+                    reject(e);
                 },
                 //请求完成
                 complete() {

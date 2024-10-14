@@ -43,7 +43,16 @@ const messages = {
 				},
 
 			},
-
+			"fast_meeting":{
+				"title": '快速会议',
+				"tip_left":'可预定当前', // 有变量，只能分开写，测试发现大括号传参不生效
+				"tip_right":'小时内的空闲时间',
+				"reserved": '已预定',
+				"theme":'请输入会议名称',
+				"name":'预约人姓名',
+				"cancel": '取消',
+				"confirm": '确定',
+			},
 			"meeting": '会议室',
 			"meeting_theme": '会议主题',
 			"booker": '预定人',
@@ -60,17 +69,21 @@ const messages = {
 			"alert_error_code": '请输入正确的内置码',
 			"canBook": '可预定',
 			"createRoomFail": '创建快速会议失败',
-			"nextMeet": '下一次会议',
+			"nextMeet": '即将开始的会议',
 			"room": '会议室',
 			"book": '创建快速会议',
-			"fast_meeting": '快速会议',
-			"quickMeeting": '预定30分钟快速会议',
 			"language":'语言',
 			"roomNumberError":'请选择正确的房间号',
 			"noRoom": '没有可用的房间',
 			"noFreeRoom": '当前时间已有会议',
 			"createMeetSuccess": '创建快速会议成功',
 			"netDataError": '接口返回数据异常',
+			"time":{
+				"minute": '分钟',
+				"hour":'小时',
+				"minutes": '分钟',
+				"hours":'小时'
+			}
 		}
 	},
 	"en":{
@@ -115,6 +128,16 @@ const messages = {
 					"cancel":'Cancel',
 				}
 			},
+			"fast_meeting":{
+				"title": 'Fast Meetings',
+				"tip_left":'Can reserve spare time in ',
+				"tip_right":' h',
+				"reserved": 'Reserved',
+				"theme":'Meeting Theme',
+				"name":'Booker Name',
+				"cancel": 'Cancel',
+				"confirm": 'Confirm',
+			},
 			"meeting": 'Room',
 			"meeting_theme": 'Conference Theme',
 			"booker": 'Booker',
@@ -133,7 +156,6 @@ const messages = {
 			"nextMeet": 'Next meet',
 			"room": 'Room',
 			"book": 'Create Fast Meeting',
-			"fast_meeting": 'Fast Meeting',
 			"quickMeeting": '30-minute quick meeting can be booked',
 			"language":'English',
 			"roomNumberError":'Please select the correct room number',
@@ -141,7 +163,13 @@ const messages = {
 			"noFreeRoom": 'There is already a meeting at the current time',
 			"createMeetSuccess": 'Create a quick meeting successfully',
 			"netDataError": 'The interface returns abnormal data',
-		}	
+			"time":{
+				"minute": 'min',
+				"hour":'h',
+				"minutes": 'min',
+				"hours":'h'
+			}
+		}
 	},
 	"ko": {
 		"message": {
@@ -185,6 +213,16 @@ const messages = {
 					"cancel": "취소",
 				}
 			},
+			"fast_meeting":{
+				"title": '빠른 회의',
+				"tip_left":'현재 5',
+				"tip_right":'시간 동안의 유휴 시간 예약 가능',
+				"reserved":'예정됨',
+				"theme": "회의 이름을 입력하십시오",
+				"name":'예약자 이름',
+				"cancel": "취소",
+				"confirm": "확인",
+			},
 			"meeting": '회의실',
 			"meeting_theme": '컨퍼런스 주제',
 			"booker": '부커',
@@ -203,7 +241,6 @@ const messages = {
 			"nextMeet": '다음 회의',
 			"room": '방',
 			"book": '빠른 모임 만들기',
-			"fast_meeting": '빠른 회의',
 			"quickMeeting": '빠른 30분 회의 예약',
 			"language":'한국인',
 			"roomNumberError":'정확한 객실번호를 선택해주세요.',
@@ -211,7 +248,14 @@ const messages = {
 			"noFreeRoom": '지금 시간에 회의가 있습니다',
 			"createMeetSuccess": '빠른 회의가 성공적으로 생성되었습니다.',
 			"netDataError": '인터페이스가 데이터 예외를 반환합니다.',
+			"time":{
+				"minute": "분",
+				"hour":'시간',
+				"minutes": "분",
+				"hours":'시간'
+			}
 		}
+		
 	}
 }
 const i18n = createI18n({
