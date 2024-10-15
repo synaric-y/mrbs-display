@@ -60,7 +60,7 @@
 				<div class="form-row">
 					<div class="label">{{$t('message.setting.right.volume')}}</div>
 					<div class="slider-wrapper">
-						<slider value="25" @changing="changeVolume" activeColor="#591bb7" backgroundColor="#ffffff" block-color="#ffffff" block-size="20" />
+						<slider value="25" @changing="changeVolume" @change="testVolume" activeColor="#591bb7" backgroundColor="#ffffff" block-color="#ffffff" block-size="20" />
 					</div>
 					<div class="slider-value">{{settings.volume+'%'}}</div>
 				</div>
@@ -184,7 +184,7 @@ export default {
 			this.settings.brightness = e.detail.value
 			
 			uni.setScreenBrightness({
-				value: this.settings.brightness / 100, //亮度是百分比，需要除以100
+				value: this.settings.brightness / 100, // 百分比，需要除以100
 				success: function () {
 					console.log('success');
 				}
@@ -192,6 +192,24 @@ export default {
 		},
 		changeVolume(e){
 			this.settings.volume = e.detail.value
+			
+			// #ifdef APP-PLUS
+			plus.device.setVolume(e.detail.value / 100) // 百分比，需要除以100
+			console.log(plus.device.getVolume()); // 获取当前音量
+			// #endif
+			
+		},
+		testVolume(e){ // 完成音量调整，测试音量
+			// #ifdef APP-PLUS
+				let main = plus.android.runtimeMainActivity();
+				let RingtoneManager = plus.android.importClass("android.media.RingtoneManager");
+				let uri = RingtoneManager.getActualDefaultRingtoneUri(main, RingtoneManager.TYPE_NOTIFICATION);  
+				let MediaPlayer = plus.android.importClass("android.media.MediaPlayer");  
+				let player = MediaPlayer.create(main, uri);  
+				player.setLooping(false);  
+				player.prepare();  
+				player.start();
+			// #endif
 		},
 		changeArea(e){
 			const tempArea = e
