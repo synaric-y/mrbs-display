@@ -72,6 +72,8 @@
 	
 	  --color-full: #797979;
 	
+	
+	  /*===========主题1============*/
 	  --color-primary: #642abb;
 	  --color-primary-light: #a281d4;
 	  --color-selected: #591BB7;
@@ -81,6 +83,19 @@
 	
 	  --color-success: #642abb;
 	  --color-success-light: #a281d4;
+	  
+	  /*===========主题1============*/
+	  --dark-color-primary: #337ecc;
+	  --dark-color-primary-light: #76a3da;
+	  --dark-color-selected: #285fd4;
+	  	
+	  --dark-color-danger: #ff7b00;
+	  --dark-color-danger-light: #fdada8;
+	  	
+	  --dark-color-success: #337ecc;
+	  --dark-color-success-light: #76a3da;
+	  
+	  
 	
 	  --section-gap: 160px;
 	}

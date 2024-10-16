@@ -12,7 +12,7 @@
 					<uni-icons @click="scan" class="scan" color="#333" type="scan" size="25"></uni-icons>
 				</div>
 
-				<button class="btn" type="default" @click="verify">{{$t('message.activate.verify')}}</button>
+				<button :class="'btn btn'+(currentTheme!='dark'?'':'-dark')" type="default" @click="verify">{{$t('message.activate.verify')}}</button>
 			</div>
 			<div class="form-row">
 				<div class="form-col">
@@ -38,7 +38,7 @@
 				</div>
 			</div>
 			<div class="btns">
-				<button class="btn" type="default" @click="finish">{{$t('message.activate.finish')}}</button>
+				<button :class="'btn btn'+(currentTheme!='dark'?'':'-dark')" type="default" @click="finish">{{$t('message.activate.finish')}}</button>
 			</div>
 		</div>
 	</div>
@@ -46,46 +46,82 @@
 
 <script>
 import LanguageSelect from '../components/LanguageSelect.vue';
+import {mapGetters} from 'vuex';
+import { getAllAreaApi,getAllRoomsApi,activateDeviceApi } from '@/api/api';
 export default {
 	name:"ActivateView",
 	components:{
 		LanguageSelect
 	},
 	emits:['close'],
+	props:['batteryInfo','deviceInfo'],
+	computed: {
+	  ...mapGetters(['currentTheme'])
+	},
 	data() {
 		return {
 			url: '',
 			area: -1,
-			areaList:[
-				{ value: 0, text: "上海" },
-				{ value: 1, text: "香港" },
-			],
+			areaList:[],
 			room: -1,
-			roomList:[
-				{ value: 0, text: "A" },
-				{ value: 1, text: "B" },
-				{ value: 2, text: "C" },
-				{ value: 3, text: "D" },
-			]
+			roomList:[],
+			windowInfo: {}
 		};
 	},
-	onLoad(){ // 获取区域信息
-		this.areaList = [
-				{ value: 0, text: "上海" },
-				{ value: 1, text: "香港" },
-			]
+	created(){ // 获取区域信息 onLoad不生效，那是页面函数，切页面才管用
+	
+		console.log(79);
+	
+		this.getAllArea()
+		
+		this.windowInfo = uni.getWindowInfo();
+		console.log(this.windowInfo);
 		
 	},
 	methods:{
+		
+		getAllArea(){
+			const that = this;
+			
+			getAllAreaApi({
+				"is_charging": this.batteryInfo.isCharging,
+				"battery_level": this.batteryInfo.level,
+			}).then(res=>{
+				const li = res.data.data
+				
+				console.log(res);
+				
+				let tempList = []
+				
+				for(let item of li) tempList.push({value:item.id, text: item.area_name})
+				
+				that.areaList = tempList
+				
+			}).catch(e=>{console.log(e)})
+		},
 		changeArea(e){ 
 			
-			
-			this.roomList = [ // 加载房间
-					{ value: 0, text: "A" },
-					{ value: 1, text: "B" },
-					{ value: 2, text: "C" },
-					{ value: 3, text: "D" },
-				]
+			getAllRoomsApi({
+				"type": "area",
+				"id": this.area,
+				"is_charge": this.batteryInfo.isCharging,
+				"battery_level": this.batteryInfo.level
+			}).then(res=>{
+				const li = res.data.data.areas.rooms
+				
+				let tempList = []
+				
+				for(let item of li) tempList.push({value:item.room_id, text: item.room_name})
+				
+				this.roomList = tempList
+				
+			}).catch(e=>{
+				console.log(e)
+				uni.showToast({
+					title: this.$t('message.netDataError'),
+					icon: 'none',
+				})
+			})
 		},
 		scan(){
 			// 允许从相机和相册扫码
@@ -115,6 +151,30 @@ export default {
 			// this.area = -1
 			// this.room = -1
 			
+			const pack = {
+				"device_id": this.deviceInfo.deviceId,                //实际设备id
+				"version": "1.0.0",                     //设备使用的软件版本？激活时是否直接使用全局的软件版本，还是由前端传入
+				"description": "",                      //设备信息
+				"resolution": `${this.windowInfo.screenWidth}*${this.windowInfo.screenHeight}`,              //分辨率
+				"is_charge": this.batteryInfo.isCharging,                         //是否充电
+				"battery_level": this.batteryInfo.level,                    //电量
+				"status": 1,                            //是否在线
+				"is_set": 0,                            //是否绑定
+				"set_time": Math.trunc(new Date().getTime() / 1000),               //绑定时间（时间戳）
+				"room_id": this.room                       //绑定的房间号，数据库中的房间号
+			}
+			
+			console.log(pack);
+			
+			// console.log(this.batteryInfo);
+			
+			// activateDeviceApi(pack)
+			// .then(res=>{
+			// 	console.log(res);
+			// }).catch(e=>{
+			// 	console.log(e);
+			// })
+			
 			this.$emit('close')
 		}
 		
@@ -137,6 +197,10 @@ export default {
 	align-items: center;
 	backdrop-filter: blur(3rpx);
 	color: #fff;
+	
+	.btn-dark{
+		background-color: var(--dark-color-primary)!important;
+	}
 	
 	.change-language {
 		position: fixed;
@@ -219,7 +283,7 @@ export default {
 				min-width: 80rpx;
 				height: 100%;
 				line-height: 25rpx;
-				background-color: #591bb7;
+				background-color: var(--color-primary);
 				color: #fff;
 			}
 			
@@ -235,16 +299,16 @@ export default {
 		.btns{
 			display: flex;
 			flex-direction: row;
-			justify-content: flex-start;
+			justify-content: flex-end;
 			width: 100%;
 			margin-top: 30rpx;
 			
 			.btn{
 				min-width: 80rpx;
 				height: 100%;
-				background-color: #591bb7;
+				background-color: var(--color-primary);
 				color: #fff;
-				margin: 0 0 0 58rpx;
+				margin: 0 58rpx 0 0;
 			}
 		}
 	}

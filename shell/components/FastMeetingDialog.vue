@@ -8,7 +8,7 @@
 				<div class="title">{{$t('message.fast_meeting.title')}}</div>
 				<uni-icons type="closeempty" size="30" @click="closeDialog"></uni-icons>
 			</div>
-			<div class="info">{{$t('message.fast_meeting.tip_left')+avaliableHours+$t('message.fast_meeting.tip_right')}}</div>
+			<div :class="'info info'+(currentTheme!='dark'?'':'-dark')">{{$t('message.fast_meeting.tip_left')+avaliableHours+$t('message.fast_meeting.tip_right')}}</div>
 			<div class="tip">
 				
 			</div>
@@ -27,7 +27,7 @@
 			
 			<div class="btns">
 				<button class="btn btn-default" type="default" @click.stop="cancelReserve">{{$t('message.fast_meeting.cancel')}}</button>
-				<button class="btn btn-confirm" type="default" @click.stop="confirmReserve">{{$t('message.fast_meeting.confirm')}}</button>
+				<button :class="'btn btn-confirm btn-confirm'+(currentTheme!='dark'?'':'-dark')" type="default" @click.stop="confirmReserve">{{$t('message.fast_meeting.confirm')}}</button>
 			</div>
 		</view>
 	</view>
@@ -37,6 +37,7 @@
 	import TimeStepperScroll from './TimeStepperScroll.vue';
 	import {getNearestNextTime} from '@/utils/timeTool.js'
 	import {SEC_PER_HOUR,nextScaleTs} from '@/utils/timestampTool.js'
+	import {mapGetters} from 'vuex';
 
 	export default {
 		name:"FastMeetingDialog",
@@ -45,6 +46,9 @@
 		},
 		props:['currentTime','meetings','avaliableHours'], // 当前时间戳（10位），会议数组，可预约多少小时
 		emits:['close','confirm'],
+		computed: {
+		  ...mapGetters(['currentTheme'])
+		},
 		data() {
 			return {
 				leftHandle: nextScaleTs(this.currentTime,15*60),
@@ -119,7 +123,12 @@
 	
 	.info{
 		font-size: 14rpx;
-		color: #591bb7;
+		color: var(--color-primary);
+		
+		&-dark{
+			color: var(--dark-color-primary);
+		}
+		
 		height: 30rpx;
 		line-height: 30rpx;
 		margin-bottom: 5rpx;
@@ -148,8 +157,12 @@
 		}
 		
 		.btn-confirm{
-			background-color: #591bb7;
+			background-color: var(--color-primary);
 			color: #fff;
+			
+			&-dark{
+				background-color: var(--dark-color-primary);
+			}
 		}
 		
 		.btn-default{

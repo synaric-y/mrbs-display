@@ -1,8 +1,8 @@
 <template>
 
 	<div class="container" id="app">
-		<GuideView v-if="needGuide" />
-		<SettingView v-if="settingViewShow" @close="settingViewShow=false" />
+		<GuideView v-if="needGuide" :batteryInfo="batteryInfo" :deviceInfo="deviceInfo" />
+		<SettingView v-if="settingViewShow" :batteryInfo="batteryInfo" :deviceInfo="deviceInfo" @close="settingViewShow=false" />
 		
 		<view class="popup-setting-room-number" v-if="showSettingRoomNumber">
 			<input class="popup-input" v-model="_roomId" :placeholder="$t('message.alert_code')" />
@@ -58,12 +58,12 @@
 				</view>
 				<!-- 预约会议对话框 -->
 				<FastMeetingDialog v-if="showQuickMeeting" @close="showQuickMeeting=false" @confirm="quickMeet(1)"
-					:currentTime="roomData.now_timestamp || Math.trunc(new Date().getTime()/1000)"
-					:meetings="roomData.entries"
-					:avaliableHours="2"/>
+					:currentTime="roomData?.now_timestamp ?? Math.trunc(new Date().getTime()/1000)"
+					:meetings="roomData?.entries ?? []"
+					:avaliableHours="1"/>
 			</view>
 		</div>
-		<div :class="[(roomData?.now_entry)?'right-meeting-info right-meeting-info-busy':'right-meeting-info']">
+		<div :class="(roomData?.now_entry)?'right-meeting-info right-meeting-info-busy':('right-meeting-info right-meeting-info'+(currentTheme === 'dark' ? '-dark' : '' ))">
 
 			<div class="battery">
 				<BatteryShow :battery="batteryInfo.level"/>
@@ -143,17 +143,19 @@
 	import SettingView from '../../views/SettingView.vue';
 	import GuideView from '../../views/GuideView.vue'
 	import BatteryShow from '../../components/BatteryShow.vue'
-	// import {
-	// 	quickMeetApi,
-	// 	quickMeetMessageMapping,
-	// 	syncRoomApi
-	// } from '../../api/api.js'
-	
 	import {
 		quickMeetApi,
 		quickMeetMessageMapping,
 		syncRoomApi
-	} from '../../api/mockApi.js' // 模拟接口
+	} from '../../api/api.js'
+	
+	// import {
+	// 	quickMeetApi,
+	// 	quickMeetMessageMapping,
+	// 	syncRoomApi
+	// } from '../../api/mockApi.js' // 模拟接口
+	
+	import { mapGetters, mapMutations } from 'vuex';
 	
 	export default {
 		name: 'App',
@@ -166,14 +168,17 @@
 			LanguageSelect,
 			BatteryShow
 		},
+		computed: {
+		  ...mapGetters(['currentTheme'])
+		},
 		data() {
 			return {
-				needGuide: false,
-				settingViewShow: false,
+				needGuide: true, // 引导页面弹窗
+				settingViewShow: false, // 设置页面弹窗
 				meeting: false,
 				timeRange: [],
-				showSettingRoomNumber: false,
-				showQuickMeeting: false,
+				showSettingRoomNumber: false, // 内置码输入弹窗
+				showQuickMeeting: false, // 快速会议弹窗
 				_roomId: 2,
 				roomId: 2,
 				meetStartTime: 8,
@@ -221,8 +226,16 @@
 			}
 			console.log('获取设备的信息deviceInfo:',this.deviceInfo);
 			this.startSync();
+			
+			uni.getBatteryInfo({
+				success: (res) => {
+					console.log('获取电量信息res:',res);
+					this.batteryInfo = res;
+				}
+			})
 		},
 		methods: {
+			...mapMutations(['changeStatus']), //对象展开运算符直接拿到change
 			// 获取会议时间
 			nowMeetTime() {
 				let start_time;
@@ -498,25 +511,25 @@
 				//console.log('syncRoom deviceInfo',this.deviceInfo);
 
 				syncRoomApi({
-					room_id: this.roomId,
-					timezone: this.timezore,
 					device_id: this.deviceInfo.deviceId,
 					battery_level: this.batteryInfo.level,
-					battery_charge: this.batteryInfo.isCharging,
-					device_info: this.deviceInfo,
+					is_charging: this.batteryInfo.isCharging,
 				}, {
 					'Content-type': 'application/json',
 					'Accept-Language': this.languageSet
 				}, ).then(res => {
+					console.log(res);
 					let data = res.data.data;
 					if (data == null) {
+						this.changeStatus('offline') // 离线
 						uni.showToast({
 							title: this.$t('message.netDataError'),
 							icon: 'none'
 						})
 						return;
 					}
-					//console.log('syncRoom返回数据成功data:', data);
+					console.log('syncRoom返回数据成功data:', data);
+					this.changeStatus('online') // 在线
 					this.roomData = data;
 					this.initTimeline(data);
 					this.foundNextMeet();
@@ -556,6 +569,8 @@
 						'Content-type': 'application/json',
 						'Accept-Language': this.languageSet
 					}).then((res) => {
+						
+						console.log(res);
 						let data = res.data.data;
 						let code = res.data.code;
 
@@ -768,7 +783,12 @@
 			flex-direction: column;
 			flex: 1;
 			height: 100vh;
-			background-color: #591BB7;
+			background-color: var(--color-primary);
+			
+			&-dark{
+				background-color: var(--dark-color-primary);
+			}
+			
 			padding: 10rpx 20rpx 0 37rpx;
 			box-sizing: border-box;
 			text-align: left;
@@ -846,7 +866,11 @@
 		}
 		
 		.right-meeting-info-busy{
-			background-color: #BD3124;
+			background-color: var(--color-danger);
+			
+			&-dark{
+				background-color: var(--dark-color-danger);
+			}
 		}
 
 		

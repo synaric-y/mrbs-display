@@ -12,6 +12,7 @@
 	} from "@/utils/indexTimeTool.js";
 
 	import {
+		computed,
 		onMounted,
 		ref,
 		watch
@@ -20,6 +21,8 @@
 	import {
 		Decimal
 	} from 'decimal.js';
+	
+	import store from '@/store/index.js'//需要引入store
 
 	const fringe = 20 // 左右两边的安全区
 
@@ -66,6 +69,10 @@
 
 		// 初始化手柄
 		getInitialHandle()
+	})
+	
+	const currentTheme = computed(()=>{
+		return store.getters.currentTheme
 	})
 
 	function isInteger(obj) {
@@ -294,14 +301,6 @@
 
 		if (!isMove) { // 不滚动就是点选
 		
-			let btn=uni.createSelectorQuery().select('#my-btn');
-			const that = this
-			btn.boundingClientRect(rect=>{
-				that.x = rect.left
-				that.y = rect.top  + rect.height
-				
-				that.toggleList()
-			}).exec();
 
 			console.log(contentWidth.value);
 
@@ -453,7 +452,7 @@
 
 			<div class="timeline-bar-container" ref="refContainer">
 
-				<div class="timeline-content" ref="refContent" id="my-content"
+				<div :class="'timeline-content timeline-content'+(currentTheme!='dark'?'':'-dark')" ref="refContent" id="my-content"
 					:style="{width:zoomIn+'%'}">
 					<div class="tags">
 						<div class="tag tag-left" :style="'left:'+((leftHandle-lb)/span)*100+'%;'" v-if="!disabled">
@@ -545,6 +544,31 @@
 			.timeline-content {
 				width: 100%;
 				position: relative;
+				
+				&-dark{
+					.tag-text {
+						background-color: var(--dark-color-primary)!important;
+					}
+					.triangle {
+						border-top: 0.4rem solid var(--dark-color-primary)!important;
+					}
+					
+					.to-start {
+						background-color: var(--dark-color-primary-light)!important;
+					}
+					
+					.in-progress {
+						background-color: var(--dark-color-danger-light)!important;
+					}
+					
+					.selecting-period {
+						background-color: var(--dark-color-primary)!important;
+					}
+					
+					.handle {
+						border: 3rpx solid var(--dark-color-primary)!important;
+					}
+				}
 				
 
 

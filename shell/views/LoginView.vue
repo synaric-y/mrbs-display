@@ -19,8 +19,8 @@
 			</div>
 			
 			<div class="btns">
-				<button class="btn" type="default" @click="finish">{{$t('message.login.confirm')}}</button>
 				<button class="btn btn-default" type="default" @click="previous">{{$t('message.login.previous')}}</button>
+				<button :class="'btn btn'+(currentTheme!='dark'?'':'-dark')" type="default" @click="finish">{{$t('message.login.confirm')}}</button>
 			</div>
 		</div>
 	</div>
@@ -28,12 +28,17 @@
 
 <script>
 // import LanguageSelect from '../components/LanguageSelect.vue';
+import {mapGetters} from 'vuex';
+import {loginApi} from '@/api/api';
 export default {
 	name:"ActivateView",
 	components:{
 		
 	},
 	emits:['close','previous'],
+	computed: {
+	  ...mapGetters(['currentTheme'])
+	},
 	data() {
 		return {
 			accountNumber: '',
@@ -42,6 +47,30 @@ export default {
 	},
 	methods:{
 		finish(){
+			loginApi(
+				{
+					"username": this.accountNumber,
+					"password": this.password
+				}
+			).then(res=>{
+				console.log(res);
+				
+				
+				if(res.data.code!==0&&res.data.code!==1){
+					uni.showToast({
+						title: this.$t('message.login.login_fail'),
+						icon: 'none',
+					})
+				}else{
+					uni.showToast({
+						title: this.$t('message.login.login_success'),
+						icon: 'none',
+					})
+				}
+				
+			}).catch(e=>{
+				console.log(e);
+			})
 			
 			this.accountNumber = ''
 			this.password = ''
@@ -71,6 +100,10 @@ export default {
 	align-items: center;
 	backdrop-filter: blur(3rpx);
 	color: #fff;
+	
+	.btn-dark{
+		background-color: var(--dark-color-primary)!important;
+	}
 	
 	.change-language {
 		position: fixed;
@@ -176,7 +209,7 @@ export default {
 			.btn{
 				min-width: 80rpx;
 				height: 100%;
-				background-color: #591bb7;
+				background-color: var(--color-primary);
 				color: #fff;
 				margin: 0 0 0 58rpx;
 			}

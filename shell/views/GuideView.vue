@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<ActivateView v-if="getTopPage=='activate'" @close="next('login')"/>
+		<ActivateView v-if="getTopPage=='activate'" :batteryInfo="batteryInfo" :deviceInfo="deviceInfo" @close="next('login')"/>
 		<LoginView v-if="getTopPage=='login'" @close="next('')" @previous="previous()"/>
 	</div>
 
@@ -18,6 +18,7 @@ export default {
 		ActivateView,
 		LoginView
 	},
+	props:['batteryInfo','deviceInfo'],
 	computed:{
 		getTopPage(){
 			return this.pageStack.peek()

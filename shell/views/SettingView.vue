@@ -27,7 +27,7 @@
 					
 				</div>
 				<div class="info-row">
-					{{$t('message.setting.left.online_status')}}: {{basicInfo.status}}
+					{{$t('message.setting.left.online_status')}}: {{this.currentStatus=='online'?'正常':'离线'}}
 				</div>
 				<div class="info-row">
 					
@@ -53,14 +53,14 @@
 				<div class="form-row">
 					<div class="label">{{$t('message.setting.right.brightness')}}</div>
 					<div class="slider-wrapper">
-						<slider value="75" @changing="changeBrightness" activeColor="#591bb7" backgroundColor="#ffffff" block-color="#ffffff" block-size="20" />
+						<slider :value="settings.brightness" @changing="changeBrightness" :activeColor="currentTheme!='dark'?'#591BB7':'#285fd4'" backgroundColor="#ffffff" block-color="#ffffff" block-size="20" />
 					</div>
 					<div class="slider-value">{{settings.brightness+'%'}}</div>
 				</div>
 				<div class="form-row">
 					<div class="label">{{$t('message.setting.right.volume')}}</div>
 					<div class="slider-wrapper">
-						<slider value="25" @changing="changeVolume" @change="testVolume" activeColor="#591bb7" backgroundColor="#ffffff" block-color="#ffffff" block-size="20" />
+						<slider :value="settings.volume" @changing="changeVolume" @change="testVolume" :activeColor="currentTheme!='dark'?'#591BB7':'#285fd4'" backgroundColor="#ffffff" block-color="#ffffff" block-size="20" />
 					</div>
 					<div class="slider-value">{{settings.volume+'%'}}</div>
 				</div>
@@ -108,8 +108,8 @@
 					<div class="label">{{$t('message.setting.right.theme_color')}}</div>
 					<div class="checkboxes">
 						<div class="checkbox-group" v-for="item in themeColorList">
-							<div :class="settings.themeColor==item.value?'my-checkbox':'my-checkbox my-checkbox-disabled'" @click="changeThemeColor(item.value)">
-								<uni-icons v-if="settings.themeColor==item.value" type="checkmarkempty" color="#591bb7" size="20"></uni-icons>
+							<div :class="settings.themeColor==item.value?('my-checkbox my-checkbox'+(currentTheme!='dark'?'':'-dark')):'my-checkbox my-checkbox-disabled'" @click="changeThemeColor(item.value)">
+								<uni-icons v-if="settings.themeColor==item.value" type="checkmarkempty" :color="currentTheme!='dark'?'#591BB7':'#285fd4'" size="20"></uni-icons>
 							</div>
 							
 							<div class="colors">
@@ -120,7 +120,7 @@
 				</div>
 				
 				<div class="btns">
-					<button class="btn" type="default" @click="submit">{{$t('message.setting.right.submit')}}</button>
+					<button :class="'btn btn'+(currentTheme!='dark'?'':'-dark')" type="default" @click="submit">{{$t('message.setting.right.submit')}}</button>
 					<button class="btn btn-default" type="default" @click="cancel">{{$t('message.setting.right.cancel')}}</button>
 				</div>
 			</div>
@@ -133,42 +133,39 @@
 
 <script>
 import LanguageSelect from '../components/LanguageSelect.vue';
+import { mapGetters, mapMutations } from 'vuex';
+import { getAllAreaApi,getAllRoomsApi,activateDeviceApi,getSettingApi } from '@/api/api';
 export default {
 	name:"SettingView",
 	components:{
 		LanguageSelect
 	},
+	props:['batteryInfo','deviceInfo'],
 	emits:['close'],
+	computed: {
+	  ...mapGetters(['currentTheme','currentStatus'])
+	},
 	data() {
 		return {
 			basicInfo:{
-				id: '0EABD',
-				type: 'AT-00',
-				battery: '80%',
-				room: 'A会议室',
-				area: '上海',
+				id: this.deviceInfo.deviceId,
+				type: this.deviceInfo.deviceBrand,
+				battery: this.batteryInfo.level+'%',
+				room: '',
+				area: '',
 				status: '正常'
 			},
 			settings:{
-				brightness: 75,
-				volume: 25,
+				brightness: 50,
+				volume: 50,
 				area: 0,
 				room: 0,
 				requestURL: 'http://www.meeting.com:1234',
 				timeFormat: 0,
 				themeColor: 0,
 			},
-
-			areaList:[
-				{ value: 0, text: "上海" },
-				{ value: 1, text: "香港" },
-			],
-			roomList:[
-				{ value: 0, text: "A" },
-				{ value: 1, text: "B" },
-				{ value: 2, text: "C" },
-				{ value: 3, text: "D" },
-			],
+			areaList:[],
+			roomList:[],
 			timeFormatList:[
 				{ value: 0, text: "12小时制" },
 				{ value: 1, text: "24小时制" },
@@ -179,7 +176,82 @@ export default {
 			]
 		};
 	},
+	created(){
+	
+		const that = this
+		uni.getScreenBrightness({
+			success: function (res) {
+				that.settings.brightness = Math.trunc(res.value*100)
+			},
+			fail: function (err) {
+				console.log(err);
+				that.settings.brightness = 50 // 中间值
+			}
+		});
+		
+		// #ifdef APP-PLUS
+		this.settings.volume = Math.trunc(plus.device.getVolume() * 100)
+		// #endif
+		
+		this.initAreaAndRoom()
+		
+	},
 	methods:{
+		initAreaAndRoom(){
+			const that = this
+			getSettingApi({
+				"device_id": that.deviceInfo.deviceId,
+				"is_charging": that.batteryInfo.isCharging,
+				"battery_level": that.batteryInfo.level,
+			}).then(res=>{
+				console.log(res);
+				that.basicInfo.room = res.data.data.room
+				that.basicInfo.area = res.data.data.area
+				
+				getAllAreaApi({
+					"is_charging": that.batteryInfo.isCharging,
+					"battery_level": that.batteryInfo.level,
+				}).then(res=>{
+					console.log(res);
+					
+					const li = res.data.data
+					let tempList = []
+					for(let item of li) tempList.push({value:item.id, text: item.area_name})
+					that.areaList = tempList
+					
+					const areaIdx = that.areaList.findIndex(item=>{return item.text == that.basicInfo.area})
+					console.log(areaIdx);
+					that.settings.area = that.areaList[areaIdx].value
+					console.log(that.settings.area);
+					
+					getAllRoomsApi({
+						"type": "area",
+						"id": that.settings.area,
+						"is_charge": that.batteryInfo.isCharging,
+						"battery_level": that.batteryInfo.level
+					}).then(res=>{
+						console.log(res);
+						
+						const li = res.data.data.areas.rooms
+						let tempList = []
+						for(let item of li){
+							tempList.push({value:item.room_id, text: item.room_name})
+						}
+						that.roomList = tempList
+						
+						const roomIdx = that.roomList.findIndex(item=>{return item.text == that.basicInfo.room})
+						console.log(roomIdx);
+						that.settings.room = that.roomList[roomIdx].value
+						console.log(that.settings.room);
+					})
+					
+				})
+				
+			}).catch(e=>{
+				console.log(e);
+			})
+		},
+		...mapMutations(['changeTheme']), //对象展开运算符直接拿到change
 		changeBrightness(e){
 			this.settings.brightness = e.detail.value
 			
@@ -212,11 +284,32 @@ export default {
 			// #endif
 		},
 		changeArea(e){
-			const tempArea = e
-			console.log(tempArea);
+			
+			getAllRoomsApi({
+				"type": "area",
+				"id": this.settings.area,
+				"is_charge": this.batteryInfo.isCharging,
+				"battery_level": this.batteryInfo.level
+			}).then(res=>{
+				const li = res.data.data.areas.rooms
+				
+				let tempList = []
+				
+				for(let item of li) tempList.push({value:item.room_id, text: item.room_name})
+				
+				this.roomList = tempList
+				
+			}).catch(e=>{
+				console.log(e)
+				uni.showToast({
+					title: this.$t('message.netDataError'),
+					icon: 'none',
+				})
+			})
 		},
 		changeThemeColor(v){
 			this.settings.themeColor = v
+			this.changeTheme(v==0?'default':'dark')
 			console.log(v);
 		},
 		submit(){
@@ -265,8 +358,9 @@ export default {
 		.info-list{
 			height: 100%;
 			.info-row{
-				height: 25rpx;
+				min-height: 25rpx;
 				line-height: 25rpx;
+				word-break:break-all;
 			}
 		}
 		
@@ -354,7 +448,12 @@ export default {
 					gap: 15rpx;
 					
 					.my-checkbox{
-						border: 1rpx solid #591bb7;
+						
+						&-dark{
+							border: 1rpx solid var(--dark-color-primary);
+						}
+						border: 1rpx solid var(--color-primary);
+						
 						border-radius: 2rpx;
 						width: 24px;
 						height: 24px;
@@ -444,9 +543,13 @@ export default {
 			.btn{
 				min-width: 80rpx;
 				height: 100%;
-				background-color: #591bb7;
+				background-color: var(--color-primary);
 				color: #fff;
 				margin: 0 0 0 58rpx;
+				
+				&-dark{
+					background-color: var(--dark-color-primary);
+				}
 			}
 			
 			.btn-default{

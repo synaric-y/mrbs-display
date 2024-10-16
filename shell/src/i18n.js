@@ -11,13 +11,17 @@ const messages = {
 				"please_select":'请选择',
 				"belong_to_meeting_room":'所属会议室',
 				"finish":'完成',
+				"activate_success":"设备激活成功！",
+				"activate_fail":"设备激活失败！",
 			},
 			"login":{
 				"title":'请输入管理员密码',
 				"account_number":'请输入账号',
 				"password":'请输入密码',
 				"confirm":'确定',
-				"previous":'返回'
+				"previous":'返回',
+				"login_fail":'用户名或密码错误',
+				"login_success":"登录成功"
 			},
 			"setting":{
 				"left":{
@@ -259,7 +263,9 @@ const messages = {
 	}
 }
 const i18n = createI18n({
+	legacy: false, // 解决vue2兼容问题
 	locale: uni.getStorageSync('lang') || 'zh', // 先从本地缓存拿，没有就是中文
+	globalInjection: true, // 解决vue2兼容问题
 	messages
 })
 export default i18n
