@@ -74,6 +74,6 @@ export {
 	dateDisplayLocale,
 	formatDate,
 	formatTime,
-	getTimestamp
+	getTimestamp,
 
 }

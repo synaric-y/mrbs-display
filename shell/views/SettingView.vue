@@ -284,7 +284,7 @@ export default {
 			// #endif
 		},
 		changeArea(e){
-			
+			this.roomList = [] // 清空现有房间
 			getAllRoomsApi({
 				"type": "area",
 				"id": this.settings.area,

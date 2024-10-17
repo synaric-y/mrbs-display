@@ -1,49 +1,45 @@
 <template>
 
 	<div class="container" id="app">
-		<GuideView v-if="needGuide" :batteryInfo="batteryInfo" :deviceInfo="deviceInfo" />
-		<SettingView v-if="settingViewShow" :batteryInfo="batteryInfo" :deviceInfo="deviceInfo" @close="settingViewShow=false" />
-		
+		<ActivateView v-if="activateViewShow" :batteryInfo="batteryInfo" :deviceInfo="deviceInfo"
+			@close="activateViewShow=false" />
+		<LoginView v-if="loginViewShow" @close="loginViewShow=false"
+			@success="()=>{loginViewShow=false;settingViewShow=true}" />
+		<SettingView v-if="settingViewShow" :batteryInfo="batteryInfo" :deviceInfo="deviceInfo"
+			@close="settingViewShow=false" />
+
 		<view class="popup-setting-room-number" v-if="showSettingRoomNumber">
 			<input class="popup-input" v-model="_roomId" :placeholder="$t('message.alert_code')" />
 			<view class="popup-sure" @click="onSetRoomId">{{$t('message.sure')}}</view>
 		</view>
-		
+
 		<div class="left-time-view">
 			<!-- 会议时间 -->
 			<view class="meeting-time">
 				<view class="meeting-scroll">
-					<scroll-view scroll-y="true"
-						:class="[largeScreenHeight > 670?'meeting-scroll-view':'ext-scroll-view']"
-						@scrolltolower="lower" @scroll="scroll">
-						<template v-for="(item,index) in timeRange" :key="index">
-							<view class="scroll-view-item">
-								<view class="scroll-item-left">
-									<text class="scroll-item-time">{{item.leftTitle}}</text>
-								</view>
-								<!-- 当前有会议 -->
-								<template v-if="item.meetHeight > 0">
-									<view class="scroll-item-right extention-height"
-										:style="{height:item.meetHeight + 'rpx'}">
-										<template v-if="item.meetHeight < 40">
-											<text class="scroll-item-meeting">{{item.meetRange}}\n{{item.title}}</text>
-										</template>
-										<template v-else>
-											<text class="scroll-item-meeting-more">{{item.meetRange}}\n{{item.title}}</text>
-										</template>
-
-										<image v-if="item.isCurrentMeet" class="in-meeting-icon"
-											src="@/static/in-meeting.png" mode="aspectFit">
-										</image>
-									</view>
-								</template>
-								<!-- 当前无会议 -->
-								<template v-else>
-									<view class="scroll-item-right">
-									</view>
-								</template>
-							</view>
-						</template>
+					<scroll-view scroll-y="true" class="meeting-scroll-view">
+						<div class="meeting-wrapper">
+							<div class="left">
+								<div class="hm" v-for="(item,index) in hourList" :key="index">
+									{{ item.text }}
+								</div>
+							</div>
+							<div class="right">
+								<div class="meeting-item" v-for="(item,index) in meetingList" :key="item.id" :style="{top: calculateY(item.start_time)+'rpx', height: calculateHeight(item.start_time,item.end_time)+'rpx' }">
+									<div :class="'meeting '+meetingClass(item.start_time,item.end_time)">
+										<text class="meeting-theme">
+											{{ item.name }}
+										</text>
+										<text class="meeting-span">
+											{{ tsHourMinuteFormat(item.start_time) +' - '+ tsHourMinuteFormat(item.end_time)}}
+										</text>
+									</div>
+									<image v-if="item.isCurrentMeeting" class="in-meeting-icon"
+										src="@/static/in-meeting.png" mode="aspectFit">
+									</image>
+								</div>
+							</div>
+						</div>
 					</scroll-view>
 				</view>
 			</view>
@@ -59,25 +55,27 @@
 				<!-- 预约会议对话框 -->
 				<FastMeetingDialog v-if="showQuickMeeting" @close="showQuickMeeting=false" @confirm="quickMeet(1)"
 					:currentTime="roomData?.now_timestamp ?? Math.trunc(new Date().getTime()/1000)"
-					:meetings="roomData?.entries ?? []"
-					:avaliableHours="1"/>
+					:meetings="roomData?.entries ?? []" :batteryInfo="batteryInfo" :deviceInfo="deviceInfo"
+					:avaliableHours="1" />
 			</view>
 		</div>
-		<div :class="(roomData?.now_entry)?'right-meeting-info right-meeting-info-busy':('right-meeting-info right-meeting-info'+(currentTheme === 'dark' ? '-dark' : '' ))">
+		<div
+			:class="(roomData?.now_entry)?'right-meeting-info right-meeting-info-busy':('right-meeting-info right-meeting-info'+(currentTheme === 'dark' ? '-dark' : '' ))">
 
 			<div class="battery">
-				<BatteryShow :battery="batteryInfo.level"/>
+				<BatteryShow :battery="batteryInfo.level" />
 			</div>
 			<div class="header">
 				<div class="header-left">
 					<div class="room-title">{{$t('message.room')}}</div>
-					<div class="room-number" @longpress="onSetting">{{roomData?.room?.room_name ?? 'A'}}</div>
+					<div class="room-number" @longpress="showSettingRoomNumber=true">
+						{{roomData?.room?.room_name ?? 'A'}}</div>
 				</div>
 				<div class="header-right">
 					<view class="change-language">
 						<LanguageSelect @update="changeLang" />
 					</view>
-					<uni-icons type="gear" @click="settingViewShow=true" color="#ffffff" size="35"></uni-icons>
+					<uni-icons type="gear" @click="prepareSetting" color="#ffffff" size="35"></uni-icons>
 				</div>
 			</div>
 			<view class="current-time">{{this.nowlanguageTime}}</view>
@@ -88,13 +86,13 @@
 				<view class="meeting-status">
 					{{(roomData?.now_entry)?$t('message.in_meeting'):$t('message.no_meeting')}}
 				</view>
-			
+
 				<!-- 现在有会 -->
 				<template v-if="roomData?.now_entry">
 					<text class="meeting-title">{{roomData?.now_entry?.name ?? '-'}}</text>
 					<view class="meeting-detail-item">
 						<image class="meeting-detail-item-icon" src="@/static/reverse-time.png" mode=""></image>
-						<text class="meeting-detail-item-desc">{{(roomData?.now_entry)?meetTimeString:'-'}}</text>
+						<text class="meeting-detail-item-desc">{{(roomData?.now_entry)?(tsHourMinuteFormat(roomData.now_entry.start_time) +' - '+ tsHourMinuteFormat(roomData.now_entry.end_time)):'-'}}</text>
 					</view>
 					<view class="meeting-detail-item">
 						<image class="meeting-detail-item-icon" src="@/static/reverse-person.png" mode=""></image>
@@ -116,7 +114,7 @@
 						<text class="meeting-detail-item-desc">{{(nextMeetData?.book_by) ?? '-'}}</text>
 					</view>
 				</template>
-				
+
 			</view>
 			<view class="right-meeting-logo">
 				<image class="company-logo" src="@/static/bcc-logo-en.png" mode="aspectFit"></image>
@@ -132,53 +130,118 @@
 		dateDisplayLocale,
 		formatDate,
 		formatTime,
-		getTimestamp
+		getTimestamp,
 	} from '../../utils/indexTimeTool.js'
+	import {
+		hourDisplay,
+		SEC_PER_MINUTE
+	} from '@/utils/timestampTool.js'
 	import LanguageSelect from '../../components/LanguageSelect.vue';
 	import {
 		timeZoneMapping,
 		languageSetMapping
 	} from '../../src/i18nMapping.js';
-	import FastMeetingDialog from '../../components/FastMeetingDialog.vue'
-	import SettingView from '../../views/SettingView.vue';
-	import GuideView from '../../views/GuideView.vue'
-	import BatteryShow from '../../components/BatteryShow.vue'
+	import FastMeetingDialog from '@/components/FastMeetingDialog.vue'
+	import LoginView from '@/views/LoginView.vue';
+	import SettingView from '@/views/SettingView.vue';
+	import ActivateView from '@/views/ActivateView.vue';
+	import BatteryShow from '../../components/BatteryShow.vue';
 	import {
 		quickMeetApi,
 		quickMeetMessageMapping,
-		syncRoomApi
+		syncRoomApi,
+		getSettingApi
 	} from '../../api/api.js'
-	
+	import {
+		Decimal
+	} from 'decimal.js';
 	// import {
 	// 	quickMeetApi,
 	// 	quickMeetMessageMapping,
 	// 	syncRoomApi
 	// } from '../../api/mockApi.js' // 模拟接口
-	
-	import { mapGetters, mapMutations } from 'vuex';
-	
+
+	import {
+		mapGetters,
+		mapMutations
+	} from 'vuex';
+
+	const heightPerBlock = 30 // 每15分钟rpx
+
 	export default {
 		name: 'App',
 		interval: null,
 		batteryInterval: null,
 		components: {
 			FastMeetingDialog,
-			GuideView,
 			SettingView,
 			LanguageSelect,
-			BatteryShow
+			BatteryShow,
+			LoginView,
+			ActivateView
 		},
 		computed: {
-		  ...mapGetters(['currentTheme'])
+			...mapGetters(['currentTheme']),
+			calculateY() {
+				return (startTs) => {
+					const len = this.hourList.length
+					const dayBegTs = this.hourList[0].ts
+					const dayEndTs = this.hourList[len - 1].ts
+
+					return Number(new Decimal(startTs).minus(this.hourList[0].ts).dividedBy(dayEndTs - dayBegTs).times(
+						len - 1).times(heightPerBlock))
+				}
+			},
+			calculateHeight() {
+				return (startTs, endTs) => {
+					const len = this.hourList.length
+					const dayBegTs = this.hourList[0].ts
+					const dayEndTs = this.hourList[len - 1].ts
+
+					const res = Number(new Decimal(endTs).minus(startTs).dividedBy(dayEndTs - dayBegTs).times(len - 1)
+						.times(heightPerBlock))
+					console.log(res);
+					return res
+				}
+			},
+			meetingClass() { // 根据会议起止时间获取类名
+				return (startTs, endTs) => {
+					const min15 = SEC_PER_MINUTE * 15
+					const min60 = SEC_PER_MINUTE * 60
+					const min90 = SEC_PER_MINUTE * 90
+
+					const diff = endTs - startTs
+
+					let res = ''
+
+					if (diff <= min15) res = 'min15'
+					else if (diff <= min60) res = 'min60'
+					else res = 'min90'
+
+					console.log(res);
+
+					return res
+				}
+			},
+			tsHourMinuteFormat() {
+				return (ts) => {
+					return formatDate(ts, 'Asia/Shanghai', 'zh-cn', 'hh:mm A');
+				}
+			}
 		},
 		data() {
 			return {
-				needGuide: true, // 引导页面弹窗
+				activateViewShow: false, // 激活页面弹窗
+				loginViewShow: false, // 登录页面弹窗
 				settingViewShow: false, // 设置页面弹窗
-				meeting: false,
-				timeRange: [],
 				showSettingRoomNumber: false, // 内置码输入弹窗
 				showQuickMeeting: false, // 快速会议弹窗
+
+				hourList: [], // 左侧会议列表时间轴
+				meetingList: [], // 所有会议
+
+				meeting: false,
+				timeRange: [],
 				_roomId: 2,
 				roomId: 2,
 				meetStartTime: 8,
@@ -205,17 +268,19 @@
 			}
 		},
 		onLoad() {
+			// 缓存获取room_id
 			let roomId = uni.getStorageSync("ROOM_ID")
 			if (roomId) {
 				this.roomId = Number(roomId)
 				this._roomId = Number(roomId)
 			}
-			console.log("Room ID: ",roomId);
-			const windowInfo = uni.getWindowInfo();
-			this.largeScreenHeight = windowInfo.windowHeight;
+			console.log("Room ID: ", roomId);
+
+			// uniapp查询窗口高度
+			this.largeScreenHeight = uni.getWindowInfo().windowHeight;
 			console.log('getWindowInfo windowHeight:', this.largeScreenHeight)
 
-			// 获取设备的信息
+			// 获取设备信息
 			let localDeviceInfo = uni.getStorageSync("DEVICE_INFO")
 			if (localDeviceInfo) {
 				this.deviceInfo = localDeviceInfo
@@ -224,15 +289,52 @@
 				uni.setStorageSync("DEVICE_INFO", deviceInfo);
 				this.deviceInfo = deviceInfo;
 			}
-			console.log('获取设备的信息deviceInfo:',this.deviceInfo);
-			this.startSync();
-			
+			console.log('获取设备的信息deviceInfo:', this.deviceInfo);
+
+			// 获取电量信息
 			uni.getBatteryInfo({
 				success: (res) => {
-					console.log('获取电量信息res:',res);
+					console.log('获取电量信息res:', res);
 					this.batteryInfo = res;
+
+					// 获取是否激活（尝试调一下syncRoom接口）
+					syncRoomApi({
+						device_id: this.deviceInfo.deviceId,
+						battery_level: this.batteryInfo.level,
+						is_charging: this.batteryInfo.isCharging,
+					}, {
+						'Content-type': 'application/json',
+						'Accept-Language': this.languageSet
+					}, ).then(res => {
+						console.log(res);
+						let data = res.data.data;
+						let code = res.data.code
+
+						if (data == null) { // 数据异常
+							this.changeStatus('offline') // 离线
+
+							if (code == -59) // 未激活
+								this.activateViewShow = true // 打开激活页面
+							else // 网络错误
+								uni.showToast({
+									title: this.$t('message.netDataError'),
+									icon: 'none'
+								})
+						} else { // 已激活，数据正常
+							// 开始同步
+							// this.startSync();
+							this.syncRoom()
+						}
+					}).catch(e => {
+						console.error(e)
+						uni.showToast({
+							title: this.$t('message.netDataError'),
+							icon: 'none'
+						})
+					})
 				}
 			})
+
 		},
 		methods: {
 			...mapMutations(['changeStatus']), //对象展开运算符直接拿到change
@@ -240,10 +342,10 @@
 			nowMeetTime() {
 				let start_time;
 				let end_time;
-				if (this.roomData && this.roomData.now_entry) {
+				if (this.roomData?.now_entry) {
 					start_time = this.roomData.now_entry.start_time;
 					end_time = this.roomData.now_entry.end_time;
-				} else if (this.nextMeetData && this.nextMeetData.start_time) {
+				} else if (this.nextMeetData?.start_time) {
 					start_time = this.nextMeetData.start_time;
 					end_time = this.nextMeetData.end_time;
 				} else {
@@ -260,7 +362,7 @@
 			startSync() {
 				// 同步room（5s）
 				this.interval && clearInterval(this.interval)
-				
+
 				this.syncRoom()
 				this.interval = setInterval(() => {
 					this.syncRoom()
@@ -269,11 +371,11 @@
 
 				// 同步电量（5分钟，300s）
 				this.batteryInterval && clearInterval(this.batteryInterval)
-				
+
 				// #ifdef APP-PLUS
 				uni.getBatteryInfo({
 					success: (res) => {
-						console.log('获取电量信息res:',res);
+						console.log('获取电量信息res:', res);
 						this.batteryInfo = res;
 					}
 				})
@@ -291,11 +393,6 @@
 			dateDisplay() {
 				const timestamp = this.roomData.now_timestamp;
 				this.nowlanguageTime = dateDisplayLocale(timestamp, this.$i18n.locale)
-			},
-
-
-			onSetting() {
-				this.showSettingRoomNumber = true
 			},
 
 			onSetRoomId() {
@@ -345,156 +442,14 @@
 			},
 
 			initTimeline(data) {
-				const now = new Date();
-				const year = now.getFullYear();
-				const month = now.getMonth() + 1;
-				const day = now.getDate();
-				// console.log('initTimeline 进入初始化配置');
-				
-				// 获取当前正在进行的会议
-				if (data.now_entry) {
-					console.log('initTimeline enter now_entry');
-					this.currenMeetStart = data.now_entry['start_time'];
-					this.currenMeetEnd = data.now_entry['end_time'];
-					this.roomFree = false;
-				} else {
-					this.currenMeetStart = 0;
-					this.currenMeetEnd = 0;
-					this.roomFree = true;
-				}
-				
-				let allMeetList = [];
-				
-				// 获取区域最早时间和最晚时间
-				if (data && data.area) {
-					this.meetStartTime = data.area.morningstarts
-					this.meetStartMinute = data.area.morningstarts_minutes
-					this.meetEndTime = data.area.eveningends
-					this.meetEndMinute = data.area.eveningends_minutes
-				} else {
-					this.meetStartTime = 8;
-					this.meetEndTime = 21;
-				}
-				
-				let tempStartTime = Number(this.meetStartTime);
-				let tempEndTime = Number(this.meetEndTime);
-				let allTimeList = [];
-				let isFirst = true;
-				// console.log('initTimeline enter tempStartTime tempEndTime:',tempStartTime,tempEndTime); 
-				while (tempStartTime <= tempEndTime) {
-					
-					// 解决小时浮点数转AM和PM
-					let ap = 'AM'
-					let pmTime = tempStartTime
-					let timeTitle = '';
-					if (tempStartTime >= 12) {
-						ap = 'PM'
-						pmTime = tempStartTime - 12
-						timeTitle = pmTime.toString().padStart(2, '0') + ':00'
-					} else {
-						timeTitle = tempStartTime.toString().padStart(2, '0') + ':00'
-					}
-					let tempMinute = 0;
-					if (timeTitle == '00:00') {
-						timeTitle = '12:00';
-					}
-					timeTitle = timeTitle + ap;
-					
-					
-					if (!isFirst) {
-						let isfoundEntry = false
-						let foundEntry = null;
-						let isCurrentMeet = false;
-						const timestampline = getTimestamp(year, month, day, tempStartTime - 1, 30);
-						for (let meet of data.entries) {
-							if (timestampline === meet['start_time']) {
-								isfoundEntry = true;
-								foundEntry = meet;
-								break;
-							}
-						}
-						if (foundEntry) {
-							let meetStartRange = formatTime(foundEntry['start_time']);
-							let meetEndRange = formatTime(foundEntry['end_time']);
-							let meetRange = meetStartRange + '-' + meetEndRange;
-							// 当前时间的会议
-							if (foundEntry['start_time'] === this.currenMeetStart) {
-								isCurrentMeet = true;
-							} else {
-								isCurrentMeet = false;
-							}
-							allTimeList.push({
-								leftTitle: 'ㆍ',
-								startTime: foundEntry['start_time'],
-								endTime: foundEntry['end_time'],
-								isCurrentMeet: isCurrentMeet,
-								title: foundEntry['name'],
-								meetRange: meetRange,
-								meetHeight: (foundEntry['end_time'] - foundEntry['start_time']) / 1800 * this
-									.itemHight
-							})
-						} else {
-							allTimeList.push({
-								leftTitle: 'ㆍ',
-								startTime: 0,
-								endTime: 0,
-								isCurrentMeet: false,
-								title: '',
-								meetRange: '',
-								meetHeight: 0
-							})
-						}
-						isFirst = true;
-					} else {
-						let isAllFoundEntry = false
-						let allFounfEntry = null;
-						let currentMeet = false;
-						const timestampline2 = getTimestamp(year, month, day, tempStartTime, 0);
-						for (let meet of data.entries) {
-							if (timestampline2 === meet['start_time']) {
-								isAllFoundEntry = true;
-								allFounfEntry = meet;
-								break;
-							}
-						}
 
-						if (isAllFoundEntry) {
-							let startRange = formatTime(allFounfEntry['start_time']);
-							let endRange = formatTime(allFounfEntry['end_time']);
-							let meetTimeRange = startRange + '-' + endRange;
-							// 当前时间的会议
-							if (allFounfEntry['start_time'] === this.currenMeetStart) {
-								currentMeet = true;
-							} else {
-								currentMeet = false;
-							}
-							allTimeList.push({
-								leftTitle: timeTitle,
-								startTime: allFounfEntry['start_time'],
-								endTime: allFounfEntry['end_time'],
-								isCurrentMeet: currentMeet,
-								title: allFounfEntry['name'],
-								meetRange: meetTimeRange,
-								meetHeight: (allFounfEntry['end_time'] - allFounfEntry['start_time']) / 1800 * this
-									.itemHight
-							})
-						} else {
-							allTimeList.push({
-								leftTitle: timeTitle,
-								startTime: 0,
-								endTime: 0,
-								isCurrentMeet: false,
-								title: '',
-								meetRange: '',
-								meetHeight: 0
-							})
-						}
-						isFirst = false;
-						tempStartTime += 1
-					}
-				}
-				this.timeRange = allTimeList;
-				//console.log('initTimeline拼接的会议数据allTimeList：', this.timeRange)
+				const startHr = data?.area?.morningstarts ?? 8
+				const endHr = data?.area?.eveningends ?? 21
+
+				const res = hourDisplay(startHr, endHr, true);
+				console.log(res);
+
+				this.hourList = res
 			},
 
 			changeLang(index) {
@@ -528,75 +483,60 @@
 						})
 						return;
 					}
+
 					console.log('syncRoom返回数据成功data:', data);
 					this.changeStatus('online') // 在线
 					this.roomData = data;
 					this.initTimeline(data);
-					this.foundNextMeet();
-					this.dateDisplay();
-					this.meetTimeString = this.nowMeetTime();
+
+
+					// 寻找当前会议
+					let entries = res.data.data.entries
+					const len = entries.length
+					
+					const now = res.data.data.now_timestamp
+					let i = 0
+					
+					for(;i<len;i++){
+						if(now>=entries[i].start_time && now<=entries[i].end_time){
+							entries[i].isCurrentMeeting = true
+							break
+						}
+					}
+					this.meetingList = entries
+					console.log(this.meetingList);
+					
+					if(i<len-1) this.nextMeetData = entries[i+1]
+
+					// this.foundNextMeet();
+					// this.dateDisplay();
+					// this.meetTimeString = this.nowMeetTime();
 				}).catch(e => {
 					console.error(e)
 				})
 			},
+			prepareSetting() { // 预先请求一下，成功则跳过登录
+				const that = this
+				getSettingApi({
+					"device_id": that.deviceInfo.deviceId,
+					"is_charging": that.batteryInfo.isCharging,
+					"battery_level": that.batteryInfo.level,
+				}).then(res => {
+					// that.loginViewShow = true
+					if (res.data.data == null) { // 未登录，则打开登录页面
+						that.loginViewShow = true
+					} else { // 已登录，直接进
+						that.settingViewShow = true
+					}
+
+				}).catch(e => {
+					console.log(e);
+				})
+			},
 
 			prepareQuickMeet() {
-				console.log('prepareQuickMeet');
-				if (!this.roomFree) {
-					const msg = this.$t('message.noFreeRoom');
-					uni.showToast({
-						title: msg,
-						icon: 'none'
-					})
-					return;
-				}
-				this.quickMeet(0);
+				this.showQuickMeeting = true;
 			},
-			quickMeet(confirm) {
-				if (isNaN(this.roomId)) {
-					uni.showToast({
-						title: this.$t('message.roomNumberError'),
-						icon: 'none'
-					})
-					return
-				}
-				console.log('this.roomId:', this.roomId)
-
-				quickMeetApi({
-						room_id: this.roomId,
-						confirm: confirm
-					}, {
-						'Content-type': 'application/json',
-						'Accept-Language': this.languageSet
-					}).then((res) => {
-						
-						console.log(res);
-						let data = res.data.data;
-						let code = res.data.code;
-
-						// this.showQuickMeeting = true;
-						console.log('quickMeet返回数据成功data:', data);
-
-
-						if (confirm == 0 && code == 0) { // 准备阶段成功，直接进快速会议页面，不提示
-							this.showQuickMeeting = true;
-							return;
-						}
-
-						uni.showToast({
-							title: this.$t(quickMeetMessageMapping[code + '']), //转成字符串
-							icon: 'none'
-						})
-
-
-					})
-					.catch((e) => {
-						console.error(e)
-					})
-			},
-
-
-
 		},
 
 		onUnload() {
@@ -655,91 +595,133 @@
 				.meeting-scroll-view {
 					width: 250rpx;
 					height: 377rpx;
-					padding-top: 10rpx;
-				}
 
-				.ext-scroll-view {
-					width: 250rpx;
-					height: 397rpx;
-					padding-top: 10rpx;
-				}
 
-				.scroll-view-item {
-					height: 30rpx;
-					width: 250rpx;
-					border: 1rpx solid #333333;
-					display: flex;
-					flex-direction: row;
-					
-					.scroll-item-left {
-						width: 50rpx;
-						height: 30rpx;
-						
-						.scroll-item-time {
-							font-size: 9rpx;
-							color: white;
+					.meeting-wrapper {
+						display: flex;
+						flex-direction: row;
+						color: #fff;
+						padding: 20rpx 8rpx;
+						gap: 8rpx;
+						height: 100%;
+
+						.left {
 							width: 50rpx;
-							position: absolute;
-							/* background-color: red; */
-							left: 8rpx;
-							font-family: 'Noto Sans CJK SC Light', 'Source Han Sans CN Light', 'Droid Sans Fallback', sans-serif;
+							flex-shrink: 0;
+
+							.hm {
+								height: 30rpx;
+								width: 100%;
+								text-align: right;
+								font-size: 9rpx;
+								font-family: 'Noto Sans CJK SC Light', 'Source Han Sans CN Light', 'Droid Sans Fallback';
+								line-height: 0rpx;
+							}
 						}
-					}
-					
-					.scroll-item-right {
-						background-color: rgba(255, 255, 255, 0.12);
-						
-						.scroll-item-meeting {
-							position: absolute;
-							width: 160rpx;
-							top: 2rpx;
-							left: 8rpx;
-							font-size: 9rpx;
-							color: white;
-							-webkit-line-clamp: 2;
-							display: -webkit-box;
-							overflow: hidden;
-							text-overflow: ellipsis;
-							word-wrap: break-word;
-							-webkit-box-orient: vertical;
-							font-family: 'Noto Sans CJK SC Light', 'Source Han Sans CN Light', 'Droid Sans Fallback', sans-serif;
+
+						.right {
+							position: relative;
+							height: 100%;
+							width: 100%;
+							
+							.meeting-item{
+								position: absolute;
+								top: 0;
+								left: 0;
+								height: 60rpx;
+								width: 100%;
+								padding: 4rpx 8rpx;
+								background-color: rgba(255, 255, 255, 0.12);
+								font-size: 9rpx;
+								border: 1rpx solid #333;
+								/*产生空隙，防止会议黏在一起*/
+								
+								display: flex;
+								flex-direction: row;
+								align-items: center;
+								gap: 5rpx;
+								
+								.in-meeting-icon {
+									flex-shrink: 0;
+									width: 10rpx;
+									height: 10rpx;
+									animation: blink 2s infinite steps(2);
+								}
+								@keyframes blink {
+								    from {
+								        opacity: 0;
+								    }
+								    to {
+								        opacity: 1.0;
+								    }
+								}
+								
+								.meeting {
+									display: flex;
+									flex-direction: column;
+									justify-content: space-between;
+									height: 100%;
+									width: 100%;
+									
+									.meeting-theme,.meeting-span {
+										line-height: 1.5;
+									}
+								}
+								
+								.min15 {
+								
+									/*会议时长不足30分钟时，由于没有显示空间，不显示起止时间*/
+									.meeting-theme {
+										word-break: break-all;
+										display: -webkit-box;
+										overflow: hidden;
+										-webkit-line-clamp: 1;
+										-webkit-box-orient: vertical;
+										text-overflow: ellipsis;
+									}
+								
+									.meeting-span {
+										display: none;
+									}
+								}
+								
+								.min60 {
+								
+									/*不足1小时时，会议名最多一行，会议名下方显示一行起止时间*/
+									.meeting-theme {
+										word-break: break-all;
+										display: -webkit-box;
+										overflow: hidden;
+										-webkit-line-clamp: 1;
+										-webkit-box-orient: vertical;
+										text-overflow: ellipsis;
+									}
+								
+									.meeting-span {}
+								}
+								
+								.min90 {
+								
+									/*1.5小时以上时，会议名可显示两行，最多显示两行，下方显示会议起止时间。*/
+									.meeting-theme {
+										word-break: break-all;
+										display: -webkit-box;
+										overflow: hidden;
+										-webkit-line-clamp: 2;
+										-webkit-box-orient: vertical;
+										text-overflow: ellipsis;
+									}
+								
+									.meeting-span {}
+								}
+							}
+
+							
 						}
-						
-						.scroll-item-meeting-more {
-							position: absolute;
-							width: 160rpx;
-							top: 2rpx;
-							left: 8rpx;
-							color: rgb(255, 255, 255);
-							font-size: 9rpx;
-							-webkit-line-clamp: 3;
-							display: -webkit-box;
-							overflow: hidden;
-							text-overflow: ellipsis;
-							word-wrap: break-word;
-							-webkit-box-orient: vertical;
-							font-family: 'Noto Sans CJK SC Light', 'Source Han Sans CN Light', 'Droid Sans Fallback', sans-serif;
-						}
-						
-						.in-meeting-icon {
-							position: absolute;
-							top: 8rpx;
-							right: 10rpx;
-							width: 14rpx;
-							height: 14rpx;
-						}
-					}
-					.extention-height {
-						margin-top: 5rpx;
-						height: 60rpx;
-						background-color: red;
-						width: 172rpx;
-						text-align: start;
-						margin-left: 13rpx;
-						background-color: rgba(255, 255, 255, 0.12);
-						position: relative;
 					}
 				}
+
+
 			}
 
 
@@ -784,18 +766,21 @@
 			flex: 1;
 			height: 100vh;
 			background-color: var(--color-primary);
-			
-			&-dark{
+
+			&-dark {
 				background-color: var(--dark-color-primary);
 			}
-			
+
 			padding: 10rpx 20rpx 0 37rpx;
 			box-sizing: border-box;
 			text-align: left;
 			color: #fff;
-			font-family: 'Noto Sans CJK SC', 'Source Han Sans CN', 'Droid Sans', sans-serif;
-			
-			.battery{
+			font-family: 'Noto Sans CJK SC',
+			'Source Han Sans CN',
+			'Droid Sans',
+			sans-serif;
+
+			.battery {
 				// position: absolute;
 				// top: 0;
 				// right: 0;
@@ -804,7 +789,7 @@
 				width: 100%;
 				padding-right: 10rpx;
 			}
-			
+
 			.header {
 				width: 100%;
 				display: flex;
@@ -814,31 +799,31 @@
 				padding-bottom: 5rpx;
 				border-bottom: 1rpx solid rgba(255, 255, 255, .5);
 				align-items: center;
-			
+
 				.header-left {
 					display: flex;
 					flex-direction: row;
 					align-items: center;
 					gap: 8rpx;
-			
+
 					.room-title {
 						font-size: 22rpx;
 						line-height: 38rpx;
 					}
-			
+
 					.room-number {
 						font-size: 38rpx;
 						line-height: 38rpx;
 					}
 				}
-				
-				.header-right{
-					
+
+				.header-right {
+
 					display: flex;
 					flex-direction: row;
 					align-items: center;
 					gap: 10rpx;
-					
+
 					.change-language {
 						width: 66rpx;
 						height: 22rpx;
@@ -851,7 +836,7 @@
 					}
 				}
 			}
-			
+
 			.current-time {
 				margin-top: 5rpx;
 				font-size: 18rpx;
@@ -860,20 +845,20 @@
 				height: 40rpx;
 				font-family: 'Noto Sans CJK SC Light', 'Source Han Sans CN Light', 'Droid Sans Fallback', sans-serif;
 			}
-			
-			
-			
+
+
+
 		}
-		
-		.right-meeting-info-busy{
+
+		.right-meeting-info-busy {
 			background-color: var(--color-danger);
-			
-			&-dark{
+
+			&-dark {
 				background-color: var(--dark-color-danger);
 			}
 		}
 
-		
+
 
 
 
@@ -881,17 +866,17 @@
 			flex: 1;
 			flex-direction: column;
 			width: 100%;
-			
+
 			.meeting-status {
 				font-size: 80rpx;
 				line-height: 1.6;
 			}
-			
+
 			.nextMeet {
 				line-height: 1.5;
 				font-size: 14rpx;
 			}
-			
+
 			.meeting-title {
 				line-height: 2;
 				font-size: 22rpx;
@@ -902,33 +887,34 @@
 				word-wrap: break-word;
 				margin-bottom: 5rpx;
 			}
-			
-			.meeting-detail-item{
+
+			.meeting-detail-item {
 				display: flex;
 				flex-direction: row;
 				align-items: center;
 				gap: 10rpx;
-				
+				margin-bottom: 10rpx;
+
 				.meeting-detail-item-icon {
 					width: 17rpx;
 					height: 17rpx;
 				}
-				
+
 				.meeting-detail-item-desc {
 					line-height: 28rpx;
 					font-size: 14rpx;
 					text-align: left;
 					font-family: 'Noto Sans CJK SC ExtraLight', 'Source Han Sans CN ExtraLight', 'Droid Sans Fallback', sans-serif;
 				}
-				
+
 			}
 		}
 
-		
+
 		.right-meeting-logo {
 			width: 100%;
 			height: 50rpx;
-			
+
 			.company-logo {
 				width: 150rpx;
 				height: 17rpx;
@@ -948,7 +934,7 @@
 			position: fixed;
 			left: 250rpx;
 			top: 150rpx;
-			
+
 			.popup-input {
 				width: 200rpx;
 				height: 60rpx;
@@ -957,7 +943,7 @@
 				border: 1rpx solid royalblue;
 				margin-top: 20rpx;
 			}
-			
+
 			.popup-sure {
 				width: 80rpx;
 				height: 40rpx;

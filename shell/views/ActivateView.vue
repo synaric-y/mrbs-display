@@ -100,7 +100,7 @@ export default {
 			}).catch(e=>{console.log(e)})
 		},
 		changeArea(e){ 
-			
+			this.roomList = [] // 清空现有房间
 			getAllRoomsApi({
 				"type": "area",
 				"id": this.area,
@@ -168,12 +168,15 @@ export default {
 			
 			// console.log(this.batteryInfo);
 			
-			// activateDeviceApi(pack)
-			// .then(res=>{
-			// 	console.log(res);
-			// }).catch(e=>{
-			// 	console.log(e);
-			// })
+			activateDeviceApi(pack)
+			.then(res=>{
+				console.log(res);
+				
+				// uni.s
+				
+			}).catch(e=>{
+				console.log(e);
+			})
 			
 			this.$emit('close')
 		}

@@ -19,7 +19,7 @@
 			</div>
 			
 			<div class="btns">
-				<button class="btn btn-default" type="default" @click="previous">{{$t('message.login.previous')}}</button>
+				<button class="btn btn-default" type="default" @click="$emit('close')">{{$t('message.login.previous')}}</button>
 				<button :class="'btn btn'+(currentTheme!='dark'?'':'-dark')" type="default" @click="finish">{{$t('message.login.confirm')}}</button>
 			</div>
 		</div>
@@ -35,7 +35,7 @@ export default {
 	components:{
 		
 	},
-	emits:['close','previous'],
+	emits:['close','previous','success'],
 	computed: {
 	  ...mapGetters(['currentTheme'])
 	},
@@ -66,16 +66,19 @@ export default {
 						title: this.$t('message.login.login_success'),
 						icon: 'none',
 					})
+					this.$emit('success')
 				}
 				
 			}).catch(e=>{
 				console.log(e);
+			}).finally(()=>{
+				this.accountNumber = ''
+				this.password = ''
+				
+				this.$emit('close')
 			})
 			
-			this.accountNumber = ''
-			this.password = ''
 			
-			this.$emit('close')
 		},
 		previous(){
 			this.$emit('previous')

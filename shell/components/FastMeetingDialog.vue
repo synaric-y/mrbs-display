@@ -38,13 +38,19 @@
 	import {getNearestNextTime} from '@/utils/timeTool.js'
 	import {SEC_PER_HOUR,nextScaleTs} from '@/utils/timestampTool.js'
 	import {mapGetters} from 'vuex';
+	import {
+		quickMeetApi,
+		quickMeetMessageMapping,
+		syncRoomApi,
+		getSettingApi
+	} from '@/api/api.js'
 
 	export default {
 		name:"FastMeetingDialog",
 		components:{
 			TimeStepperScroll
 		},
-		props:['currentTime','meetings','avaliableHours'], // 当前时间戳（10位），会议数组，可预约多少小时
+		props:['currentTime','meetings','avaliableHours','deviceInfo','batteryInfo'], // 当前时间戳（10位），会议数组，可预约多少小时
 		emits:['close','confirm'],
 		computed: {
 		  ...mapGetters(['currentTheme'])
@@ -73,10 +79,49 @@
 			},
 			confirmReserve(){
 				// 提交逻辑
+				
+				const pack = {
+					"device_id": this.deviceInfo.deviceId,
+					"begin_time": this.leftHandle,
+					"end_time": this.rightHandle,
+					"is_charge": this.batteryInfo.isCharging,
+					"battery_level": this.batteryInfo.level,
+					"booker": this.booker,
+					"theme": this.theme
+				}
+				
+				console.log(pack);
+				
+				quickMeetApi(pack)
+				.then((res) => {
+						
+						console.log(res);
+						let data = res.data.data;
+						let code = res.data.code;
+				
+						// this.showQuickMeeting = true;
+						console.log('quickMeet返回数据成功data:', data);
+				
+				
+						if (confirm == 0 && code == 0) { // 准备阶段成功，直接进快速会议页面，不提示
+							this.showQuickMeeting = true;
+							return;
+						}
+				
+						uni.showToast({
+							title: this.$t(quickMeetMessageMapping[code + '']), //转成字符串
+							icon: 'none'
+						})
+				
+				
+					})
+					.catch((e) => {
+						console.error(e)
+					})
+				
 				this.theme = ''
 				this.booker = ''
 				this.$emit('close')
-				this.$emit('confirm')
 			},
 		}
 	}

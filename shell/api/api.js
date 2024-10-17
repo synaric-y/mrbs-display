@@ -1,96 +1,136 @@
 import Request from '@/utils/request.js'
 let request = new Request().http
 
-    function quickMeetApi(data,header) {
-        return request({
-            url: "/web/appapi/api.php?act=book_fast_meeting",
-            method: "POST", //请求方式
-            data: data, //请求数据
-			header: header // 请求头
-        })
+function quickMeetApi(data, header) {
+	return request({
+		url: "/web/appapi/api.php?act=book_fast_meeting",
+		method: "POST", //请求方式
+		data: data, //请求数据
+		header: header // 请求头
+	})
+}
+
+/**
+ *  心跳包
+ * 
+ *  未激活的回复：
+ *  {
+		"code": -59,
+		"msg": "not_activate",
+		"data": null
+	}
+	激活的回复：
+	{
+	    "code": 0,
+	    "msg": "success",
+	    "data": {
+	        "now_time": "01:17PM",
+	        "now_timestamp": 1729142270,
+	        "display_day": "Thursday, October 17, 2024",
+	        "area": null,
+	        "now_entry": null,
+	        "entries": [],
+	        "room": null
+	    }
+	}
+ */
+function syncRoomApi(data, header) {
+	return request({
+		url: "/web/appapi/api.php?act=sync_room",
+		method: "POST", //请求方式
+		data: data, //请求数据
+		header: header, // 请求头
+		hideLoading: true //隐藏加载
+	})
+}
+
+function getAllAreaApi(data) {
+	return request({
+		url: "/web/call.php?act=get_info%2Fget_all_area",
+		method: "POST", //请求方式
+		data: data, //请求数据,
+		hideLoading: true //隐藏加载
+	})
+}
+
+function getAllRoomsApi(data) {
+	return request({
+		url: "/web/call.php?act=get_info%2Fget_all_rooms",
+		method: "POST", //请求方式
+		data: data, //请求数据,
+		hideLoading: true //隐藏加载
+	})
+}
+
+function activateDeviceApi(data) {
+	return request({
+		url: "/web/appapi/api.php?act=activate_device",
+		method: "POST", //请求方式
+		data: data, //请求数据
+	})
+}
+
+function changeBindApi(data) {
+	return request({
+		url: "/web/appapi/api.php?act=change_bind",
+		method: "POST", //请求方式
+		data: data, //请求数据
+	})
+}
+
+function loginApi(data) {
+	return request({
+		url: "/web/appapi/api.php?act=login",
+		method: "POST", //请求方式
+		data: data, //请求数据
+	})
+}
+
+function logoutApi() {
+	return request({
+		url: "/web/call.php?act=logout",
+		method: "POST", //请求方式
+	})
+}
+
+/**
+ * {
+    "code": 0,
+    "msg": "success",
+    "data": {
+        "room": "TestB",
+        "area": "shanghai",
+        "is_set": "0"
     }
-	
-	function syncRoomApi(data,header) {
-	    return request({
-	        url: "/web/appapi/api.php?act=sync_room",
-	        method: "POST", //请求方式
-	        data: data, //请求数据
-			header: header, // 请求头
-			hideLoading: true //隐藏加载
-	    })
-	}
-	
-	function getAllAreaApi(data) {
-	    return request({
-	        url: "/web/call.php?act=get_info%2Fget_all_area",
-	        method: "POST", //请求方式
-	        data: data, //请求数据
-	    })
-	}
-	
-	function getAllRoomsApi(data) {
-	    return request({
-	        url: "/web/call.php?act=get_info%2Fget_all_rooms",
-	        method: "POST", //请求方式
-	        data: data, //请求数据
-	    })
-	}
-	
-	function activateDeviceApi(data) {
-	    return request({
-	        url: "/web/appapi/api.php?act=activate_device",
-	        method: "POST", //请求方式
-	        data: data, //请求数据
-	    })
-	}
-	
-	function changeBindApi(data) {
-	    return request({
-	        url: "/web/appapi/api.php?act=change_bind",
-	        method: "POST", //请求方式
-	        data: data, //请求数据
-	    })
-	}
-	
-	function loginApi(data) {
-	    return request({
-	        url: "/web/appapi/api.php?act=login",
-	        method: "POST", //请求方式
-	        data: data, //请求数据
-	    })
-	}
-	
-	function logoutApi() {
-	    return request({
-	        url: "/web/call.php?act=logout",
-	        method: "POST", //请求方式
-	    })
-	}
-	
-	function getSettingApi(data) {
-	    return request({
-	        url: "/web/appapi/api.php?act=get_setting",
-	        method: "POST", //请求方式
-	        data: data, //请求数据
-	    })
-	}
-	
-	function getDeviceInfoApi(data) {
-	    return request({
-	        url: "/web/call.php?act=device%2Fdevice_info",
-	        method: "POST", //请求方式
-	        data: data, //请求数据
-	    })
-	}
-	
-	const quickMeetMessageMapping = {
-		'-1': 'message.noRoom',
-		'-2': 'message.noFreeRoom',
-		'0': 'message.createMeetSuccess'
-	}
+}
+ * 
+*/
+function getSettingApi(data) {
+	return request({
+		url: "/web/appapi/api.php?act=get_setting",
+		method: "POST", //请求方式
+		data: data, //请求数据,
+		hideLoading: true //隐藏加载
+	})
+}
+
+function getDeviceInfoApi(data) {
+	return request({
+		url: "/web/call.php?act=device%2Fdevice_info",
+		method: "POST", //请求方式
+		data: data, //请求数据,
+		hideLoading: true //隐藏加载
+	})
+}
+
+const quickMeetMessageMapping = {
+	'-1': 'message.noRoom',
+	'-2': 'message.noFreeRoom',
+	'0': 'message.createMeetSuccess'
+}
 
 export {
-    quickMeetApi,
+	quickMeetApi,
 	syncRoomApi,
 	quickMeetMessageMapping,
 	getAllAreaApi,
