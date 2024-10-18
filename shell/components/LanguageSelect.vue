@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<ocSelect :title="$t('message.language')" :localdata="datasource" @change="changeLang"/>
+		<ocSelect :title="$t('message.index.right.language')" :localdata="datasource" @change="changeLang"/>
 	</view>
 </template>
 
@@ -12,6 +12,7 @@
 			ocSelect
 		},
 		emits:['update'],
+
 		data() {
 			return {
 				datasource: [{

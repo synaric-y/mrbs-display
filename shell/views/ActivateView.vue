@@ -12,7 +12,12 @@
 					<uni-icons @click="scan" class="scan" color="#333" type="scan" size="25"></uni-icons>
 				</div>
 
-				<button :class="'btn btn'+(currentTheme!='dark'?'':'-dark')" type="default" @click="verify">{{$t('message.activate.verify')}}</button>
+				<button :class="'btn btn'+(currentTheme!='dark'?'':'-dark')" type="default" @click="verify">
+				
+				<uni-icons color="#fff" v-if="verified" type="checkmarkempty" size="30"></uni-icons>
+				<text v-else>{{$t('message.activate.verify')}}</text>
+				
+				</button>
 			</div>
 			<div class="form-row">
 				<div class="form-col">
@@ -46,21 +51,22 @@
 
 <script>
 import LanguageSelect from '../components/LanguageSelect.vue';
-import {mapGetters} from 'vuex';
+import {mapGetters,mapMutations} from 'vuex';
 import { getAllAreaApi,getAllRoomsApi,activateDeviceApi } from '@/api/api';
 export default {
 	name:"ActivateView",
 	components:{
 		LanguageSelect
 	},
-	emits:['close'],
+	emits:['close','activateSuccess'],
 	props:['batteryInfo','deviceInfo'],
 	computed: {
-	  ...mapGetters(['currentTheme'])
+	  ...mapGetters(['currentTheme','currentBaseURL'])
 	},
 	data() {
 		return {
 			url: '',
+			verified: false,
 			area: -1,
 			areaList:[],
 			room: -1,
@@ -79,11 +85,11 @@ export default {
 		
 	},
 	methods:{
-		
+		...mapMutations(['changeTheme','changeTimeFormat','changeBaseURL']), //对象展开运算符直接拿到change
 		getAllArea(){
 			const that = this;
 			
-			getAllAreaApi({
+			getAllAreaApi(this.currentBaseURL,{
 				"is_charging": this.batteryInfo.isCharging,
 				"battery_level": this.batteryInfo.level,
 			}).then(res=>{
@@ -101,7 +107,7 @@ export default {
 		},
 		changeArea(e){ 
 			this.roomList = [] // 清空现有房间
-			getAllRoomsApi({
+			getAllRoomsApi(this.currentBaseURL,{
 				"type": "area",
 				"id": this.area,
 				"is_charge": this.batteryInfo.isCharging,
@@ -144,8 +150,56 @@ export default {
 		},
 		verify(){
 			
+			// 改store
+			this.changeBaseURL(this.url)
+			
+			// 尝试调这个接口，返回成功就是联通了
+			getAllAreaApi(this.currentBaseURL,{
+				"is_charging": this.batteryInfo.isCharging,
+				"battery_level": this.batteryInfo.level,
+			}).then(res=>{
+				console.log(res);
+				
+				if(res.data.code == 0){
+					this.verified = true
+					this.getAllArea() //重新获取区域信息
+					
+					uni.showToast({
+						title: this.$t('message.activate.verify_success'),
+						icon: 'none',
+					})
+				}
+				else if(res.data.code == -49){
+					this.verified = true
+					this.getAllArea() //重新获取区域信息
+					
+					uni.showToast({
+						title: this.$t('message.activate.verify_duplicate'),
+						icon: 'none',
+					})
+				}
+				else{
+					uni.showToast({
+						title: this.$t('message.activate.verify_fail'),
+						icon: 'none',
+					})
+				}
+				
+
+				
+			}).catch(e=>{
+				console.log(e)
+				uni.showToast({
+					title: this.$t('message.netDataError'),
+					icon: 'none',
+				})
+			})
+			
 		},
 		finish(){
+			
+
+			
 			
 			// this.url = ''
 			// this.area = -1
@@ -168,17 +222,34 @@ export default {
 			
 			// console.log(this.batteryInfo);
 			
-			activateDeviceApi(pack)
+			activateDeviceApi(this.currentBaseURL,pack)
 			.then(res=>{
 				console.log(res);
 				
-				// uni.s
+				this.changeBaseURL(this.url)
+				
+				this.url = ''
+				this.area = -1
+				this.room = -1
+				
+				uni.showToast({
+					title: this.$t('message.activate.activate_success'),
+					icon: 'none',
+				})
+				
+				this.$emit('activateSuccess')
+				this.$emit('close')
 				
 			}).catch(e=>{
 				console.log(e);
+				uni.showToast({
+					title: this.$t('message.activate.activate_fail'),
+					icon: 'none',
+				})
+				this.$emit('close')
 			})
 			
-			this.$emit('close')
+			
 		}
 		
 	}

@@ -15,6 +15,8 @@
 			<TimeStepperScroll 
 			:lb="lb" 
 			:ub="ub" 
+			:areaLb="areaLb"
+			:areaUb="areaUb"
 			:meetings="meetings"
 			v-model:leftHandle="leftHandle"
 			v-model:rightHandle="rightHandle"
@@ -50,10 +52,10 @@
 		components:{
 			TimeStepperScroll
 		},
-		props:['currentTime','meetings','avaliableHours','deviceInfo','batteryInfo'], // 当前时间戳（10位），会议数组，可预约多少小时
-		emits:['close','confirm'],
+		props:['currentTime','meetings','avaliableHours','deviceInfo','batteryInfo','areaLb','areaUb'], // 当前时间戳（10位），会议数组，可预约多少小时
+		emits:['close'],
 		computed: {
-		  ...mapGetters(['currentTheme'])
+		  ...mapGetters(['currentTheme','currentBaseURL'])
 		},
 		data() {
 			return {
@@ -92,7 +94,7 @@
 				
 				console.log(pack);
 				
-				quickMeetApi(pack)
+				quickMeetApi(this.currentBaseURL,pack)
 				.then((res) => {
 						
 						console.log(res);

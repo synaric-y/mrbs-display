@@ -6,28 +6,39 @@ function formatDate(timestamp, timeZone, locale, dateFormat) {
 		.format(dateFormat);
 }
 
-function displayHM(timestamp,locale) {
-	let dateFormat = 'hh:mm A';
+function displayHM(timestamp,locale,is12) {
+	// console.log(is12);
+	let dateFormat = is12?'hh:mm A':'HH:mm';
+	// console.log(dateFormat);
 	const koDate = formatDate(timestamp, 'Asia/Seoul', 'ko', dateFormat);
 	const enDate = formatDate(timestamp, 'America/New_York', 'en', dateFormat);
 	const zhDate = formatDate(timestamp, 'Asia/Shanghai', 'zh-cn', dateFormat);
-	let parts = null;
-	//console.log(locale);
-	if (locale == 'en') {
-		parts = enDate.split(' ');
-	} else if (locale == 'ko') {
-		parts = koDate.split(' ');
-	} else {
-		parts = zhDate.split(' ');
+	// let parts = null;
+	// //console.log(locale);
+	// if (locale == 'en') {
+	// 	parts = enDate.split(' ');
+	// } else if (locale == 'ko') {
+	// 	parts = koDate.split(' ');
+	// } else {
+	// 	parts = zhDate.split(' ');
+	// }
+	// //console.log('displayHM am pm :', parts);
+	// const timeMinute = parts[0];
+	// const ap = parts[1];
+	
+	switch(locale){
+		case 'en': return enDate
+		case 'ko': return koDate
+		default: return zhDate
 	}
-	//console.log('displayHM am pm :', parts);
-	const timeMinute = parts[0];
-	const ap = parts[1];
-	return timeMinute + ' ' + ap;
+	
+	return zhDate
 }
 
-function dateDisplayLocale(timestamp,locale) {
+function dateDisplayLocale(timestamp,locale,is12) {
 	// console.log('dateDisplay now_timestamp', timestamp);
+	
+	// console.log(is12);
 	let dateFormat = 'YYYY年MM月DD日';
 	if (locale == 'en') {
 		dateFormat = 'MMMM D, YYYY';
@@ -36,7 +47,7 @@ function dateDisplayLocale(timestamp,locale) {
 	} else {
 		dateFormat = 'YYYY年MM月DD日';
 	}
-	const displayAP = displayHM(timestamp,locale);
+	const displayAP = displayHM(timestamp,locale,is12);
 	const koDate = formatDate(timestamp, 'Asia/Seoul', 'ko', dateFormat);
 	const enDate = formatDate(timestamp, 'America/New_York', 'en', dateFormat);
 	const zhDate = formatDate(timestamp, 'Asia/Shanghai', 'zh-cn', dateFormat);
@@ -75,5 +86,5 @@ export {
 	formatDate,
 	formatTime,
 	getTimestamp,
-
+	displayHM
 }

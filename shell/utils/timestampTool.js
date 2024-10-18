@@ -18,7 +18,7 @@ const nextScaleTs=(ts,scale)=>{
 	
 	let res = new Decimal(ts).dividedBy(scale).floor().times(scale).plus(scale);
 	
-	console.log(res);
+	// console.log(res);
 	
 	return Number(res)
 }
@@ -71,30 +71,32 @@ const nearestScaleTs = (ts,lb,ub,scale)=>{
 	return previousScaleTs
 }
 
-
-function hourDisplay(begHr,endHr,is12){
-	
-	// console.log(begHr,endHr,is12);
+function hourToTimestamp(hr){
 	
 	const now = new Date();
 	
 	let todayStartTs = new Date(now.getFullYear()+'/'+(now.getMonth()+1)+'/'+now.getDate()).getTime()/1000; // s
 	
-	let todayBegTs = new Decimal(todayStartTs).plus(begHr * SEC_PER_HOUR)
+	const res = new Decimal(todayStartTs).plus(hr * SEC_PER_HOUR)
 	
-	let todayEndTs = new Decimal(todayStartTs).plus(endHr * SEC_PER_HOUR)
+	return Number(res)
+}
+
+
+function hourDisplay(begTs,endTs,is12){
 	
-	// console.log(now,todayStartTs,todayBegTs,todayEndTs);
 	
 	let res = []
 	
+	let todayBegTs = new Decimal(begTs)
+	let todayEndTs = new Decimal(endTs)
 	
 	while(Number(todayBegTs) <= Number(todayEndTs)){
 		
 		let text = '.' 
 		
 		if(todayBegTs.mod(SEC_PER_HOUR / 2)==0) // 能被半小时整除，则格式化成小时-分钟
-			text = formatDate(Number(todayBegTs), 'Asia/Shanghai', 'zh-cn', is12?'hh:mm A':'hh:mm')
+			text = formatDate(Number(todayBegTs), 'Asia/Shanghai', 'zh-cn', is12?'hh:mm A':'HH:mm')
 			
 			
 		res.push({
@@ -117,5 +119,6 @@ export {
 	tsDiff,
 	nextScaleTs,
 	nearestScaleTs,
-	hourDisplay
+	hourDisplay,
+	hourToTimestamp
 }

@@ -26,7 +26,7 @@
 
 	const fringe = 20 // 左右两边的安全区
 
-	const props = defineProps(['lb', 'ub', 'meetings', 'leftHandle', 'rightHandle', 'currentTime', 'disabled', 'isFirst',
+	const props = defineProps(['lb', 'ub', 'areaLb','areaUb','meetings', 'leftHandle', 'rightHandle', 'currentTime', 'disabled', 'isFirst',
 		'scale'
 	])
 	const emits = defineEmits(["update:leftHandle", "update:rightHandle", "update:disabled"]);
@@ -88,11 +88,11 @@
 
 		timeTable.value.unshift({
 			start_time: props.lb,
-			end_time: endTs,
+			end_time: Math.max(endTs,props.areaLb),
 			status: 2
 		})
 		timeTable.value.unshift({
-			start_time: props.ub - SEC_PER_HOUR,
+			start_time: Math.min(props.ub - SEC_PER_HOUR,props.areaUb),
 			end_time: props.ub,
 			status: 2
 		})
@@ -112,7 +112,7 @@
 			    id: entry.id,
 			    start_time: Math.max(entry.start_time,props.lb), // 截断越界的部分
 			    end_time: Math.min(props.ub,entry.end_time),
-			    status: entry.entry_type==99?2:entry.entry_type
+			    status: 0
 		    })
 		}
 	}
@@ -504,7 +504,7 @@
 				{{formatTime(leftHandle)}}-{{formatTime(rightHandle)}},&nbsp;{{tsDiff(leftHandle,rightHandle)}}
 			</div>
 			<div class="title" v-else>
-				{{$t('time.notAvailable')}}
+				{{$t('time.not_available')}}
 			</div>
 
 

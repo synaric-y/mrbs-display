@@ -1,8 +1,9 @@
 import Request from '@/utils/request.js'
 let request = new Request().http
 
-function quickMeetApi(data, header) {
+function quickMeetApi(host, data, header) {
 	return request({
+		host: host,
 		url: "/web/appapi/api.php?act=book_fast_meeting",
 		method: "POST", //请求方式
 		data: data, //请求数据
@@ -33,9 +34,16 @@ function quickMeetApi(data, header) {
 	        "room": null
 	    }
 	}
+	重复激活：
+	{
+	    "code": -49,
+	    "msg": "Device has been activated",
+	    "data": null
+	}
  */
-function syncRoomApi(data, header) {
+function syncRoomApi(host, data, header) {
 	return request({
+		host: host,
 		url: "/web/appapi/api.php?act=sync_room",
 		method: "POST", //请求方式
 		data: data, //请求数据
@@ -44,8 +52,9 @@ function syncRoomApi(data, header) {
 	})
 }
 
-function getAllAreaApi(data) {
+function getAllAreaApi(host, data) {
 	return request({
+		host: host,
 		url: "/web/call.php?act=get_info%2Fget_all_area",
 		method: "POST", //请求方式
 		data: data, //请求数据,
@@ -53,8 +62,9 @@ function getAllAreaApi(data) {
 	})
 }
 
-function getAllRoomsApi(data) {
+function getAllRoomsApi(host, data) {
 	return request({
+		host: host,
 		url: "/web/call.php?act=get_info%2Fget_all_rooms",
 		method: "POST", //请求方式
 		data: data, //请求数据,
@@ -62,32 +72,36 @@ function getAllRoomsApi(data) {
 	})
 }
 
-function activateDeviceApi(data) {
+function activateDeviceApi(host, data) {
 	return request({
+		host: host,
 		url: "/web/appapi/api.php?act=activate_device",
 		method: "POST", //请求方式
 		data: data, //请求数据
 	})
 }
 
-function changeBindApi(data) {
+function changeBindApi(host, data) {
 	return request({
+		host: host,
 		url: "/web/appapi/api.php?act=change_bind",
 		method: "POST", //请求方式
 		data: data, //请求数据
 	})
 }
 
-function loginApi(data) {
+function loginApi(host, data) {
 	return request({
+		host: host,
 		url: "/web/appapi/api.php?act=login",
 		method: "POST", //请求方式
 		data: data, //请求数据
 	})
 }
 
-function logoutApi() {
+function logoutApi(host) {
 	return request({
+		host: host,
 		url: "/web/call.php?act=logout",
 		method: "POST", //请求方式
 	})
@@ -105,8 +119,9 @@ function logoutApi() {
 }
  * 
 */
-function getSettingApi(data) {
+function getSettingApi(host, data) {
 	return request({
+		host: host,
 		url: "/web/appapi/api.php?act=get_setting",
 		method: "POST", //请求方式
 		data: data, //请求数据,
@@ -114,8 +129,9 @@ function getSettingApi(data) {
 	})
 }
 
-function getDeviceInfoApi(data) {
+function getDeviceInfoApi(host, data) {
 	return request({
+		host: host,
 		url: "/web/call.php?act=device%2Fdevice_info",
 		method: "POST", //请求方式
 		data: data, //请求数据,

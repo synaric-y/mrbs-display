@@ -37,7 +37,7 @@ export default {
 	},
 	emits:['close','previous','success'],
 	computed: {
-	  ...mapGetters(['currentTheme'])
+	  ...mapGetters(['currentTheme','currentBaseURL'])
 	},
 	data() {
 		return {
@@ -47,7 +47,7 @@ export default {
 	},
 	methods:{
 		finish(){
-			loginApi(
+			loginApi(this.currentBaseURL,
 				{
 					"username": this.accountNumber,
 					"password": this.password

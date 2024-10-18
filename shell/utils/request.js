@@ -1,12 +1,16 @@
-import {
-	HOST
-} from '@/modules/config.js'
+// import {
+// 	HOST
+// } from '@/modules/config.js'
 
+import store from '@/store/index.js'
+
+// let HOST = store.state.baseURL
 
 export default class Request {
     http(param) {
         // 请求参数
-        var url = param.url,
+        var host = param.host,
+			url = param.url,
             method = param.method,
             header = {},
             data = param.data || {},
@@ -15,7 +19,7 @@ export default class Request {
             hideLoading = param.hideLoading || false;
 
         //拼接完整请求地址
-        var requestUrl = HOST + url;
+        var requestUrl = host + url;
        //拼接完整请求地址（根据环境切换）
        // var requestUrl = operate.api() + url;
 
@@ -56,7 +60,7 @@ export default class Request {
                 //请求失败
                 fail: (e) => {
                     uni.showToast({
-                        title: "请求失败" + e.msg,
+                        title: "请求失败",
                         icon: 'none'
                     });
                     reject(e);

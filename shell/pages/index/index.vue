@@ -2,16 +2,11 @@
 
 	<div class="container" id="app">
 		<ActivateView v-if="activateViewShow" :batteryInfo="batteryInfo" :deviceInfo="deviceInfo"
-			@close="activateViewShow=false" />
+			@close="activateViewShow=false" @activateSuccess="startSync" />
 		<LoginView v-if="loginViewShow" @close="loginViewShow=false"
 			@success="()=>{loginViewShow=false;settingViewShow=true}" />
 		<SettingView v-if="settingViewShow" :batteryInfo="batteryInfo" :deviceInfo="deviceInfo"
 			@close="settingViewShow=false" />
-
-		<view class="popup-setting-room-number" v-if="showSettingRoomNumber">
-			<input class="popup-input" v-model="_roomId" :placeholder="$t('message.alert_code')" />
-			<view class="popup-sure" @click="onSetRoomId">{{$t('message.sure')}}</view>
-		</view>
 
 		<div class="left-time-view">
 			<!-- 会议时间 -->
@@ -25,7 +20,7 @@
 								</div>
 							</div>
 							<div class="right">
-								<div class="meeting-item" v-for="(item,index) in meetingList" :key="item.id" :style="{top: calculateY(item.start_time)+'rpx', height: calculateHeight(item.start_time,item.end_time)+'rpx' }">
+								<div class="meeting-item" :id="'meeting-'+item.id" v-for="(item,index) in meetingList" :key="item.id" :style="{top: calculateY(item.start_time)+'rpx', height: calculateHeight(item.start_time,item.end_time)+'rpx' }">
 									<div :class="'meeting '+meetingClass(item.start_time,item.end_time)">
 										<text class="meeting-theme">
 											{{ item.name }}
@@ -34,7 +29,7 @@
 											{{ tsHourMinuteFormat(item.start_time) +' - '+ tsHourMinuteFormat(item.end_time)}}
 										</text>
 									</div>
-									<image v-if="item.isCurrentMeeting" class="in-meeting-icon"
+									<image v-if="item.id==roomData?.now_entry?.id" class="in-meeting-icon"
 										src="@/static/in-meeting.png" mode="aspectFit">
 									</image>
 								</div>
@@ -48,27 +43,30 @@
 				<!-- <view class="reserve-title">{{$t('message.quickMeeting')}}</view> -->
 				<div class="reserve-title"></div>
 				<view
-					:class="[(roomData && (roomData.now_entry != null))?'reserve-button':'reserve-button reserve-button-free']"
-					@click="prepareQuickMeet">
-					{{$t('message.book')}}
+					:class="[hasTimeInCurrentAvaliable?'reserve-button reserve-button-free':'reserve-button']"
+					@click="prepareQuickMeet(hasTimeInCurrentAvaliable)">
+					{{$t('message.index.left.book')}}
 				</view>
 				<!-- 预约会议对话框 -->
-				<FastMeetingDialog v-if="showQuickMeeting" @close="showQuickMeeting=false" @confirm="quickMeet(1)"
+				<FastMeetingDialog v-if="showQuickMeeting" @close="showQuickMeeting=false"
 					:currentTime="roomData?.now_timestamp ?? Math.trunc(new Date().getTime()/1000)"
+					
+					:areaLb="lb"
+					:areaUb="ub"
 					:meetings="roomData?.entries ?? []" :batteryInfo="batteryInfo" :deviceInfo="deviceInfo"
-					:avaliableHours="1" />
+					:avaliableHours="avaliableHours" />
 			</view>
 		</div>
 		<div
-			:class="(roomData?.now_entry)?'right-meeting-info right-meeting-info-busy':('right-meeting-info right-meeting-info'+(currentTheme === 'dark' ? '-dark' : '' ))">
+			:class="(roomData?.now_entry)?('right-meeting-info right-meeting-info-busy right-meeting-info-busy'+(currentTheme === 'dark' ? '-dark' : '' )):('right-meeting-info right-meeting-info'+(currentTheme === 'dark' ? '-dark' : '' ))">
 
 			<div class="battery">
 				<BatteryShow :battery="batteryInfo.level" />
 			</div>
 			<div class="header">
 				<div class="header-left">
-					<div class="room-title">{{$t('message.room')}}</div>
-					<div class="room-number" @longpress="showSettingRoomNumber=true">
+					<div class="room-title">{{$t('message.index.right.meeting')}}</div>
+					<div class="room-number">
 						{{roomData?.room?.room_name ?? 'A'}}</div>
 				</div>
 				<div class="header-right">
@@ -84,7 +82,7 @@
 			<view class="right-meeting-detail">
 				<!-- 空闲中 -->
 				<view class="meeting-status">
-					{{(roomData?.now_entry)?$t('message.in_meeting'):$t('message.no_meeting')}}
+					{{(roomData?.now_entry)?$t('message.index.right.in_meeting'):$t('message.index.right.no_meeting')}}
 				</view>
 
 				<!-- 现在有会 -->
@@ -102,12 +100,12 @@
 				<!-- 现在无会 -->
 				<template v-else>
 					<view class="nextMeet">
-						{{$t('message.nextMeet')}}:
+						{{$t('message.index.right.next_meeting')}}:
 					</view>
 					<text class="meeting-title">{{(nextMeetData?.name) ?? '-'}}</text>
 					<view class="meeting-detail-item">
 						<image class="meeting-detail-item-icon" src="@/static/reverse-time.png" mode=""></image>
-						<text class="meeting-detail-item-desc">{{(nextMeetData)? meetTimeString:'-'}}</text>
+						<text class="meeting-detail-item-desc">{{(nextMeetData)?(tsHourMinuteFormat(nextMeetData.start_time) +' - '+ tsHourMinuteFormat(nextMeetData.end_time)):'-'}}</text>
 					</view>
 					<view class="meeting-detail-item">
 						<image class="meeting-detail-item-icon" src="@/static/reverse-person.png" mode=""></image>
@@ -131,10 +129,14 @@
 		formatDate,
 		formatTime,
 		getTimestamp,
+		displayHM
 	} from '../../utils/indexTimeTool.js'
 	import {
 		hourDisplay,
-		SEC_PER_MINUTE
+		nextScaleTs,
+		hourToTimestamp,
+		SEC_PER_MINUTE,
+		SEC_PER_HOUR
 	} from '@/utils/timestampTool.js'
 	import LanguageSelect from '../../components/LanguageSelect.vue';
 	import {
@@ -167,6 +169,7 @@
 	} from 'vuex';
 
 	const heightPerBlock = 30 // 每15分钟rpx
+	
 
 	export default {
 		name: 'App',
@@ -181,7 +184,7 @@
 			ActivateView
 		},
 		computed: {
-			...mapGetters(['currentTheme']),
+			...mapGetters(['currentTheme','currentTimeFormat','currentBaseURL']),
 			calculateY() {
 				return (startTs) => {
 					const len = this.hourList.length
@@ -200,7 +203,7 @@
 
 					const res = Number(new Decimal(endTs).minus(startTs).dividedBy(dayEndTs - dayBegTs).times(len - 1)
 						.times(heightPerBlock))
-					console.log(res);
+					// console.log(res);
 					return res
 				}
 			},
@@ -218,67 +221,106 @@
 					else if (diff <= min60) res = 'min60'
 					else res = 'min90'
 
-					console.log(res);
+					// console.log(res);
 
 					return res
 				}
 			},
 			tsHourMinuteFormat() {
 				return (ts) => {
-					return formatDate(ts, 'Asia/Shanghai', 'zh-cn', 'hh:mm A');
+					return displayHM(ts, 'zh-cn', this.currentTimeFormat=='12'?true:false);
 				}
-			}
+			},
+			hasTimeInCurrentAvaliable(){
+				
+				function leftAvailable(tempLb,li,lb){
+					if(tempLb < lb) return false
+					for(let entry of li){
+						if(tempLb>=entry.start_time && tempLb<entry.end_time) return false
+					}
+					return true
+				}
+				
+				function rightAvailable(tempUb,li,ub){
+					if(tempUb > ub) return false
+					for(let entry of li){
+						if(tempUb>entry.start_time && tempUb<=entry.end_time) return false
+					}
+					return true
+				}
+				
+				function isBothValid(tempLb, tempUb, li){
+					for(let entry of li){
+						if(tempLb<=entry.start_time && tempUb>=entry.end_time) return false
+					}
+				
+					return true
+				}
+				
+				
+				let startTs = nextScaleTs(this.roomData.now_timestamp,15*SEC_PER_MINUTE) // 5:45
+				// 1729200600
+				// let startTs = nextScaleTs(1729200600,15*SEC_PER_MINUTE) // 5:45
+				let endTs = startTs + this.avaliableHours * SEC_PER_HOUR // 6:45
+				
+				// console.log(startTs,endTs);
+				
+				if(endTs <= this.lb || startTs >= this.ub) return false // 已经不在预定时间内 
+				
+				const realStart = Math.max(startTs,this.lb) // 6:00
+				const realEnd = Math.min(endTs,this.ub) // 6:45
+				
+				// console.log(realStart,realEnd);
+				
+				startTs = realStart
+				endTs = realStart + 15*SEC_PER_MINUTE
+				
+				// 滑动窗口……
+				for(;endTs<=realEnd;startTs+=15*SEC_PER_MINUTE,endTs+=15*SEC_PER_MINUTE){
+					
+					// console.log(startTs,endTs);
+					
+					if(leftAvailable(startTs,this.meetingList,realStart) && rightAvailable(endTs,this.meetingList,realEnd) && isBothValid(startTs,endTs,this.meetingList) && (startTs < endTs)){
+						return true
+					}
+				}
+				
+				return false
+			},
 		},
 		data() {
 			return {
 				activateViewShow: false, // 激活页面弹窗
 				loginViewShow: false, // 登录页面弹窗
 				settingViewShow: false, // 设置页面弹窗
-				showSettingRoomNumber: false, // 内置码输入弹窗
 				showQuickMeeting: false, // 快速会议弹窗
 
+
+				avaliableHours : 1, // 可预约一小时内的时间
+				lb: 8, // 会议室开始时间
+				ub: 21, // 会议室结束时间
 				hourList: [], // 左侧会议列表时间轴
 				meetingList: [], // 所有会议
+				
 
 				meeting: false,
-				timeRange: [],
-				_roomId: 2,
-				roomId: 2,
-				meetStartTime: 8,
-				meetStartMinute: 0,
-				meetEndTime: 21,
-				meetEndMinute: 30,
-				meetArangeList: [],
-				currenMeetStart: 0,
-				currenMeetEnd: 0,
-				value: 0,
 				roomData: null,
 				nextMeetData: null,
-				roomFree: false,
+				
 				nowlanguageTime: '',
 				timezore: 'Asia/Shanghai',
 				languageSet: 'zh-CN,zh;q=0.9',
-				meetTimeZore: '',
-				meetTimeString: '',
-				largeScreenHeight: 0,
-				quickMeetingMsg: '接口未及时返回数据',
-				itemHight: 29.5,
+				
+				
 				batteryInfo: {},
 				deviceInfo: {},
 			}
 		},
 		onLoad() {
-			// 缓存获取room_id
-			let roomId = uni.getStorageSync("ROOM_ID")
-			if (roomId) {
-				this.roomId = Number(roomId)
-				this._roomId = Number(roomId)
-			}
-			console.log("Room ID: ", roomId);
 
 			// uniapp查询窗口高度
-			this.largeScreenHeight = uni.getWindowInfo().windowHeight;
-			console.log('getWindowInfo windowHeight:', this.largeScreenHeight)
+			// this.largeScreenHeight = uni.getWindowInfo().windowHeight;
+			// console.log('getWindowInfo windowHeight:', this.largeScreenHeight)
 
 			// 获取设备信息
 			let localDeviceInfo = uni.getStorageSync("DEVICE_INFO")
@@ -298,7 +340,7 @@
 					this.batteryInfo = res;
 
 					// 获取是否激活（尝试调一下syncRoom接口）
-					syncRoomApi({
+					syncRoomApi(this.currentBaseURL,{
 						device_id: this.deviceInfo.deviceId,
 						battery_level: this.batteryInfo.level,
 						is_charging: this.batteryInfo.isCharging,
@@ -322,11 +364,12 @@
 								})
 						} else { // 已激活，数据正常
 							// 开始同步
-							// this.startSync();
-							this.syncRoom()
+							this.startSync();
+							// this.syncRoom()
 						}
 					}).catch(e => {
 						console.error(e)
+						this.activateViewShow = true // 打开激活页面
 						uni.showToast({
 							title: this.$t('message.netDataError'),
 							icon: 'none'
@@ -360,6 +403,9 @@
 			},
 
 			startSync() {
+				
+				console.log(435);
+				
 				// 同步room（5s）
 				this.interval && clearInterval(this.interval)
 
@@ -392,21 +438,8 @@
 
 			dateDisplay() {
 				const timestamp = this.roomData.now_timestamp;
-				this.nowlanguageTime = dateDisplayLocale(timestamp, this.$i18n.locale)
-			},
-
-			onSetRoomId() {
-				console.log('set room', this._roomId)
-				if (isNaN(this._roomId)) {
-					uni.showToast({
-						title: this.$t('message.alert_error_code')
-					})
-					return
-				}
-				this.roomId = this._roomId
-				this.showSettingRoomNumber = false
-				uni.setStorageSync("ROOM_ID", this.roomId)
-				this.syncRoom()
+				this.nowlanguageTime = dateDisplayLocale(timestamp, this.$i18n.locale,this.currentTimeFormat=='12'?true:false)
+				
 			},
 
 			foundNextMeet() {
@@ -423,31 +456,13 @@
 				if (foundNextMeet) {
 					this.nextMeetData = foundNextMeet;
 				}
-				//  else {
-				// 	this.nextMeetData = {
-				// 		"start_time": 0,
-				// 		"end_time": 0,
-				// 		"entry_type": 0,
-				// 		"repeat_id": null,
-				// 		"room_id": this.roomId,
-				// 		"timestamp": "",
-				// 		"create_by": "",
-				// 		"modified_by": "",
-				// 		"name": "",
-				// 		"type": "I",
-				// 		"description": "",
-				// 		"book_by": "",
-				// 	};
-				// }
 			},
 
 			initTimeline(data) {
+				// console.log(this.currentTimeFormat);
 
-				const startHr = data?.area?.morningstarts ?? 8
-				const endHr = data?.area?.eveningends ?? 21
-
-				const res = hourDisplay(startHr, endHr, true);
-				console.log(res);
+				const res = hourDisplay(this.lb,this.ub, this.currentTimeFormat=='12'?true:false);
+				// console.log(res);
 
 				this.hourList = res
 			},
@@ -465,7 +480,7 @@
 				//console.log('syncRoom batteryInfo',this.batteryInfo);
 				//console.log('syncRoom deviceInfo',this.deviceInfo);
 
-				syncRoomApi({
+				syncRoomApi(this.currentBaseURL,{
 					device_id: this.deviceInfo.deviceId,
 					battery_level: this.batteryInfo.level,
 					is_charging: this.batteryInfo.isCharging,
@@ -473,7 +488,7 @@
 					'Content-type': 'application/json',
 					'Accept-Language': this.languageSet
 				}, ).then(res => {
-					console.log(res);
+					// console.log(res);
 					let data = res.data.data;
 					if (data == null) {
 						this.changeStatus('offline') // 离线
@@ -487,29 +502,47 @@
 					console.log('syncRoom返回数据成功data:', data);
 					this.changeStatus('online') // 在线
 					this.roomData = data;
-					this.initTimeline(data);
+					this.lb = hourToTimestamp(this.roomData?.area?.morningstarts ?? 8)
+				    this.ub = hourToTimestamp(this.roomData?.area?.eveningends ?? 21)
+					
+					// console.log(this.lb,this.ub);
+					
+					this.initTimeline();
 
 
-					// 寻找当前会议
+					// 寻找当前会议并作标记
 					let entries = res.data.data.entries
-					const len = entries.length
 					
-					const now = res.data.data.now_timestamp
-					let i = 0
+					const idx = entries.indexOf(item=>{return item.id == this.roomData.now_entry.id;})
+					if(idx != -1) entries[idx].isCurrentMeeting = true
 					
-					for(;i<len;i++){
-						if(now>=entries[i].start_time && now<=entries[i].end_time){
-							entries[i].isCurrentMeeting = true
-							break
-						}
-					}
 					this.meetingList = entries
-					console.log(this.meetingList);
+					// console.log(this.meetingList);
 					
-					if(i<len-1) this.nextMeetData = entries[i+1]
 
-					// this.foundNextMeet();
-					// this.dateDisplay();
+					// 寻找下一个会议
+					this.foundNextMeet();
+					
+					// 会议列表渲染完成后，滚动到当前会议/下一个会议
+					// this.$nextTick(()=>{
+						
+					// 	const targetId = (this.roomData?.now_entry?.id ?? this.nextMeetData?.id ?? 0)
+						
+					// 	console.log(targetId);
+						
+					// 	if(targetId == 0) return
+						
+					// 	const query = uni.createSelectorQuery();
+					// 	query.select('#meeting-'+targetId).boundingClientRect(data => {
+					// 		console.log(data)
+					// 		this.scrollTop = Math.max(data.top - 60*1.75, 0); // 让上面空出半小时
+					// 	}).exec();
+						
+					// });
+					
+					
+					
+					this.dateDisplay();
 					// this.meetTimeString = this.nowMeetTime();
 				}).catch(e => {
 					console.error(e)
@@ -517,7 +550,7 @@
 			},
 			prepareSetting() { // 预先请求一下，成功则跳过登录
 				const that = this
-				getSettingApi({
+				getSettingApi(this.currentBaseURL,{
 					"device_id": that.deviceInfo.deviceId,
 					"is_charging": that.batteryInfo.isCharging,
 					"battery_level": that.batteryInfo.level,
@@ -533,9 +566,15 @@
 					console.log(e);
 				})
 			},
-
-			prepareQuickMeet() {
-				this.showQuickMeeting = true;
+			prepareQuickMeet(opt) {
+				if(opt){
+					this.showQuickMeeting = true;
+				}else{
+					uni.showToast({
+						title: this.$t('message.index.left.no_free'),
+						icon: 'none'
+					})
+				}
 			},
 		},
 
@@ -643,16 +682,16 @@
 								
 								.in-meeting-icon {
 									flex-shrink: 0;
-									width: 10rpx;
-									height: 10rpx;
+									width: 15rpx;
+									height: 15rpx;
 									animation: blink 2s infinite steps(2);
 								}
 								@keyframes blink {
-								    from {
+								    0% {
 								        opacity: 0;
 								    }
-								    to {
-								        opacity: 1.0;
+								    100% {
+								        opacity: 1;
 								    }
 								}
 								

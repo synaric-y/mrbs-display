@@ -27,7 +27,7 @@
 					
 				</div>
 				<div class="info-row">
-					{{$t('message.setting.left.online_status')}}: {{this.currentStatus=='online'?'正常':'离线'}}
+					{{$t('message.setting.left.online_status')}}: {{this.currentStatus=='online'?$t('message.setting.left.normal'):$t('message.setting.left.offline')}}
 				</div>
 				<div class="info-row">
 					
@@ -53,23 +53,23 @@
 				<div class="form-row">
 					<div class="label">{{$t('message.setting.right.brightness')}}</div>
 					<div class="slider-wrapper">
-						<slider :value="settings.brightness" @changing="changeBrightness" :activeColor="currentTheme!='dark'?'#591BB7':'#285fd4'" backgroundColor="#ffffff" block-color="#ffffff" block-size="20" />
+						<slider value="50" @changing="changeBrightness" :activeColor="currentTheme!='dark'?'#591BB7':'#285fd4'" backgroundColor="#ffffff" block-color="#ffffff" block-size="20" />
 					</div>
-					<div class="slider-value">{{settings.brightness+'%'}}</div>
+					<div class="slider-value">{{brightness+'%'}}</div>
 				</div>
 				<div class="form-row">
 					<div class="label">{{$t('message.setting.right.volume')}}</div>
 					<div class="slider-wrapper">
-						<slider :value="settings.volume" @changing="changeVolume" @change="testVolume" :activeColor="currentTheme!='dark'?'#591BB7':'#285fd4'" backgroundColor="#ffffff" block-color="#ffffff" block-size="20" />
+						<slider value="50" @changing="changeVolume" @change="testVolume" :activeColor="currentTheme!='dark'?'#591BB7':'#285fd4'" backgroundColor="#ffffff" block-color="#ffffff" block-size="20" />
 					</div>
-					<div class="slider-value">{{settings.volume+'%'}}</div>
+					<div class="slider-value">{{volume+'%'}}</div>
 				</div>
 				<div class="form-row">
 					<div class="form-col">
 						<div class="label">{{$t('message.setting.right.area')}}</div>
 						<uni-data-select
 							class="data-select"
-							v-model="settings.area"
+							v-model="area"
 							:localdata="areaList"
 							:clear="false"
 							:placeholder="$t('message.activate.please_select')"
@@ -80,7 +80,7 @@
 						<div class="label">{{$t('message.setting.right.meeting_room')}}</div>
 						<uni-data-select
 							class="data-select"
-							v-model="settings.room"
+							v-model="room"
 							:localdata="roomList"
 							:placeholder="$t('message.activate.please_select')"
 							:clear="false"
@@ -90,7 +90,7 @@
 				<div class="form-row">
 					<div class="label">{{$t('message.setting.right.request_url')}}</div>
 					<div class="input-wrapper">
-						<input class="my-input" v-model="settings.requestURL"/>
+						<input class="my-input" v-model="requestURL"/>
 					</div>
 				</div>
 				<div class="form-row">
@@ -98,7 +98,7 @@
 					<uni-data-select
 						class="data-select"
 						style="width: 90rpx;"
-						v-model="settings.timeFormat"
+						v-model="timeFormat"
 						:localdata="timeFormatList"
 						:placeholder="$t('message.activate.please_select')"
 						:clear="false"
@@ -108,8 +108,8 @@
 					<div class="label">{{$t('message.setting.right.theme_color')}}</div>
 					<div class="checkboxes">
 						<div class="checkbox-group" v-for="item in themeColorList">
-							<div :class="settings.themeColor==item.value?('my-checkbox my-checkbox'+(currentTheme!='dark'?'':'-dark')):'my-checkbox my-checkbox-disabled'" @click="changeThemeColor(item.value)">
-								<uni-icons v-if="settings.themeColor==item.value" type="checkmarkempty" :color="currentTheme!='dark'?'#591BB7':'#285fd4'" size="20"></uni-icons>
+							<div :class="themeColor==item.value?('my-checkbox my-checkbox'+(currentTheme!='dark'?'':'-dark')):'my-checkbox my-checkbox-disabled'" @click="changeThemeColor(item.value)">
+								<uni-icons v-if="themeColor==item.value" type="checkmarkempty" :color="currentTheme!='dark'?'#591BB7':'#285fd4'" size="20"></uni-icons>
 							</div>
 							
 							<div class="colors">
@@ -120,12 +120,16 @@
 				</div>
 				
 				<div class="btns">
-					<button :class="'btn btn'+(currentTheme!='dark'?'':'-dark')" type="default" @click="submit">{{$t('message.setting.right.submit')}}</button>
 					<button class="btn btn-default" type="default" @click="cancel">{{$t('message.setting.right.cancel')}}</button>
+					<button :class="'btn btn'+(currentTheme!='dark'?'':'-dark')" type="default" @click="submit">{{$t('message.setting.right.submit')}}</button>
+					
 				</div>
 			</div>
 		</div>
-		
+		<uni-popup ref="popup" type="dialog">
+			<uni-popup-dialog type="warn" :cancelText="$t('message.setting.right.cancel')" :confirmText="$t('message.setting.right.confirm')" :title="$t('message.setting.right.notice')" :content="$t('message.setting.right.restart')" @confirm="restart()"
+				@close="dialogClose"></uni-popup-dialog>
+		</uni-popup>
 		
 		
 	</div>
@@ -134,7 +138,7 @@
 <script>
 import LanguageSelect from '../components/LanguageSelect.vue';
 import { mapGetters, mapMutations } from 'vuex';
-import { getAllAreaApi,getAllRoomsApi,activateDeviceApi,getSettingApi } from '@/api/api';
+import { getAllAreaApi,getAllRoomsApi,activateDeviceApi,getSettingApi,changeBindApi } from '@/api/api';
 export default {
 	name:"SettingView",
 	components:{
@@ -143,7 +147,7 @@ export default {
 	props:['batteryInfo','deviceInfo'],
 	emits:['close'],
 	computed: {
-	  ...mapGetters(['currentTheme','currentStatus'])
+	  ...mapGetters(['currentTheme','currentStatus','currentTimeFormat','currentBaseURL'])
 	},
 	data() {
 		return {
@@ -153,22 +157,24 @@ export default {
 				battery: this.batteryInfo.level+'%',
 				room: '',
 				area: '',
-				status: '正常'
 			},
-			settings:{
-				brightness: 50,
-				volume: 50,
-				area: 0,
-				room: 0,
-				requestURL: 'http://www.meeting.com:1234',
-				timeFormat: 0,
-				themeColor: 0,
-			},
+			
+			brightness: 50,
+			volume: 50,
+			
+			area: 0,
+			room: 0,
+			
+			requestURL: '',
+			oldRequestURL: '',
+			timeFormat: 0,
+			themeColor: 0,
+			
 			areaList:[],
 			roomList:[],
 			timeFormatList:[
-				{ value: 0, text: "12小时制" },
-				{ value: 1, text: "24小时制" },
+				{ value: 0, text: this.$t('message.setting.right.12hour_format') },
+				{ value: 1, text: this.$t('message.setting.right.24hour_format') },
 			],
 			themeColorList:[
 				{ value: 0, colors:['#591bb7','#b71b1b']},
@@ -178,28 +184,19 @@ export default {
 	},
 	created(){
 	
-		const that = this
-		uni.getScreenBrightness({
-			success: function (res) {
-				that.settings.brightness = Math.trunc(res.value*100)
-			},
-			fail: function (err) {
-				console.log(err);
-				that.settings.brightness = 50 // 中间值
-			}
-		});
-		
-		// #ifdef APP-PLUS
-		this.settings.volume = Math.trunc(plus.device.getVolume() * 100)
-		// #endif
-		
 		this.initAreaAndRoom()
 		
+		// store必须在created初始化
+		this.requestURL = this.currentBaseURL
+		this.oldRequestURL = this.currentBaseURL
+		this.timeFormat = this.currentTimeFormat=='12'?0:1
+		this.themeColor = this.currentTheme=='default'?0:1
 	},
 	methods:{
+		...mapMutations(['changeTheme','changeTimeFormat','changeBaseURL']), //对象展开运算符直接拿到change
 		initAreaAndRoom(){
 			const that = this
-			getSettingApi({
+			getSettingApi(this.currentBaseURL,{
 				"device_id": that.deviceInfo.deviceId,
 				"is_charging": that.batteryInfo.isCharging,
 				"battery_level": that.batteryInfo.level,
@@ -208,7 +205,7 @@ export default {
 				that.basicInfo.room = res.data.data.room
 				that.basicInfo.area = res.data.data.area
 				
-				getAllAreaApi({
+				getAllAreaApi(that.currentBaseURL,{
 					"is_charging": that.batteryInfo.isCharging,
 					"battery_level": that.batteryInfo.level,
 				}).then(res=>{
@@ -221,12 +218,12 @@ export default {
 					
 					const areaIdx = that.areaList.findIndex(item=>{return item.text == that.basicInfo.area})
 					console.log(areaIdx);
-					that.settings.area = that.areaList[areaIdx].value
-					console.log(that.settings.area);
+					that.area = that.areaList[areaIdx].value
+					console.log(that.area);
 					
-					getAllRoomsApi({
+					getAllRoomsApi(that.currentBaseURL,{
 						"type": "area",
-						"id": that.settings.area,
+						"id": that.area,
 						"is_charge": that.batteryInfo.isCharging,
 						"battery_level": that.batteryInfo.level
 					}).then(res=>{
@@ -241,8 +238,8 @@ export default {
 						
 						const roomIdx = that.roomList.findIndex(item=>{return item.text == that.basicInfo.room})
 						console.log(roomIdx);
-						that.settings.room = that.roomList[roomIdx].value
-						console.log(that.settings.room);
+						that.room = that.roomList[roomIdx].value
+						console.log(that.room);
 					})
 					
 				})
@@ -251,19 +248,19 @@ export default {
 				console.log(e);
 			})
 		},
-		...mapMutations(['changeTheme']), //对象展开运算符直接拿到change
+		
 		changeBrightness(e){
-			this.settings.brightness = e.detail.value
+			this.brightness = e.detail.value
 			
 			uni.setScreenBrightness({
-				value: this.settings.brightness / 100, // 百分比，需要除以100
+				value: this.brightness / 100, // 百分比，需要除以100
 				success: function () {
 					console.log('success');
 				}
 			});
 		},
 		changeVolume(e){
-			this.settings.volume = e.detail.value
+			this.volume = e.detail.value
 			
 			// #ifdef APP-PLUS
 			plus.device.setVolume(e.detail.value / 100) // 百分比，需要除以100
@@ -285,9 +282,9 @@ export default {
 		},
 		changeArea(e){
 			this.roomList = [] // 清空现有房间
-			getAllRoomsApi({
+			getAllRoomsApi(this.currentBaseURL,{
 				"type": "area",
-				"id": this.settings.area,
+				"id": this.area,
 				"is_charge": this.batteryInfo.isCharging,
 				"battery_level": this.batteryInfo.level
 			}).then(res=>{
@@ -308,15 +305,59 @@ export default {
 			})
 		},
 		changeThemeColor(v){
-			this.settings.themeColor = v
+			this.themeColor = v
 			this.changeTheme(v==0?'default':'dark')
 			console.log(v);
 		},
 		submit(){
 			
-			console.log(this.settings);
+			// 改store
+			this.changeBaseURL(this.requestURL)
+			this.changeTimeFormat(this.timeFormat==0?'12':'24')
+			this.changeTheme(this.themeColor==0?'default':'dark')
+
+			// 换绑
+			changeBindApi(this.currentBaseURL,{
+				"device_id": this.deviceInfo.deviceId, //实际设备id
+				"room_id": this.room,                 //房间id
+				"is_charging": this.batteryInfo.isCharging,
+				"battery_level": this.batteryInfo.level
+			}).then(res=>{
+				uni.showToast({
+					title: this.$t('message.setting.right.setting_success'),
+					icon: 'none',
+				})
+				
+				if(this.oldRequestURL!==this.requestURL){ // 请求地址改变需显示重启弹窗
+					this.$refs.popup.open()
+				}else{
+					this.$emit('close')
+				}
+				
+			}).catch(e=>{
+				uni.showToast({
+					title: this.$t('message.netDataError'),
+					icon: 'none',
+				})
+				console.log(e);
+				
+				if(this.oldRequestURL!==this.requestURL){ // 请求地址改变需显示重启弹窗
+					this.$refs.popup.open()
+				}else{
+					this.$emit('close')
+				}
+			})
 			
-			this.$emit('close')
+			
+		},
+		restart(){
+			this.$refs.popup.close()
+			// #ifdef APP-PLUS
+			plus.runtime.restart();
+			// #endif
+		},
+		dialogClose(){
+			this.$refs.popup.close()
 		},
 		cancel(){
 			this.$emit('close')

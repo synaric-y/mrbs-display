@@ -13,6 +13,9 @@ const messages = {
 				"finish":'完成',
 				"activate_success":"设备激活成功！",
 				"activate_fail":"设备激活失败！",
+				"verify_success":'请求地址验证成功！',
+				"verify_fail":'请求地址验证失败！',
+				"verify_duplicate":'此设备已激活！'
 			},
 			"login":{
 				"title":'请输入管理员密码',
@@ -32,6 +35,8 @@ const messages = {
 					"room_area":'所属房间&区域',
 					"online_status":'在线状态',
 					"about_us":'关于我们',
+					"normal":'正常',
+					"offline":'离线'
 				},
 				"right":{
 					"setting":'设置',
@@ -41,9 +46,15 @@ const messages = {
 					"meeting_room":'会议室',
 					"request_url":'请求地址',
 					"time_format":'时间格式',
+					"12hour_format":'12小时制',
+					"24hour_format":'24小时制',
 					"theme_color":'主题颜色',
 					"submit":'提交',
 					"cancel":'取消',
+					"confirm":'确定',
+					"notice":'通知',
+					"restart":'请求地址变更需重启应用，是否重启？',
+					"setting_success":'设置修改成功'
 				},
 
 			},
@@ -57,37 +68,27 @@ const messages = {
 				"cancel": '取消',
 				"confirm": '确定',
 			},
-			"meeting": '会议室',
-			"meeting_theme": '会议主题',
-			"booker": '预定人',
-			"in_meeting": '会 议 中',
-			"no_meeting": '空 闲 中',
-			"upcoming_meetings": '即将开始',
-			"alert_code": '请输入内置码',
-			"sure": '确定',
-			"cancle": '取消',
-			"confirm": '确定',
-			"booked": '已预定',
-			"over_meeting":'已结束',
-			"small_in_meeting": '会议中',
-			"alert_error_code": '请输入正确的内置码',
-			"canBook": '可预定',
-			"createRoomFail": '创建快速会议失败',
-			"nextMeet": '即将开始的会议',
-			"room": '会议室',
-			"book": '创建快速会议',
-			"language":'语言',
-			"roomNumberError":'请选择正确的房间号',
-			"noRoom": '没有可用的房间',
-			"noFreeRoom": '当前时间已有会议',
-			"createMeetSuccess": '创建快速会议成功',
-			"netDataError": '接口返回数据异常',
+			"index":{
+				"left":{
+					"book": '创建快速会议',
+					"no_free": '当前时段会议室已约满',
+				},
+				"right":{
+					"meeting": '会议室',
+					"language":'语言',
+					"in_meeting": '会 议 中',
+					"no_meeting": '空 闲 中',
+					"next_meeting": '即将开始的会议',
+				}
+			},
 			"time":{
 				"minute": '分钟',
 				"hour":'小时',
 				"minutes": '分钟',
-				"hours":'小时'
-			}
+				"hours":'小时',
+				"not_available": '不可用'
+			},
+			"netDataError": '接口返回数据异常',
 		}
 	},
 	"en":{
@@ -118,6 +119,8 @@ const messages = {
 					"room_area":'Room & Area',
 					"online_status":'Online Status',
 					"about_us":'About',
+					"normal":'Normal',
+					"offline":'Offline'
 				},
 				"right":{
 					"setting":'Settings',
@@ -127,9 +130,15 @@ const messages = {
 					"meeting_room":'Meeting Room',
 					"request_url":'Request URL',
 					"time_format":'Time Format',
+					"12hour_format":'12 Hour Format',
+					"24hour_format":'24 Hour Format',
 					"theme_color":'Theme Color',
 					"submit":'Submit',
 					"cancel":'Cancel',
+					"confirm":'Confirm',
+					"notice":'Notice',
+					"restart":'Request URL change requires restarting the application. Do you want to restart it?',
+					"setting_success":'Setting modified successfully'
 				}
 			},
 			"fast_meeting":{
@@ -142,37 +151,27 @@ const messages = {
 				"cancel": 'Cancel',
 				"confirm": 'Confirm',
 			},
-			"meeting": 'Room',
-			"meeting_theme": 'Conference Theme',
-			"booker": 'Booker',
-			"in_meeting": 'Meeting',
-			"no_meeting": 'Free',
-			"upcoming_meetings": 'Upcoming Meetings',
-			"alert_code": 'Please enter the built-in code',
-			"sure": 'Sure',
-			"cancle": 'Cancle',
-			"confirm": 'Confirm',
-			"booked": 'Booked',
-			"over_meeting":'Over',
-			"small_in_meeting": 'Meeting',
-			"alert_error_code": 'Please enter the correct built-in code',
-			"canBook": 'Available',
-			"nextMeet": 'Next meet',
-			"room": 'Room',
-			"book": 'Create Fast Meeting',
-			"quickMeeting": '30-minute quick meeting can be booked',
-			"language":'English',
-			"roomNumberError":'Please select the correct room number',
-			"noRoom": 'No rooms available',
-			"noFreeRoom": 'There is already a meeting at the current time',
-			"createMeetSuccess": 'Create a quick meeting successfully',
-			"netDataError": 'The interface returns abnormal data',
+			"index":{
+				"left":{
+					"book": 'Create Fast Meeting',
+					"no_free": 'There is no free room at the current time',
+				},
+				"right":{
+					"meeting": 'Room',
+					"language":'Language',
+					"in_meeting": 'Meeting',
+					"no_meeting": 'Free',
+					"next_meeting": 'Upcoming Meetings',
+				}
+			},
 			"time":{
 				"minute": 'min',
 				"hour":'h',
 				"minutes": 'min',
-				"hours":'h'
-			}
+				"hours":'h',
+				"not_available": 'Not Available'
+			},
+			"netDataError": 'The interface returns abnormal data',
 		}
 	},
 	"ko": {
@@ -203,6 +202,8 @@ const messages = {
 					"room_area":'소속 공간 및 영역',
 					"online_status":'온라인 상태',
 					"about_us":'우리에 대해',
+					"normal":'정상',
+					"offline": "오프라인"
 				},
 				"right":{
 					"setting":'설정',
@@ -212,9 +213,15 @@ const messages = {
 					"meeting_room":'회의실',
 					"request_url":'요청 주소',
 					"time_format":'시간 형식',
+					"12hour_format":'12시간제',
+					"24hour_format":'24시간제',
 					"theme_color":'주제 색상',
 					"submit":'제출',
 					"cancel": "취소",
+					"confirm": "확인",
+					"notice":'알림',
+					"restart": "주소 변경 요청은 애플리케이션을 재부팅해야 합니다. 재부팅하시겠습니까?",
+					"setting_success":'설정 수정 성공'
 				}
 			},
 			"fast_meeting":{
@@ -227,37 +234,27 @@ const messages = {
 				"cancel": "취소",
 				"confirm": "확인",
 			},
-			"meeting": '회의실',
-			"meeting_theme": '컨퍼런스 주제',
-			"booker": '부커',
-			"in_meeting": '회 의 중',
-			"no_meeting": '여유있음',
-			"upcoming_meetings": '곧 시작됩니다',
-			"alert_code": '내장코드를 입력해주세요',
-			"sure": '확인',
-			"cancle": '취소',
-			"confirm": '확인',
-			"booked": '예약하다',
-			"over_meeting":'종료됨',
-			"small_in_meeting": '회의 중',
-			"alert_error_code": '올바른 내장 코드를 입력하세요.',
-			"canBook": '예약 가능',
-			"nextMeet": '다음 회의',
-			"room": '방',
-			"book": '빠른 모임 만들기',
-			"quickMeeting": '빠른 30분 회의 예약',
-			"language":'한국인',
-			"roomNumberError":'정확한 객실번호를 선택해주세요.',
-			"noRoom": '이용 가능한 객실이 없습니다.',
-			"noFreeRoom": '지금 시간에 회의가 있습니다',
-			"createMeetSuccess": '빠른 회의가 성공적으로 생성되었습니다.',
-			"netDataError": '인터페이스가 데이터 예외를 반환합니다.',
+			"index":{
+				"left":{
+					"book": "빠른 모임 만들기",
+					"no_free":'현재 시간대 회의실이 가득 찼습니다',
+				},
+				"right":{
+					"meeting": "회의실",
+					"language":'언어',
+					"in_meeting":'회의 중',
+					"no_meeting":'유휴 중',
+					"next_meeting":'곧 시작될 회의',
+				}
+			},
 			"time":{
 				"minute": "분",
 				"hour":'시간',
 				"minutes": "분",
-				"hours":'시간'
-			}
+				"hours":'시간',
+				"not_available": '사용 불가능'
+			},
+			"netDataError": '인터페이스가 데이터 예외를 반환합니다.',
 		}
 		
 	}
