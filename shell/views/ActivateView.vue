@@ -90,7 +90,7 @@ export default {
 			const that = this;
 			
 			getAllAreaApi(this.currentBaseURL,{
-				"is_charging": this.batteryInfo.isCharging,
+				"is_charging": this.batteryInfo.isCharging?1:0,
 				"battery_level": this.batteryInfo.level,
 			}).then(res=>{
 				const li = res.data.data
@@ -110,7 +110,7 @@ export default {
 			getAllRoomsApi(this.currentBaseURL,{
 				"type": "area",
 				"id": this.area,
-				"is_charge": this.batteryInfo.isCharging,
+				"is_charge": this.batteryInfo.isCharging?1:0,
 				"battery_level": this.batteryInfo.level
 			}).then(res=>{
 				const li = res.data.data.areas.rooms
@@ -155,7 +155,7 @@ export default {
 			
 			// 尝试调这个接口，返回成功就是联通了
 			getAllAreaApi(this.currentBaseURL,{
-				"is_charging": this.batteryInfo.isCharging,
+				"is_charging": this.batteryInfo.isCharging?1:0,
 				"battery_level": this.batteryInfo.level,
 			}).then(res=>{
 				console.log(res);
@@ -210,7 +210,7 @@ export default {
 				"version": "1.0.0",                     //设备使用的软件版本？激活时是否直接使用全局的软件版本，还是由前端传入
 				"description": "",                      //设备信息
 				"resolution": `${this.windowInfo.screenWidth}*${this.windowInfo.screenHeight}`,              //分辨率
-				"is_charge": this.batteryInfo.isCharging,                         //是否充电
+				"is_charge": this.batteryInfo.isCharging?1:0,                         //是否充电
 				"battery_level": this.batteryInfo.level,                    //电量
 				"status": 1,                            //是否在线
 				"is_set": 0,                            //是否绑定

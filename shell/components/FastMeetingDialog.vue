@@ -13,8 +13,8 @@
 				
 			</div>
 			<TimeStepperScroll 
-			:lb="lb" 
-			:ub="ub" 
+			:lb="areaLb" 
+			:ub="areaUb" 
 			:areaLb="areaLb"
 			:areaUb="areaUb"
 			:meetings="meetings"
@@ -23,9 +23,10 @@
 			:currentTime="currentTime"
 			v-model:disabled="disabled"
 			:isFirst="false"
+			:avaliableHours="avaliableHours"
 			:scale="scale"/>
-			<input class="my-input" :placeholder="$t('message.fast_meeting.theme')" v-model="theme"/>
-			<input class="my-input" :placeholder="$t('message.fast_meeting.name')" v-model="booker"/>
+			<input @input="wordLimit1" :class="'my-input ' + inputClass1" maxlength="50"  :placeholder="$t('message.fast_meeting.theme')" v-model="theme"/>
+			<input @input="wordLimit2" :class="'my-input ' + inputClass2" maxlength="30" :placeholder="$t('message.fast_meeting.name')" v-model="booker"/>
 			
 			<div class="btns">
 				<button class="btn btn-default" type="default" @click.stop="cancelReserve">{{$t('message.fast_meeting.cancel')}}</button>
@@ -39,6 +40,7 @@
 	import TimeStepperScroll from './TimeStepperScroll.vue';
 	import {getNearestNextTime} from '@/utils/timeTool.js'
 	import {SEC_PER_HOUR,nextScaleTs} from '@/utils/timestampTool.js'
+	import { PageMixin } from '@/mixin';
 	import {mapGetters} from 'vuex';
 	import {
 		quickMeetApi,
@@ -48,15 +50,13 @@
 	} from '@/api/api.js'
 
 	export default {
+		mixins: [PageMixin],
 		name:"FastMeetingDialog",
 		components:{
 			TimeStepperScroll
 		},
 		props:['currentTime','meetings','avaliableHours','deviceInfo','batteryInfo','areaLb','areaUb'], // 当前时间戳（10位），会议数组，可预约多少小时
 		emits:['close'],
-		computed: {
-		  ...mapGetters(['currentTheme','currentBaseURL'])
-		},
 		data() {
 			return {
 				leftHandle: nextScaleTs(this.currentTime,15*60),
@@ -67,9 +67,23 @@
 				theme: "",
 				booker: "",
 				scale: 15,
+				inputClass1: "",
+				inputClass2: "",
 			};
 		},
 		methods:{
+			wordLimit1(e){
+				console.log('文本输入');
+				const len = e.detail.value.length
+				
+				if(len>50) this.inputClass1 = 'input-blink'
+			},
+			wordLimit2(e){
+				console.log('文本输入');
+				const len = e.detail.value.length
+				
+				if(len>30) this.inputClass2 = 'input-blink'
+			},
 			closeDialog(){
 				this.$emit('close')
 			},
@@ -80,13 +94,27 @@
 				this.$emit('close')
 			},
 			confirmReserve(){
-				// 提交逻辑
+				// 校验
+				if(this.theme && this.theme.length>50){
+					uni.showToast({
+						title: this.$t('message.fast_meeting.theme_too_long'), 
+						icon: 'none'
+					})
+					return
+				}
+				if(this.booker && this.booker.length>30){
+					uni.showToast({
+						title: this.$t('message.fast_meeting.booker_too_long'), 
+						icon: 'none'
+					})
+					return
+				}
 				
 				const pack = {
 					"device_id": this.deviceInfo.deviceId,
 					"begin_time": this.leftHandle,
 					"end_time": this.rightHandle,
-					"is_charge": this.batteryInfo.isCharging,
+					"is_charge": this.batteryInfo.isCharging?1:0,
 					"battery_level": this.batteryInfo.level,
 					"booker": this.booker,
 					"theme": this.theme
@@ -101,17 +129,8 @@
 						let data = res.data.data;
 						let code = res.data.code;
 				
-						// this.showQuickMeeting = true;
-						console.log('quickMeet返回数据成功data:', data);
-				
-				
-						if (confirm == 0 && code == 0) { // 准备阶段成功，直接进快速会议页面，不提示
-							this.showQuickMeeting = true;
-							return;
-						}
-				
 						uni.showToast({
-							title: this.$t(quickMeetMessageMapping[code + '']), //转成字符串
+							title: this.$t('message.fast_meeting.success'), //转成字符串
 							icon: 'none'
 						})
 				
@@ -119,6 +138,10 @@
 					})
 					.catch((e) => {
 						console.error(e)
+						uni.showToast({
+							title: this.$t('message.fast_meeting.fail'), //转成字符串
+							icon: 'none'
+						})
 					})
 				
 				this.theme = ''
@@ -130,6 +153,9 @@
 </script>
 
 <style lang="scss" scoped>
+	
+
+	
 .mask{
 	position: fixed;
 	top: 0;
@@ -189,6 +215,11 @@
 		height: 30rpx;
 		padding-left: 10rpx;
 		margin-bottom: 10rpx;
+		
+	}
+	
+	.input-blink{
+		border: 1rpx solid red!important;
 	}
 	
 	

@@ -53,14 +53,14 @@
 				<div class="form-row">
 					<div class="label">{{$t('message.setting.right.brightness')}}</div>
 					<div class="slider-wrapper">
-						<slider value="50" @changing="changeBrightness" :activeColor="currentTheme!='dark'?'#591BB7':'#285fd4'" backgroundColor="#ffffff" block-color="#ffffff" block-size="20" />
+						<slider :value="initialBrightness" @changing="changeBrightness" :activeColor="currentTheme!='dark'?'#591BB7':'#285fd4'" backgroundColor="#ffffff" block-color="#ffffff" block-size="20" />
 					</div>
 					<div class="slider-value">{{brightness+'%'}}</div>
 				</div>
 				<div class="form-row">
 					<div class="label">{{$t('message.setting.right.volume')}}</div>
 					<div class="slider-wrapper">
-						<slider value="50" @changing="changeVolume" @change="testVolume" :activeColor="currentTheme!='dark'?'#591BB7':'#285fd4'" backgroundColor="#ffffff" block-color="#ffffff" block-size="20" />
+						<slider :value="initialVolume" @changing="changeVolume" @change="testVolume" :activeColor="currentTheme!='dark'?'#591BB7':'#285fd4'" backgroundColor="#ffffff" block-color="#ffffff" block-size="20" />
 					</div>
 					<div class="slider-value">{{volume+'%'}}</div>
 				</div>
@@ -159,6 +159,9 @@ export default {
 				area: '',
 			},
 			
+			initialBrightness: 50,
+			initialVolume: 50,
+			
 			brightness: 50,
 			volume: 50,
 			
@@ -184,6 +187,7 @@ export default {
 	},
 	created(){
 	
+		console.log("设置页面初始化");
 		this.initAreaAndRoom()
 		
 		// store必须在created初始化
@@ -191,6 +195,21 @@ export default {
 		this.oldRequestURL = this.currentBaseURL
 		this.timeFormat = this.currentTimeFormat=='12'?0:1
 		this.themeColor = this.currentTheme=='default'?0:1
+		
+		const that = this
+		uni.getScreenBrightness({
+			success: function (res) {
+				console.log(res);
+				that.initialBrightness = Math.round(res.value*100)
+				that.brightness = that.initialBrightness
+			}
+		});
+		
+		// #ifdef APP-PLUS
+		this.initialVolume = Math.round(plus.device.getVolume()*100)
+		this.volume = this.initialVolume
+		// #endif
+		
 	},
 	methods:{
 		...mapMutations(['changeTheme','changeTimeFormat','changeBaseURL']), //对象展开运算符直接拿到change
@@ -198,7 +217,7 @@ export default {
 			const that = this
 			getSettingApi(this.currentBaseURL,{
 				"device_id": that.deviceInfo.deviceId,
-				"is_charging": that.batteryInfo.isCharging,
+				"is_charging": this.batteryInfo.isCharging?1:0,
 				"battery_level": that.batteryInfo.level,
 			}).then(res=>{
 				console.log(res);
@@ -206,7 +225,7 @@ export default {
 				that.basicInfo.area = res.data.data.area
 				
 				getAllAreaApi(that.currentBaseURL,{
-					"is_charging": that.batteryInfo.isCharging,
+					"is_charging": this.batteryInfo.isCharging?1:0,
 					"battery_level": that.batteryInfo.level,
 				}).then(res=>{
 					console.log(res);
@@ -285,7 +304,7 @@ export default {
 			getAllRoomsApi(this.currentBaseURL,{
 				"type": "area",
 				"id": this.area,
-				"is_charge": this.batteryInfo.isCharging,
+				"is_charge": this.batteryInfo.isCharging?1:0,
 				"battery_level": this.batteryInfo.level
 			}).then(res=>{
 				const li = res.data.data.areas.rooms
@@ -320,7 +339,7 @@ export default {
 			changeBindApi(this.currentBaseURL,{
 				"device_id": this.deviceInfo.deviceId, //实际设备id
 				"room_id": this.room,                 //房间id
-				"is_charging": this.batteryInfo.isCharging,
+				"is_charging": this.batteryInfo.isCharging?1:0,
 				"battery_level": this.batteryInfo.level
 			}).then(res=>{
 				uni.showToast({

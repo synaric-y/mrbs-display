@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<button size="default" type="default" class="select-btn" id="my-btn"
-		style="color:#ffffff;backgroundColor:rgba(230, 241, 252, 0.25);borderColor:#1AAD19"
+		:style="'font-size:' + (($i18n.locale=='zh')?12:10) +'rpx'"
 		hover-class="is-hover" @click="clickBtn">{{title}}</button>
 	</view>
 	<div v-if="listShow" class="mask" @click="toggleList">
@@ -17,7 +17,9 @@
 </template>
 
 <script>
+import { PageMixin } from '@/mixin';
 	export default {
+		mixins: [PageMixin],
 		name:"ocSelect",
 		props: ["title","localdata"],
 		emits:['change'],

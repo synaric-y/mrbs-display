@@ -35,6 +35,21 @@ function displayHM(timestamp,locale,is12) {
 	return zhDate
 }
 
+function displayHMOnly(timestamp,locale,is12) {
+	let dateFormat = is12?'hh:mm A':'HH:mm';
+	const koDate = formatDate(timestamp, 'Asia/Shanghai', 'ko', dateFormat);
+	const enDate = formatDate(timestamp, 'Asia/Shanghai', 'en', dateFormat);
+	const zhDate = formatDate(timestamp, 'Asia/Shanghai', 'zh-cn', dateFormat);
+	
+	switch(locale){
+		case 'en': return enDate
+		case 'ko': return koDate
+		default: return zhDate
+	}
+	
+	return zhDate
+}
+
 function dateDisplayLocale(timestamp,locale,is12) {
 	// console.log('dateDisplay now_timestamp', timestamp);
 	
@@ -47,9 +62,41 @@ function dateDisplayLocale(timestamp,locale,is12) {
 	} else {
 		dateFormat = 'YYYY年MM月DD日';
 	}
+	
 	const displayAP = displayHM(timestamp,locale,is12);
 	const koDate = formatDate(timestamp, 'Asia/Seoul', 'ko', dateFormat);
 	const enDate = formatDate(timestamp, 'America/New_York', 'en', dateFormat);
+	const zhDate = formatDate(timestamp, 'Asia/Shanghai', 'zh-cn', dateFormat);
+	
+	let nowlanguageTime = displayAP + '  '
+	if (locale == 'en') {
+		nowlanguageTime += enDate;
+	} else if (locale == 'ko') {
+		nowlanguageTime += koDate;
+	} else {
+		nowlanguageTime += zhDate;
+	}
+	// console.log('dateDisplay now_timestamp currenlanguageTime', nowlanguageTime);
+	
+	return nowlanguageTime
+}
+
+function dateDisplayLocaleOnly(timestamp,locale,is12) { // 不切时区
+	// console.log('dateDisplay now_timestamp', timestamp);
+	
+	// console.log(is12);
+	let dateFormat = 'YYYY年MM月DD日';
+	if (locale == 'en') {
+		dateFormat = 'MMMM D, YYYY';
+	} else if (locale == 'ko') {
+		dateFormat = 'YYYY년MM월DD일';
+	} else {
+		dateFormat = 'YYYY年MM月DD日';
+	}
+	
+	const displayAP = displayHMOnly(timestamp,locale,is12);
+	const koDate = formatDate(timestamp, 'Asia/Shanghai', 'ko', dateFormat);
+	const enDate = formatDate(timestamp, 'Asia/Shanghai', 'en', dateFormat);
 	const zhDate = formatDate(timestamp, 'Asia/Shanghai', 'zh-cn', dateFormat);
 	
 	let nowlanguageTime = displayAP + '  '
@@ -83,6 +130,7 @@ function getTimestamp(year, month, day, hour, minute) {
 
 export {
 	dateDisplayLocale,
+	dateDisplayLocaleOnly,
 	formatDate,
 	formatTime,
 	getTimestamp,

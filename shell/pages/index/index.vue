@@ -23,7 +23,7 @@
 								<div class="meeting-item" :id="'meeting-'+item.id" v-for="(item,index) in meetingList" :key="item.id" :style="{top: calculateY(item.start_time)+'rpx', height: calculateHeight(item.start_time,item.end_time)+'rpx' }">
 									<div :class="'meeting '+meetingClass(item.start_time,item.end_time)">
 										<text class="meeting-theme">
-											{{ item.name }}
+											{{ item.description || $t('message.index.left.default_name') }}
 										</text>
 										<text class="meeting-span">
 											{{ tsHourMinuteFormat(item.start_time) +' - '+ tsHourMinuteFormat(item.end_time)}}
@@ -76,7 +76,7 @@
 					<uni-icons type="gear" @click="prepareSetting" color="#ffffff" size="35"></uni-icons>
 				</div>
 			</div>
-			<view class="current-time">{{this.nowlanguageTime}}</view>
+			<view class="current-time">{{nowlanguageTime}}</view>
 
 			<!-- 会议详情 -->
 			<view class="right-meeting-detail">
@@ -87,14 +87,14 @@
 
 				<!-- 现在有会 -->
 				<template v-if="roomData?.now_entry">
-					<text class="meeting-title">{{roomData?.now_entry?.name ?? '-'}}</text>
+					<text class="meeting-title">{{roomData?.now_entry?.description || $t('message.index.right.default_name')}}</text>
 					<view class="meeting-detail-item">
 						<image class="meeting-detail-item-icon" src="@/static/reverse-time.png" mode=""></image>
 						<text class="meeting-detail-item-desc">{{(roomData?.now_entry)?(tsHourMinuteFormat(roomData.now_entry.start_time) +' - '+ tsHourMinuteFormat(roomData.now_entry.end_time)):'-'}}</text>
 					</view>
 					<view class="meeting-detail-item">
 						<image class="meeting-detail-item-icon" src="@/static/reverse-person.png" mode=""></image>
-						<text class="meeting-detail-item-desc">{{roomData?.now_entry?.book_by ?? '-'}}</text>
+						<text class="meeting-detail-item-desc">{{roomData?.now_entry?.create_by || $t('message.index.right.default_booker')}}</text>
 					</view>
 				</template>
 				<!-- 现在无会 -->
@@ -126,6 +126,7 @@
 	import moment from 'moment-timezone';
 	import {
 		dateDisplayLocale,
+		dateDisplayLocaleOnly,
 		formatDate,
 		formatTime,
 		getTimestamp,
@@ -157,6 +158,10 @@
 	import {
 		Decimal
 	} from 'decimal.js';
+	import {
+		isBetween,
+		clamp
+	} from "@/utils/mathUtil";
 	// import {
 	// 	quickMeetApi,
 	// 	quickMeetMessageMapping,
@@ -233,60 +238,70 @@
 			},
 			hasTimeInCurrentAvaliable(){
 				
-				function leftAvailable(tempLb,li,lb){
-					if(tempLb < lb) return false
-					for(let entry of li){
-						if(tempLb>=entry.start_time && tempLb<entry.end_time) return false
-					}
-					return true
-				}
+				// 下一个15分钟在不在区域可用时间内 
+				// console.log(this.roomData?.now_timestamp);
+				// console.log(nextScaleTs(this.roomData.now_timestamp,15*SEC_PER_MINUTE),this.lb,this.ub);
+				// console.log(isBetween(nextScaleTs(this.roomData.now_timestamp,15*SEC_PER_MINUTE),this.lb,this.ub));
+				// console.log(this.roomData?.now_timestamp);
+				return (this.roomData?.now_timestamp && isBetween(nextScaleTs(this.roomData.now_timestamp,15*SEC_PER_MINUTE),this.lb,this.ub))
 				
-				function rightAvailable(tempUb,li,ub){
-					if(tempUb > ub) return false
-					for(let entry of li){
-						if(tempUb>entry.start_time && tempUb<=entry.end_time) return false
-					}
-					return true
-				}
+				// function leftAvailable(tempLb,li,lb){
+				// 	if(tempLb < lb) return false
+				// 	for(let entry of li){
+				// 		if(tempLb>=entry.start_time && tempLb<entry.end_time) return false
+				// 	}
+				// 	return true
+				// }
 				
-				function isBothValid(tempLb, tempUb, li){
-					for(let entry of li){
-						if(tempLb<=entry.start_time && tempUb>=entry.end_time) return false
-					}
+				// function rightAvailable(tempUb,li,ub){
+				// 	if(tempUb > ub) return false
+				// 	for(let entry of li){
+				// 		if(tempUb>entry.start_time && tempUb<=entry.end_time) return false
+				// 	}
+				// 	return true
+				// }
 				
-					return true
-				}
+				// function isBothValid(tempLb, tempUb, li){
+				// 	for(let entry of li){
+				// 		if(tempLb<=entry.start_time && tempUb>=entry.end_time) return false
+				// 	}
+				
+				// 	return true
+				// }
 				
 				
-				let startTs = nextScaleTs(this.roomData.now_timestamp,15*SEC_PER_MINUTE) // 5:45
-				// 1729200600
-				// let startTs = nextScaleTs(1729200600,15*SEC_PER_MINUTE) // 5:45
-				let endTs = startTs + this.avaliableHours * SEC_PER_HOUR // 6:45
+				// let startTs = nextScaleTs(this.roomData.now_timestamp,15*SEC_PER_MINUTE) // 5:45
+				// // 1729200600
+				// // let startTs = nextScaleTs(1729200600,15*SEC_PER_MINUTE) // 5:45
+				// let endTs = startTs + this.avaliableHours * SEC_PER_HOUR // 6:45
 				
-				// console.log(startTs,endTs);
+				// // console.log(startTs,endTs);
 				
-				if(endTs <= this.lb || startTs >= this.ub) return false // 已经不在预定时间内 
+				// if(endTs <= this.lb || startTs >= this.ub) return false // 已经不在预定时间内 
 				
-				const realStart = Math.max(startTs,this.lb) // 6:00
-				const realEnd = Math.min(endTs,this.ub) // 6:45
+				// const realStart = Math.max(startTs,this.lb) // 6:00
+				// const realEnd = Math.min(endTs,this.ub) // 6:45
 				
-				// console.log(realStart,realEnd);
+				// // console.log(realStart,realEnd);
 				
-				startTs = realStart
-				endTs = realStart + 15*SEC_PER_MINUTE
+				// startTs = realStart
+				// endTs = realStart + 15*SEC_PER_MINUTE
 				
-				// 滑动窗口……
-				for(;endTs<=realEnd;startTs+=15*SEC_PER_MINUTE,endTs+=15*SEC_PER_MINUTE){
+				// // 滑动窗口……
+				// for(;endTs<=realEnd;startTs+=15*SEC_PER_MINUTE,endTs+=15*SEC_PER_MINUTE){
 					
-					// console.log(startTs,endTs);
+				// 	// console.log(startTs,endTs);
 					
-					if(leftAvailable(startTs,this.meetingList,realStart) && rightAvailable(endTs,this.meetingList,realEnd) && isBothValid(startTs,endTs,this.meetingList) && (startTs < endTs)){
-						return true
-					}
-				}
+				// 	if(leftAvailable(startTs,this.meetingList,realStart) && rightAvailable(endTs,this.meetingList,realEnd) && isBothValid(startTs,endTs,this.meetingList) && (startTs < endTs)){
+				// 		return true
+				// 	}
+				// }
 				
-				return false
+				// return false
 			},
+			nowlanguageTime(){
+				return this.roomData?.now_timestamp && dateDisplayLocaleOnly(this.roomData.now_timestamp, this.$i18n.locale, this.currentTimeFormat=='12'?true:false)
+			}
 		},
 		data() {
 			return {
@@ -306,8 +321,6 @@
 				meeting: false,
 				roomData: null,
 				nextMeetData: null,
-				
-				nowlanguageTime: '',
 				timezore: 'Asia/Shanghai',
 				languageSet: 'zh-CN,zh;q=0.9',
 				
@@ -343,7 +356,7 @@
 					syncRoomApi(this.currentBaseURL,{
 						device_id: this.deviceInfo.deviceId,
 						battery_level: this.batteryInfo.level,
-						is_charging: this.batteryInfo.isCharging,
+						is_charging: this.batteryInfo.isCharging?1:0,
 					}, {
 						'Content-type': 'application/json',
 						'Accept-Language': this.languageSet
@@ -436,11 +449,6 @@
 				// #endif
 			},
 
-			dateDisplay() {
-				const timestamp = this.roomData.now_timestamp;
-				this.nowlanguageTime = dateDisplayLocale(timestamp, this.$i18n.locale,this.currentTimeFormat=='12'?true:false)
-				
-			},
 
 			foundNextMeet() {
 				this.nextMeetData = null;
@@ -472,7 +480,6 @@
 				this.timezore = timeZoneMapping[locale]
 				this.languageSet = languageSetMapping[locale]
 
-				this.dateDisplay()
 				this.syncRoom()
 			},
 
@@ -483,7 +490,7 @@
 				syncRoomApi(this.currentBaseURL,{
 					device_id: this.deviceInfo.deviceId,
 					battery_level: this.batteryInfo.level,
-					is_charging: this.batteryInfo.isCharging,
+					is_charging: this.batteryInfo.isCharging?1:0,
 				}, {
 					'Content-type': 'application/json',
 					'Accept-Language': this.languageSet
@@ -499,7 +506,7 @@
 						return;
 					}
 
-					console.log('syncRoom返回数据成功data:', data);
+					// console.log('syncRoom返回数据成功data:', data);
 					this.changeStatus('online') // 在线
 					this.roomData = data;
 					this.lb = hourToTimestamp(this.roomData?.area?.morningstarts ?? 8)
@@ -542,7 +549,6 @@
 					
 					
 					
-					this.dateDisplay();
 					// this.meetTimeString = this.nowMeetTime();
 				}).catch(e => {
 					console.error(e)
@@ -552,7 +558,7 @@
 				const that = this
 				getSettingApi(this.currentBaseURL,{
 					"device_id": that.deviceInfo.deviceId,
-					"is_charging": that.batteryInfo.isCharging,
+					"is_charging": this.batteryInfo.isCharging?1:0,
 					"battery_level": that.batteryInfo.level,
 				}).then(res => {
 					// that.loginViewShow = true
@@ -645,7 +651,7 @@
 						height: 100%;
 
 						.left {
-							width: 50rpx;
+							// width: 50rpx;
 							flex-shrink: 0;
 
 							.hm {
@@ -922,9 +928,14 @@
 				width: 100%;
 				font-weight: 500;
 				text-align: left;
-				text-overflow: ellipsis;
-				word-wrap: break-word;
 				margin-bottom: 5rpx;
+				
+				word-break: break-all;
+				display: -webkit-box;
+				overflow: hidden;
+				-webkit-line-clamp: 1;
+				-webkit-box-orient: vertical;
+				text-overflow: ellipsis;
 			}
 
 			.meeting-detail-item {
@@ -944,6 +955,13 @@
 					font-size: 14rpx;
 					text-align: left;
 					font-family: 'Noto Sans CJK SC ExtraLight', 'Source Han Sans CN ExtraLight', 'Droid Sans Fallback', sans-serif;
+					
+					word-break: break-all;
+					display: -webkit-box;
+					overflow: hidden;
+					-webkit-line-clamp: 1;
+					-webkit-box-orient: vertical;
+					text-overflow: ellipsis;
 				}
 
 			}

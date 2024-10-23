@@ -18,6 +18,8 @@ export default class Request {
 			header = param.header || {'content-type': "application/json"},
             hideLoading = param.hideLoading || false;
 
+		// console.log(param.url);
+		// console.log(param.data);
         //拼接完整请求地址
         var requestUrl = host + url;
        //拼接完整请求地址（根据环境切换）

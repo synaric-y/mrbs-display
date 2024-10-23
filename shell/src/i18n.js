@@ -67,11 +67,16 @@ const messages = {
 				"name":'预约人姓名',
 				"cancel": '取消',
 				"confirm": '确定',
+				"success": '会议预订成功！',
+				"fail": '会议预订失败!',
+				"theme_too_long":'会议主题不应超过50字',
+				"booker_too_long":'预订人名称不应超过30字',
 			},
 			"index":{
 				"left":{
 					"book": '创建快速会议',
 					"no_free": '当前时段会议室已约满',
+					"default_name": 'xx会议'
 				},
 				"right":{
 					"meeting": '会议室',
@@ -79,6 +84,8 @@ const messages = {
 					"in_meeting": '会 议 中',
 					"no_meeting": '空 闲 中',
 					"next_meeting": '即将开始的会议',
+					"default_name": 'xx会议',
+					"default_booker": 'xx预定'
 				}
 			},
 			"time":{
@@ -150,11 +157,16 @@ const messages = {
 				"name":'Booker Name',
 				"cancel": 'Cancel',
 				"confirm": 'Confirm',
+				"success": 'Fast meeting is successfully reserved',
+				"fail": 'Reservation failed!',
+				"theme_too_long":'Theme should not exceed 50 words',
+				"booker_too_long":'Booker name should not exceed 30 words',
 			},
 			"index":{
 				"left":{
 					"book": 'Create Fast Meeting',
 					"no_free": 'There is no free room at the current time',
+					"default_name": 'xx Meeting'
 				},
 				"right":{
 					"meeting": 'Room',
@@ -162,6 +174,8 @@ const messages = {
 					"in_meeting": 'Meeting',
 					"no_meeting": 'Free',
 					"next_meeting": 'Upcoming Meetings',
+					"default_name": 'xx Meeting',
+					"default_booker": 'xx'
 				}
 			},
 			"time":{
@@ -233,11 +247,16 @@ const messages = {
 				"name":'예약자 이름',
 				"cancel": "취소",
 				"confirm": "확인",
+				"success": "회의 예약 성공!",
+				"fail": "회의 예약 실패!",
+				"theme_too_long":'회의 주제는 50자를 초과해서는 안 됩니다',
+				"booker_too_long":'예약자 이름은 30자를 초과해서는 안 됩니다',
 			},
 			"index":{
 				"left":{
 					"book": "빠른 모임 만들기",
 					"no_free":'현재 시간대 회의실이 가득 찼습니다',
+					"default_name": 'xx',
 				},
 				"right":{
 					"meeting": "회의실",
@@ -245,6 +264,8 @@ const messages = {
 					"in_meeting":'회의 중',
 					"no_meeting":'유휴 중',
 					"next_meeting":'곧 시작될 회의',
+					"default_name": 'xx',
+					"default_booker": 'xx'
 				}
 			},
 			"time":{
