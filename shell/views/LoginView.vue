@@ -14,8 +14,9 @@
 			<div class="form-row">
 				<div class="label">{{$t('message.login.password')}}</div>
 				<div class="input-wrapper">
-					<input password class="my-input" v-model="password"/>
+					<input  class="my-input" v-model="password"/>
 				</div>
+				<!-- <button class="btn btn-default" type="default" @click="$emit('close')">{{$t('message.login.previous')}}</button> -->
 			</div>
 			
 			<div class="btns">
