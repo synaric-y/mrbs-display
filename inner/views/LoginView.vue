@@ -77,8 +77,6 @@ export default {
 			}).finally(()=>{
 				this.accountNumber = ''
 				this.password = ''
-				
-				this.$emit('close')
 			})
 			
 			

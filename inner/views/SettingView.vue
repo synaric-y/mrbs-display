@@ -159,8 +159,8 @@ export default {
 			brightness: 50,
 			volume: 50,
 			
-			area: 0,
-			room: 0,
+			area: -1,
+			room: -1,
 			
 			requestURL: '',
 			oldRequestURL: '',
@@ -230,52 +230,47 @@ export default {
 		},
 		initAreaAndRoom(){
 			const that = this
-			setTimeout(()=>{
-				getSettingApi(this.currentBaseURL,{})
-				.then(res=>{
+			getSettingApi(this.currentBaseURL,{})
+			.then(res=>{
+				console.log(res);
+				that.basicInfo.room = res.data.data.room
+				that.basicInfo.area = res.data.data.area
+				
+				getAllAreaApi(that.currentBaseURL,{
+				}).then(res=>{
 					console.log(res);
-					that.basicInfo.room = res.data.data.room
-					that.basicInfo.area = res.data.data.area
 					
-					getAllAreaApi(that.currentBaseURL,{
+					const li = res.data.data
+					let tempList = []
+					for(let item of li) tempList.push({value:item.id, text: item.area_name})
+					that.areaList = tempList
+					
+					const areaIdx = that.areaList.findIndex(item=>{return item.text == that.basicInfo.area})
+					console.log(areaIdx);
+					that.area = that.areaList[areaIdx].value
+					console.log(that.area);
+					
+					getAllRoomsApi(that.currentBaseURL,{
+						"type": "area",
+						"id": that.area,
 					}).then(res=>{
-						console.log(res);
+						console.log(JSON.stringify(res));
 						
-						const li = res.data.data
+						const li = res.data.data.areas.rooms
 						let tempList = []
-						for(let item of li) tempList.push({value:item.id, text: item.area_name})
-						that.areaList = tempList
+						for(let item of li){
+							tempList.push({value:item.room_id, text: item.room_name})
+						}
+						that.roomList = tempList
 						
-						const areaIdx = that.areaList.findIndex(item=>{return item.text == that.basicInfo.area})
-						console.log(areaIdx);
-						that.area = that.areaList[areaIdx].value
-						console.log(that.area);
-						
-						getAllRoomsApi(that.currentBaseURL,{
-							"type": "area",
-							"id": that.area,
-						}).then(res=>{
-							console.log(JSON.stringify(res));
-							
-							const li = res.data.data.areas.rooms
-							let tempList = []
-							for(let item of li){
-								tempList.push({value:item.room_id, text: item.room_name})
-							}
-							that.roomList = tempList
-							
-							const roomIdx = that.roomList.findIndex(item=>{return item.text == that.basicInfo.room})
-							console.log(roomIdx);
-							that.room = that.roomList[roomIdx].value
-							console.log(that.room);
-						})
-						
+						const roomIdx = that.roomList.findIndex(item=>{return item.text == that.basicInfo.room})
+						console.log(roomIdx);
+						that.room = that.roomList[roomIdx].value
+						console.log(that.room);
 					})
 					
-				}).catch(e=>{
-					console.log(e);
 				})
-			},2000)
+			})
 		},
 		
 		changeBrightness(e){
@@ -309,6 +304,7 @@ export default {
 		},
 		changeArea(e){
 			this.roomList = [] // 清空现有房间
+			this.room = -1 // 恢复默认值
 			getAllRoomsApi(this.currentBaseURL,{
 				"type": "area",
 				"id": this.area,
@@ -337,36 +333,95 @@ export default {
 		submit(){
 			
 			const that = this
-
-			// 换绑
-			changeBindApi(this.currentBaseURL,{
-				"room_id": this.room,                 //房间id
-			}).then(res=>{
+			
+			if(!this.requestURL || this.requestURL==''){
 				uni.showToast({
-					title: this.$t('message.setting.right.setting_success'),
+					title: this.$t('message.setting.right.url_empty'),
 					icon: 'none',
 				})
+				return
+			}
+			if(!this.area || this.area==-1){
+				uni.showToast({
+					title: this.$t('message.setting.right.area_empty'),
+					icon: 'none',
+				})
+				return
+			}
+			if(!this.room || this.room==-1){
+				uni.showToast({
+					title: this.$t('message.setting.right.room_empty'),
+					icon: 'none',
+				})
+				return
+			}
+			
+			
+			
+			// 请求地址改变, 验证新地址连通性
+			if(that.oldRequestURL!==that.requestURL){ 
+				console.log(that.requestURL,that.oldRequestURL);
 				
-				// 改store
-				that.changeBaseURL(this.requestURL)
-				that.changeTimeFormat(this.timeFormat==0?'12':'24')
-				that.changeTheme(this.themeColor==0?'default':'dark')
+				uni.showLoading({
+					title:this.$t('message.setting.right.validating')
+				})
+				// 尝试调这个接口，返回成功就是联通了
+				getAllAreaApi(that.requestURL,{
+				})
+				.then(res=>{
+					console.log(JSON.stringify(res));
+					
+					if(res.data.code != 0){ // 返回错误
+						throw new Error('invalid url')
+					}else{
+						that.doChange()
+					}
+					
+					
+				})
+				.catch(e=>{ // 请求超时
+					uni.showToast({
+						title: this.$t('message.setting.right.invalid_url'),
+						icon: 'none',
+					})
+					console.log(e);
+				}).finally(()=>{
+					uni.hideLoading()
+				})
+			}else{ // 直接改
+				this.doChange()
+			}
+			
+			
+			
+			
+			
+		},
+		doChange(){
+			const that = this
+			// 换绑
+			changeBindApi(that.currentBaseURL,{
+				"room_id": that.room,                 //房间id
+			}).then(()=>{
+				// 改时间格式
+				that.changeTimeFormat(that.timeFormat==0?'12':'24')
 				
-				if(this.oldRequestURL!==this.requestURL){ // 请求地址改变需显示重启弹窗
-					this.$refs.popup.open()
+				if(that.oldRequestURL!==that.requestURL){
+					that.changeBaseURL(that.requestURL)
+					that.$refs.popup.open()
 				}else{
-					this.$emit('close')
+					uni.showToast({
+						title: that.$t('message.setting.right.setting_success'),
+						icon: 'none',
+					})
+					that.$emit('close')
 				}
-				
 			}).catch(e=>{
 				uni.showToast({
 					title: this.$t('message.netDataError'),
 					icon: 'none',
 				})
-				console.log(e);
 			})
-			
-			
 		},
 		restart(){
 			this.$refs.popup.close()

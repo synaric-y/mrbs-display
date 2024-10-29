@@ -25,8 +25,8 @@
 			:isFirst="false"
 			:avaliableHours="avaliableHours"
 			:scale="scale"/>
-			<input @input="wordLimit1" :class="'my-input ' + inputClass1" maxlength="50"  :placeholder="$t('message.fast_meeting.theme')" v-model="theme"/>
-			<input @input="wordLimit2" :class="'my-input ' + inputClass2" maxlength="30" :placeholder="$t('message.fast_meeting.name')" v-model="booker"/>
+			<input @input="wordLimit1" :class="'my-input '+inputBlink1" maxlength="50"  :placeholder="$t('message.fast_meeting.theme')" v-model="theme"/>
+			<input @input="wordLimit2" :class="'my-input '+inputBlink2" maxlength="30" :placeholder="$t('message.fast_meeting.name')" v-model="booker"/>
 			
 			<div class="btns">
 				<button class="btn btn-default" type="default" @click.stop="cancelReserve">{{$t('message.fast_meeting.cancel')}}</button>
@@ -66,22 +66,27 @@
 				theme: "",
 				booker: "",
 				scale: 15,
-				inputClass1: "",
-				inputClass2: "",
+				
+				inputBlink1: '',
+				inputBlink2: ''
 			};
 		},
 		methods:{
 			wordLimit1(e){
-				console.log('文本输入');
-				const len = e.detail.value.length
 				
-				if(len>50) this.inputClass1 = 'input-blink'
+				const len = e.detail.value.length
+				console.log(len);
+				
+				if(len>=50) this.inputBlink1 = 'input-blink'
+				else this.inputBlink1 = ''
 			},
 			wordLimit2(e){
-				console.log('文本输入');
-				const len = e.detail.value.length
 				
-				if(len>30) this.inputClass2 = 'input-blink'
+				const len = e.detail.value.length
+				console.log(len);
+				
+				if(len>=30) this.inputBlink2 = 'input-blink'
+				else this.inputBlink2 = ''
 			},
 			closeDialog(){
 				this.$emit('close')
@@ -185,6 +190,7 @@
 	background-color: #fff;
 	border-radius: 4rpx;
 	box-shadow: 0 0 4rpx 2rpx rgba(0,0,0,.25);
+	overflow-y: auto;
 	
 	.header{
 		display: flex;
@@ -214,19 +220,28 @@
 	}
 	
 
+	@keyframes blink {
+		50% {
+			border-color: var(--color-danger-light);
+		}
+	}
 	
 	.my-input{
-		border: 1rpx solid #ccc;
+		border-width: 1rpx;
+		border-style: solid;
+		border-color: #ccc;
+		
 		border-radius: 3rpx;
 		height: 30rpx;
 		padding-left: 10rpx;
 		margin-bottom: 10rpx;
-		
 	}
 	
 	.input-blink{
-		border: 1rpx solid red!important;
+		animation: blink 0.3s 5 ease-in-out;
 	}
+	
+	
 	
 	
 	

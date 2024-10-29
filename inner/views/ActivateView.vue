@@ -111,6 +111,7 @@ export default {
 		},
 		changeArea(e){ 
 			this.roomList = [] // 清空现有房间
+			this.room = -1
 			getAllRoomsApi(this.currentBaseURL,{
 				"type": "area",
 				"id": this.area,

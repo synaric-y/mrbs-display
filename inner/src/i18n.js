@@ -19,7 +19,7 @@ const messages = {
 				"url_empty":'请求地址为空',
 				"not_verified":'请求地址未验证',
 				"area_empty":'区域未选择',
-				"room_empty":'房间未选择'
+				"room_empty":'房间未选择',
 			},
 			"login":{
 				"title":'请输入管理员密码',
@@ -58,7 +58,13 @@ const messages = {
 					"confirm":'确定',
 					"notice":'通知',
 					"restart":'请求地址变更需重启应用，是否重启？',
-					"setting_success":'设置修改成功'
+					"setting_success":'设置修改成功',
+					"url_empty":'请求地址为空',
+					"not_verified":'请求地址未验证',
+					"area_empty":'区域未选择',
+					"room_empty":'房间未选择',
+					"invalid_url":'请求地址无效',
+					"validating":'验证中...'
 				},
 
 			},
@@ -154,7 +160,13 @@ const messages = {
 					"confirm":'Confirm',
 					"notice":'Notice',
 					"restart":'Request URL change requires restarting the application. Do you want to restart it?',
-					"setting_success":'Setting modified successfully'
+					"setting_success":'Setting modified successfully',
+					"url_empty":'Request address is empty',
+					"not_verified":'Request address unverified',
+					"area_empty":'Area not selected',
+					"room_empty":'Room not selected',
+					"invalid_url":'Invalid URL',
+					"validating":'Validating...'
 				}
 			},
 			"fast_meeting":{
@@ -249,7 +261,13 @@ const messages = {
 					"confirm": "확인",
 					"notice":'알림',
 					"restart": "주소 변경 요청은 애플리케이션을 재부팅해야 합니다. 재부팅하시겠습니까?",
-					"setting_success":'설정 수정 성공'
+					"setting_success":'설정 수정 성공',
+					"url_empty":'요청 주소가 비어 있음',
+					"not_verified":'요청 주소가 검증되지 않았습니다',
+					"area_empty":'영역을 선택하지 않았습니다',
+					"room_empty":'방 선택 안 함',
+					"invalid_url":'잘못된 요청 주소',
+					"validating":'확인 중...'
 				}
 			},
 			"fast_meeting":{

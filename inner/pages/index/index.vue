@@ -328,7 +328,7 @@
 				languageSet: 'zh-CN,zh;q=0.9',
 			}
 		},
-		onMounted() {
+		onLoad() {
 			
 			// 获取是否激活（尝试调一下syncRoom接口），需要等电量和设备信息传过来才行，等待5秒
 			uni.showLoading({

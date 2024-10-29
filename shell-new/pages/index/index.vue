@@ -1,5 +1,5 @@
 <template>
-	<web-view id="wv" src="../../static/index.html" @message="handleWebviewMessage"></web-view>
+	<web-view id="wv" :src="baseURL+wvURL" @message="handleWebviewMessage"></web-view>
 </template>
 
 <script>
@@ -8,6 +8,8 @@
 		data() {
 			return {
 				wvNode: null,
+				wvURL: '/display/index.html',
+				baseURL: 'https://meeting-manage-test.businessconnectchina.com:12443'
 			}
 		},
 		onLoad() {
@@ -71,7 +73,19 @@
 					case 'restart':{
 						that.restart()
 					}break;
+					case 'updateBaseURL':{
+						that.updateBaseURL(val)
+					}break;
+					case 'updateWvURL':{
+						that.updateWvURL(val)
+					}break;
 				}
+			},
+			updateBaseURL(val){
+				this.baseURL = val
+			},
+			updateWvURL(val){
+				this.wvURL = val
 			},
 			sendDeviceInfo(){
 				const that = this
