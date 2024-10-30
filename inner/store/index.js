@@ -55,16 +55,18 @@ const store = createStore({
 	}
 })
 
-// 监听 Vuex 的 state 变化，如果有变化就保存到 localStorage 中
-store.subscribe((mutation, state) => {
-  uni.setStorageSync('vuex-state', JSON.stringify(state))
-})
 
 // 如果 localStorage 中有之前保存的 state，就将其替换当前的 state
 let savedState = undefined
 if(uni.getStorageSync('vuex-state')) savedState = JSON.parse(uni.getStorageSync('vuex-state'))
 if (savedState) {
-  // store.replaceState(savedState)
+  store.replaceState(savedState)
 }
+
+// 监听 Vuex 的 state 变化，如果有变化就保存到 localStorage 中
+store.subscribe((mutation, state) => {
+  console.log(60);
+  uni.setStorageSync('vuex-state', JSON.stringify(state))
+})
 
 export default store
