@@ -93,7 +93,7 @@
 						<input class="my-input" v-model="requestURL"/>
 					</div>
 				</div>
-				<div class="form-row">
+<!-- 				<div class="form-row">
 					<div class="label">{{$t('message.setting.right.time_format')}}</div>
 					<uni-data-select
 						class="data-select"
@@ -117,7 +117,7 @@
 							</div>
 						</div>
 					</div>
-				</div>
+				</div> -->
 				
 				<div class="btns">
 					<button class="btn btn-default" type="default" @click="cancel">{{$t('message.setting.right.cancel')}}</button>
@@ -330,7 +330,7 @@ export default {
 			this.changeTheme(v==0?'default':'dark')
 			console.log(v);
 		},
-		submit(){
+		submit: async function(){
 			
 			const that = this
 			
@@ -341,43 +341,38 @@ export default {
 				})
 				return
 			}
-			if(!this.area || this.area==-1){
-				uni.showToast({
-					title: this.$t('message.setting.right.area_empty'),
-					icon: 'none',
+			
+			// 如果有区域和房间就换绑
+			console.log(this.area,this.room);
+			if(this.area && this.area!=-1 && this.room && this.room!=-1){	
+				console.log(347);
+				await changeBindApi(that.currentBaseURL,{
+					"room_id": that.room,                 //房间id
+				}).then(()=>{
+					
+				}).catch(e=>{
+					uni.showToast({
+						title: this.$t('message.netDataError'),
+						icon: 'none',
+					})
 				})
-				return
-			}
-			if(!this.room || this.room==-1){
-				uni.showToast({
-					title: this.$t('message.setting.right.room_empty'),
-					icon: 'none',
-				})
-				return
 			}
 			
-			
-			
-			// 请求地址改变, 验证新地址连通性
-			if(that.oldRequestURL!==that.requestURL){ 
-				console.log(that.requestURL,that.oldRequestURL);
-				
+			// 修改请求地址
+			if(that.oldRequestURL!==that.requestURL){
 				uni.showLoading({
 					title:this.$t('message.setting.right.validating')
 				})
 				// 尝试调这个接口，返回成功就是联通了
-				getAllAreaApi(that.requestURL,{
+				await getAllAreaApi(that.requestURL,{
 				})
 				.then(res=>{
-					console.log(JSON.stringify(res));
-					
 					if(res.data.code != 0){ // 返回错误
 						throw new Error('invalid url')
-					}else{
-						that.doChange()
+					}else{ // 验证通过
+						that.changeBaseURL(that.requestURL)
+						that.$refs.popup.open()
 					}
-					
-					
 				})
 				.catch(e=>{ // 请求超时
 					uni.showToast({
@@ -388,40 +383,16 @@ export default {
 				}).finally(()=>{
 					uni.hideLoading()
 				})
-			}else{ // 直接改
-				this.doChange()
+				
+			}else{
+				uni.showToast({
+					title: that.$t('message.setting.right.setting_success'),
+					icon: 'none',
+				})
+				that.$emit('close')
 			}
 			
 			
-			
-			
-			
-		},
-		doChange(){
-			const that = this
-			// 换绑
-			changeBindApi(that.currentBaseURL,{
-				"room_id": that.room,                 //房间id
-			}).then(()=>{
-				// 改时间格式
-				that.changeTimeFormat(that.timeFormat==0?'12':'24')
-				
-				if(that.oldRequestURL!==that.requestURL){
-					that.changeBaseURL(that.requestURL)
-					that.$refs.popup.open()
-				}else{
-					uni.showToast({
-						title: that.$t('message.setting.right.setting_success'),
-						icon: 'none',
-					})
-					that.$emit('close')
-				}
-			}).catch(e=>{
-				uni.showToast({
-					title: this.$t('message.netDataError'),
-					icon: 'none',
-				})
-			})
 		},
 		restart(){
 			this.$refs.popup.close()

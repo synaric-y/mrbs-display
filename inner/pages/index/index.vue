@@ -9,7 +9,7 @@
 		<div class="left-time-view">
 			<!-- 会议时间 -->
 			<view class="meeting-time">
-				<view class="meeting-scroll">
+				<view :class="temporary_meeting?'meeting-scroll-short':'meeting-scroll'">
 					<scroll-view scroll-y="true" class="meeting-scroll-view">
 						<div class="meeting-wrapper">
 							<div class="left">
@@ -21,7 +21,7 @@
 								<div class="meeting-item" :id="'meeting-'+item.id" v-for="(item,index) in meetingList" :key="item.id" :style="{top: calculateY(item.start_time)+'rpx', height: calculateHeight(item.start_time,item.end_time)+'rpx' }">
 									<div :class="'meeting '+meetingClass(item.start_time,item.end_time)">
 										<text class="meeting-theme">
-											{{ item.description || $t('message.index.left.default_name') }}
+											{{ item.name || $t('message.index.left.default_name') }}
 										</text>
 										<text class="meeting-span">
 											{{ tsHourMinuteFormat(item.start_time) +' - '+ tsHourMinuteFormat(item.end_time)}}
@@ -37,10 +37,11 @@
 				</view>
 			</view>
 			<!-- 预约会议 -->
-			<view class="reserve-meeting">
+			<view class="reserve-meeting" v-if="temporary_meeting">
 				<!-- <view class="reserve-title">{{$t('message.quickMeeting')}}</view> -->
 				<div class="reserve-title"></div>
 				<view
+					
 					:class="[hasTimeInCurrentAvaliable?'reserve-button reserve-button-free':'reserve-button']"
 					@click="prepareQuickMeet(hasTimeInCurrentAvaliable)">
 					{{$t('message.index.left.book')}}
@@ -84,7 +85,7 @@
 
 				<!-- 现在有会 -->
 				<template v-if="roomData?.now_entry">
-					<text class="meeting-title">{{roomData?.now_entry?.description || $t('message.index.right.default_name')}}</text>
+					<text class="meeting-title">{{roomData?.now_entry?.name || $t('message.index.right.default_name')}}</text>
 					<view class="meeting-detail-item">
 						<image class="meeting-detail-item-icon" src="@/static/reverse-time.png" mode=""></image>
 						<text class="meeting-detail-item-desc">{{(roomData?.now_entry)?(tsHourMinuteFormat(roomData.now_entry.start_time) +' - '+ tsHourMinuteFormat(roomData.now_entry.end_time)):'-'}}</text>
@@ -106,7 +107,7 @@
 					</view>
 					<view class="meeting-detail-item">
 						<image class="meeting-detail-item-icon" src="@/static/reverse-person.png" mode=""></image>
-						<text class="meeting-detail-item-desc">{{(nextMeetData?.book_by) ?? '-'}}</text>
+						<text class="meeting-detail-item-desc">{{(nextMeetData?.create_by) ?? '-'}}</text>
 					</view>
 				</template>
 
@@ -326,6 +327,8 @@
 				nextMeetData: null,
 				timezore: 'Asia/Shanghai',
 				languageSet: 'zh-CN,zh;q=0.9',
+				
+				temporary_meeting: false // 显示快速会议按钮
 			}
 		},
 		onLoad() {
@@ -470,6 +473,12 @@
 					this.roomData = data;
 					this.lb = hourToTimestamp(this.roomData?.area?.morningstarts ?? 8)
 				    this.ub = hourToTimestamp(this.roomData?.area?.eveningends ?? 21)
+					this.temporary_meeting = (this.roomData?.room?.temporary_meeting==1) ?? false // 快速会议按钮显示
+					const time_type = this.roomData?.room?.time_type==12?"12":"24"
+					const theme_type = this.roomData?.room?.theme_type==0?'default':'dark'
+					
+					this.changeTheme(theme_type)
+					this.changeTimeFormat(time_type)
 					
 					// console.log(this.lb,this.ub);
 					
@@ -576,6 +585,7 @@
 
 		.left-time-view {
 			display: flex;
+			flex-direction: column;
 			margin: 0;
 			padding: 0;
 			width: 250rpx;
@@ -591,12 +601,19 @@
 
 				.meeting-scroll {
 					width: 250rpx;
-					height: 470rpx;
+					height: 100vh;
+					// height: 470rpx;
+				}
+				
+				.meeting-scroll-short{
+					width: 250rpx;
+					height: calc(100vh - 63rpx);
 				}
 
 				.meeting-scroll-view {
 					width: 250rpx;
-					height: 377rpx;
+					height: 100%;
+					// height: 377rpx;
 
 
 					.meeting-wrapper {
@@ -731,9 +748,7 @@
 				height: 63rpx;
 				width: 250rpx;
 				border-top: 1rpx solid rgba(230, 241, 252, 0.25);
-				position: absolute;
-				left: 0;
-				bottom: 0;
+				flex-shrink: 0;
 				display: flex;
 				justify-content: center;
 				align-items: center;

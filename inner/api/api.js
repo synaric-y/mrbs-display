@@ -63,7 +63,7 @@ function syncRoomApi(host, data, header) {
 	})
 }
 
-function getAllAreaApi(host, data) {
+async function getAllAreaApi(host, data) {
 	return request({
 		host: host,
 		url: "/web/call.php?act=get_info%2Fget_all_area",
@@ -106,7 +106,7 @@ function activateDeviceApi(host, data) {
 	})
 }
 
-function changeBindApi(host, data) {
+async function changeBindApi(host, data) {
 	return request({
 		host: host,
 		url: "/web/appapi/api.php?act=change_bind",
