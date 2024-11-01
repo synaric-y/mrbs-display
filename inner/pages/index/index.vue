@@ -7,7 +7,7 @@
 		<SettingView v-if="settingViewShow" @close="settingViewShow=false" />
 
 		<div class="left-time-view">
-			<!-- 会议时间 -->
+			<!-- 会议时间列表 -->
 			<view class="meeting-time">
 				<view :class="temporary_meeting?'meeting-scroll-short':'meeting-scroll'">
 					<scroll-view scroll-y="true" class="meeting-scroll-view">
@@ -27,7 +27,7 @@
 											{{ tsHourMinuteFormat(item.start_time) +' - '+ tsHourMinuteFormat(item.end_time)}}
 										</text>
 									</div>
-									<image v-if="item.id==roomData?.now_entry?.id" class="in-meeting-icon"
+									<image v-if="displayStatus=='in-progress'&&item.id==meetingInDisplay.id" class="in-meeting-icon"
 										src="@/static/in-meeting.png" mode="aspectFit">
 									</image>
 								</div>
@@ -36,7 +36,7 @@
 					</scroll-view>
 				</view>
 			</view>
-			<!-- 预约会议 -->
+			<!-- 预约会议按钮 -->
 			<view class="reserve-meeting" v-if="temporary_meeting">
 				<!-- <view class="reserve-title">{{$t('message.quickMeeting')}}</view> -->
 				<div class="reserve-title"></div>
@@ -48,24 +48,29 @@
 				</view>
 				<!-- 预约会议对话框 -->
 				<FastMeetingDialog v-if="showQuickMeeting" @close="showQuickMeeting=false"
-					:currentTime="roomData?.now_timestamp ?? Math.trunc(new Date().getTime()/1000)"
+					:currentTime="serverTime ?? Math.trunc(new Date().getTime()/1000)"
 					:areaLb="lb"
 					:areaUb="ub"
-					:meetings="roomData?.entries ?? []"
-					:avaliableHours="avaliableHours" />
+					:meetings="meetingList ?? []"
+					:avaliableHours="avaliableHours"
+					:scale="scale"/>
 			</view>
 		</div>
+		
+		<!-- 右侧信息 -->
 		<div
-			:class="(roomData?.now_entry)?('right-meeting-info right-meeting-info-busy right-meeting-info-busy'+(currentTheme === 'dark' ? '-dark' : '' )):('right-meeting-info right-meeting-info'+(currentTheme === 'dark' ? '-dark' : '' ))">
+			:class="(displayStatus=='in-progress')?('right-meeting-info right-meeting-info-busy right-meeting-info-busy'+(currentTheme === 'dark' ? '-dark' : '' )):('right-meeting-info right-meeting-info'+(currentTheme === 'dark' ? '-dark' : '' ))">
 
+			<!-- 电量  -->
 			<div class="battery">
 				<BatteryShow/>
 			</div>
+			<!-- 会议室、时间、语言  -->
 			<div class="header">
 				<div class="header-left">
 					<div class="room-title">{{$t('message.index.right.meeting')}}</div>
 					<div class="room-number">
-						{{roomData?.room?.room_name ?? 'A'}}</div>
+						{{roomName ?? 'A'}}</div>
 				</div>
 				<div class="header-right">
 					<view class="change-language">
@@ -76,42 +81,31 @@
 			</div>
 			<view class="current-time">{{nowlanguageTime}}</view>
 
-			<!-- 会议详情 -->
+			<!-- 会议信息 -->
 			<view class="right-meeting-detail">
-				<!-- 空闲中 -->
+				
+				<!-- 空闲中|会议中 -->
 				<view class="meeting-status">
-					{{(roomData?.now_entry)?$t('message.index.right.in_meeting'):$t('message.index.right.no_meeting')}}
+					{{displayStatus=='in-progress'?$t('message.index.right.in_meeting'):$t('message.index.right.no_meeting')}}
 				</view>
+				
+				<!-- 即将开始的会议 -->
+				<div class="nextMeet" v-if="displayStatus!='in-progress'">{{ $t('message.index.right.next_meeting') }}</div>
 
-				<!-- 现在有会 -->
-				<template v-if="roomData?.now_entry">
-					<text class="meeting-title">{{roomData?.now_entry?.name || $t('message.index.right.default_name')}}</text>
-					<view class="meeting-detail-item">
-						<image class="meeting-detail-item-icon" src="@/static/reverse-time.png" mode=""></image>
-						<text class="meeting-detail-item-desc">{{(roomData?.now_entry)?(tsHourMinuteFormat(roomData.now_entry.start_time) +' - '+ tsHourMinuteFormat(roomData.now_entry.end_time)):'-'}}</text>
-					</view>
-					<view class="meeting-detail-item">
-						<image class="meeting-detail-item-icon" src="@/static/reverse-person.png" mode=""></image>
-						<text class="meeting-detail-item-desc">{{roomData?.now_entry?.create_by || $t('message.index.right.default_booker')}}</text>
-					</view>
-				</template>
-				<!-- 现在无会 -->
-				<template v-else>
-					<view class="nextMeet">
-						{{$t('message.index.right.next_meeting')}}:
-					</view>
-					<text class="meeting-title">{{(nextMeetData?.name) ?? '-'}}</text>
-					<view class="meeting-detail-item">
-						<image class="meeting-detail-item-icon" src="@/static/reverse-time.png" mode=""></image>
-						<text class="meeting-detail-item-desc">{{(nextMeetData)?(tsHourMinuteFormat(nextMeetData.start_time) +' - '+ tsHourMinuteFormat(nextMeetData.end_time)):'-'}}</text>
-					</view>
-					<view class="meeting-detail-item">
-						<image class="meeting-detail-item-icon" src="@/static/reverse-person.png" mode=""></image>
-						<text class="meeting-detail-item-desc">{{(nextMeetData?.create_by) ?? '-'}}</text>
-					</view>
-				</template>
 
+				<!-- 预订人、标题、时间 -->
+				<text class="meeting-title">{{ (show_meeting_name&&(meetingInDisplay?.name ?? '-')) || $t('message.index.right.default_name') }}</text>
+				<view class="meeting-detail-item">
+					<image class="meeting-detail-item-icon" src="@/static/reverse-time.png" mode=""></image>
+					<text class="meeting-detail-item-desc">{{ meetingInDisplay ?(tsHourMinuteFormat(meetingInDisplay.start_time) +' - '+ tsHourMinuteFormat(meetingInDisplay.end_time)):'-'}}</text>
+				</view>
+				<view class="meeting-detail-item">
+					<image class="meeting-detail-item-icon" src="@/static/reverse-person.png" mode=""></image>
+					<text class="meeting-detail-item-desc">{{ (show_book&&(meetingInDisplay?.book_by ?? '-')) || $t('message.index.right.default_booker') }}</text>
+				</view>
 			</view>
+			
+			<!-- logo -->
 			<view class="right-meeting-logo">
 				<image class="company-logo" src="@/static/bcc-logo-en.png" mode="aspectFit"></image>
 			</view>
@@ -161,6 +155,8 @@
 		clamp
 	} from "@/utils/mathUtil";
 	import {PageMixin} from '@/mixin/index.js'
+	
+	import _ from 'lodash'; // lodash，用于数组运算
 
 	const heightPerBlock = 30 // 每15分钟rpx
 	
@@ -240,71 +236,11 @@
 					return displayHM(ts, 'zh-cn', this.currentTimeFormat=='12'?true:false);
 				}
 			},
-			hasTimeInCurrentAvaliable(){
-				
-				// 下一个15分钟在不在区域可用时间内 
-				// console.log(this.roomData?.now_timestamp);
-				// console.log(nextScaleTs(this.roomData.now_timestamp,15*SEC_PER_MINUTE),this.lb,this.ub);
-				// console.log(isBetween(nextScaleTs(this.roomData.now_timestamp,15*SEC_PER_MINUTE),this.lb,this.ub));
-				// console.log(this.roomData?.now_timestamp);
-				return (this.roomData?.now_timestamp && isBetween(nextScaleTs(this.roomData.now_timestamp,15*SEC_PER_MINUTE),this.lb,this.ub))
-				
-				// function leftAvailable(tempLb,li,lb){
-				// 	if(tempLb < lb) return false
-				// 	for(let entry of li){
-				// 		if(tempLb>=entry.start_time && tempLb<entry.end_time) return false
-				// 	}
-				// 	return true
-				// }
-				
-				// function rightAvailable(tempUb,li,ub){
-				// 	if(tempUb > ub) return false
-				// 	for(let entry of li){
-				// 		if(tempUb>entry.start_time && tempUb<=entry.end_time) return false
-				// 	}
-				// 	return true
-				// }
-				
-				// function isBothValid(tempLb, tempUb, li){
-				// 	for(let entry of li){
-				// 		if(tempLb<=entry.start_time && tempUb>=entry.end_time) return false
-				// 	}
-				
-				// 	return true
-				// }
-				
-				
-				// let startTs = nextScaleTs(this.roomData.now_timestamp,15*SEC_PER_MINUTE) // 5:45
-				// // 1729200600
-				// // let startTs = nextScaleTs(1729200600,15*SEC_PER_MINUTE) // 5:45
-				// let endTs = startTs + this.avaliableHours * SEC_PER_HOUR // 6:45
-				
-				// // console.log(startTs,endTs);
-				
-				// if(endTs <= this.lb || startTs >= this.ub) return false // 已经不在预定时间内 
-				
-				// const realStart = Math.max(startTs,this.lb) // 6:00
-				// const realEnd = Math.min(endTs,this.ub) // 6:45
-				
-				// // console.log(realStart,realEnd);
-				
-				// startTs = realStart
-				// endTs = realStart + 15*SEC_PER_MINUTE
-				
-				// // 滑动窗口……
-				// for(;endTs<=realEnd;startTs+=15*SEC_PER_MINUTE,endTs+=15*SEC_PER_MINUTE){
-					
-				// 	// console.log(startTs,endTs);
-					
-				// 	if(leftAvailable(startTs,this.meetingList,realStart) && rightAvailable(endTs,this.meetingList,realEnd) && isBothValid(startTs,endTs,this.meetingList) && (startTs < endTs)){
-				// 		return true
-				// 	}
-				// }
-				
-				// return false
+			hasTimeInCurrentAvaliable(){ // 下一个15分钟(scale)在不在区域可用时间内
+				return (this.serverTime && isBetween(nextScaleTs(this.serverTime,this.scale*SEC_PER_MINUTE),this.lb,this.ub))
 			},
 			nowlanguageTime(){
-				return this.roomData?.now_timestamp && dateDisplayLocaleOnly(this.roomData.now_timestamp, this.$i18n.locale, this.currentTimeFormat=='12'?true:false)
+				return dateDisplayLocaleOnly(this.serverTime, this.$i18n.locale, this.currentTimeFormat=='12'?true:false)
 			}
 		},
 		data() {
@@ -320,15 +256,20 @@
 				ub: 21, // 会议室结束时间
 				hourList: [], // 左侧会议列表时间轴
 				meetingList: [], // 所有会议
-				
+				meetingInDisplay: null, // 正在显示的会议
+				displayStatus: 'none', // 会议状态：none无会议 in-progress进行中 to-start待开始
+				serverTime: new Date().getTime()/1000, // 服务器时间（s）
+				roomName: '', // 房间名
 
-				meeting: false,
-				roomData: null,
-				nextMeetData: null,
 				timezore: 'Asia/Shanghai',
 				languageSet: 'zh-CN,zh;q=0.9',
 				
-				temporary_meeting: false // 显示快速会议按钮
+				show_book: false, // 显示预定人
+				show_meeting_name: false, // 显示会议主题
+				temporary_meeting: false, // 显示快速会议按钮
+				// resolution: 1800, // 最小预约间隔（s）
+				scale: 15, // 最小预约间隔（min）
+				
 			}
 		},
 		onLoad() {
@@ -381,27 +322,29 @@
 
 		},
 		methods: {
-			// 获取会议时间
-			nowMeetTime() {
-				let start_time;
-				let end_time;
-				if (this.roomData?.now_entry) {
-					start_time = this.roomData.now_entry.start_time;
-					end_time = this.roomData.now_entry.end_time;
-				} else if (this.nextMeetData?.start_time) {
-					start_time = this.nextMeetData.start_time;
-					end_time = this.nextMeetData.end_time;
-				} else {
-					return '';
+			// 获取当前或下一次会议
+			getNowOrNextMeeting(entries, ts){
+				
+				const currentMeeting = _.find(entries, item=>{
+					return ts < item.end_time
+				});
+				
+				if(currentMeeting==undefined){ // 找不到会议
+					this.meetingInDisplay = null
+					this.displayStatus = 'none'
 				}
-				let dateFormat = 'hh:mm A';
-				const startTime = formatDate(start_time, 'Asia/Shanghai', 'zh-cn', dateFormat);
-				const endTime = formatDate(end_time, 'Asia/Shanghai', 'zh-cn', dateFormat);
-				let stampStr = startTime + '-' + endTime;
-				console.log('nowMeetTime startTime endTime', startTime, endTime);
-				return stampStr;
+				else if(ts >= currentMeeting.start_time){ // 进行中
+					this.meetingInDisplay = currentMeeting
+					this.displayStatus = 'in-progress'
+				}
+				else{ // 待开始
+					this.meetingInDisplay = currentMeeting
+					this.displayStatus = 'to-start'
+				}
+				
+				// console.log(currentMeeting,ts,this.displayStatus);
+				
 			},
-
 			startSync() {
 				
 				console.log(435);
@@ -415,32 +358,6 @@
 				}, 5000)
 
 
-			},
-
-
-			foundNextMeet() {
-				this.nextMeetData = null;
-				let foundNextMeet = false;
-				let entryList = this.roomData.entries;
-				let nowTime = this.roomData.now_timestamp || (new Date().getTime() / 1000);
-				for (let entry of entryList) {
-					if (nowTime < entry['start_time']) {
-						foundNextMeet = entry;
-						break;
-					}
-				}
-				if (foundNextMeet) {
-					this.nextMeetData = foundNextMeet;
-				}
-			},
-
-			initTimeline(data) {
-				// console.log(this.currentTimeFormat);
-
-				const res = hourDisplay(this.lb,this.ub, this.currentTimeFormat=='12'?true:false);
-				// console.log(res);
-
-				this.hourList = res
 			},
 
 			changeLang(index) {
@@ -459,8 +376,10 @@
 				}, ).then(res => {
 					// console.log(res);
 					let data = res.data.data;
-					if (data == null) {
-						this.changeStatus('offline') // 离线
+					
+					
+					if (data == null) { // 离线
+						this.changeStatus('offline') 
 						uni.showToast({
 							title: this.$t('message.netDataError'),
 							icon: 'none'
@@ -468,56 +387,39 @@
 						return;
 					}
 
-					// console.log('syncRoom返回数据成功data:', data);
 					this.changeStatus('online') // 在线
-					this.roomData = data;
-					this.lb = hourToTimestamp(this.roomData?.area?.morningstarts ?? 8)
-				    this.ub = hourToTimestamp(this.roomData?.area?.eveningends ?? 21)
-					this.temporary_meeting = (this.roomData?.room?.temporary_meeting==1) ?? false // 快速会议按钮显示
-					const time_type = this.roomData?.room?.time_type==12?"12":"24"
-					const theme_type = this.roomData?.room?.theme_type==0?'default':'dark'
 					
+					const {now_timestamp, area, room, entries} = data
+					
+					this.roomName = room.room_name // 房间名
+					// this.resolution = area.resolution // 最小会议时间
+					this.scale = area.resolution / SEC_PER_MINUTE // 最小会议时间
+					this.serverTime = now_timestamp // 服务器时间(s)
+					this.lb = hourToTimestamp(area?.morningstarts ?? 8) // 区域开始时间
+				    this.ub = hourToTimestamp(area?.eveningends ?? 21) // 区域结束时间
+					this.show_book = (room?.show_book==1) ?? false // 预定人显示
+					this.show_meeting_name = (room?.show_meeting_name==1) ?? false // 会议主题显示
+					this.temporary_meeting = (room?.temporary_meeting==1) ?? false // 快速会议按钮显示
+					
+					
+					// 时间主题同步
+					const time_type = room?.time_type==12?"12":"24" // 时间格式
+					const theme_type = room?.theme_type==0?'default':'dark' // 主题
 					this.changeTheme(theme_type)
 					this.changeTimeFormat(time_type)
 					
-					// console.log(this.lb,this.ub);
 					
-					this.initTimeline();
+					// 左侧时间轴同步
+					this.hourList = hourDisplay(this.lb,this.ub, this.currentTimeFormat=='12'?true:false);
 
 
-					// 寻找当前会议并作标记
-					let entries = res.data.data.entries
+					// 寻找当前会议或下一次会议
+					this.getNowOrNextMeeting(entries,this.serverTime)
 					
-					const idx = entries.indexOf(item=>{return item.id == this.roomData.now_entry.id;})
-					if(idx != -1) entries[idx].isCurrentMeeting = true
-					
+					// 会议列表赋值
 					this.meetingList = entries
 					// console.log(this.meetingList);
 					
-
-					// 寻找下一个会议
-					this.foundNextMeet();
-					
-					// 会议列表渲染完成后，滚动到当前会议/下一个会议
-					// this.$nextTick(()=>{
-						
-					// 	const targetId = (this.roomData?.now_entry?.id ?? this.nextMeetData?.id ?? 0)
-						
-					// 	console.log(targetId);
-						
-					// 	if(targetId == 0) return
-						
-					// 	const query = uni.createSelectorQuery();
-					// 	query.select('#meeting-'+targetId).boundingClientRect(data => {
-					// 		console.log(data)
-					// 		this.scrollTop = Math.max(data.top - 60*1.75, 0); // 让上面空出半小时
-					// 	}).exec();
-						
-					// });
-					
-					
-					
-					// this.meetTimeString = this.nowMeetTime();
 				}).catch(e => {
 					console.error(e)
 				})
@@ -890,7 +792,7 @@
 			.meeting-title {
 				line-height: 2;
 				font-size: 22rpx;
-				width: 100%;
+				width: 50%;
 				font-weight: 500;
 				text-align: left;
 				margin-bottom: 5rpx;

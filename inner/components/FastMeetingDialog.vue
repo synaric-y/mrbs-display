@@ -25,8 +25,8 @@
 			:isFirst="false"
 			:avaliableHours="avaliableHours"
 			:scale="scale"/>
-			<input @input="wordLimit1" :class="'my-input '+inputBlink1" maxlength="50"  :placeholder="$t('message.fast_meeting.theme')" v-model="theme"/>
-			<input @input="wordLimit2" :class="'my-input '+inputBlink2" maxlength="30" :placeholder="$t('message.fast_meeting.name')" v-model="booker"/>
+			<input @input="wordLimit1" :class="'my-input '+inputBlink1" :maxlength="inputMaxLength1"  :placeholder="$t('message.fast_meeting.theme')" v-model="theme"/>
+			<input @input="wordLimit2" :class="'my-input '+inputBlink2" :maxlength="inputMaxLength2" :placeholder="$t('message.fast_meeting.name')" v-model="booker"/>
 			
 			<div class="btns">
 				<button class="btn btn-default" type="default" @click.stop="cancelReserve">{{$t('message.fast_meeting.cancel')}}</button>
@@ -39,7 +39,7 @@
 <script>
 	import TimeStepperScroll from './TimeStepperScroll.vue';
 	import {getNearestNextTime} from '@/utils/timeTool.js'
-	import {SEC_PER_HOUR,nextScaleTs} from '@/utils/timestampTool.js'
+	import {SEC_PER_HOUR,SEC_PER_MINUTE,nextScaleTs} from '@/utils/timestampTool.js'
 	import { PageMixin } from '@/mixin';
 	import {
 		quickMeetApi,
@@ -54,19 +54,19 @@
 		components:{
 			TimeStepperScroll
 		},
-		props:['currentTime','meetings','avaliableHours','areaLb','areaUb'], // 当前时间戳（10位），会议数组，可预约多少小时
+		props:['currentTime','meetings','avaliableHours','areaLb','areaUb','scale'], // 当前时间戳（10位），会议数组，可预约多少小时
 		emits:['close'],
 		data() {
 			return {
-				leftHandle: nextScaleTs(this.currentTime,15*60),
-				rightHandle: nextScaleTs(this.currentTime,15*60),
-				lb: nextScaleTs(this.currentTime,15*60) - SEC_PER_HOUR,
-				ub: nextScaleTs(this.currentTime,15*60) + (1+this.avaliableHours)*SEC_PER_HOUR,
+				leftHandle: nextScaleTs(this.currentTime,this.scale*SEC_PER_MINUTE),
+				rightHandle: nextScaleTs(this.currentTime,this.scale*SEC_PER_MINUTE),
+				// lb: nextScaleTs(this.currentTime,15*60) - SEC_PER_HOUR,
+				// ub: nextScaleTs(this.currentTime,15*60) + (1+this.avaliableHours)*SEC_PER_HOUR,
 				disabled: false,
 				theme: "",
 				booker: "",
-				scale: 15,
-				
+				inputMaxLength1: 30,
+				inputMaxLength2: 20,
 				inputBlink1: '',
 				inputBlink2: ''
 			};
@@ -77,7 +77,7 @@
 				const len = e.detail.value.length
 				console.log(len);
 				
-				if(len>=50) this.inputBlink1 = 'input-blink'
+				if(len>=this.inputMaxLength1) this.inputBlink1 = 'input-blink'
 				else this.inputBlink1 = ''
 			},
 			wordLimit2(e){
@@ -85,7 +85,7 @@
 				const len = e.detail.value.length
 				console.log(len);
 				
-				if(len>=30) this.inputBlink2 = 'input-blink'
+				if(len>=this.inputMaxLength2) this.inputBlink2 = 'input-blink'
 				else this.inputBlink2 = ''
 			},
 			closeDialog(){
@@ -99,14 +99,14 @@
 			},
 			confirmReserve(){
 				// 校验
-				if(this.theme && this.theme.length>50){
+				if(this.theme && this.theme.length>this.inputMaxLength1){
 					uni.showToast({
 						title: this.$t('message.fast_meeting.theme_too_long'), 
 						icon: 'none'
 					})
 					return
 				}
-				if(this.booker && this.booker.length>30){
+				if(this.booker && this.booker.length>this.inputMaxLength2){
 					uni.showToast({
 						title: this.$t('message.fast_meeting.booker_too_long'), 
 						icon: 'none'
@@ -115,11 +115,8 @@
 				}
 				
 				const pack = {
-					"device_id": 'E37A3ACCCF19E6BD73C03DE47EB1D41B',
 					"begin_time": this.leftHandle,
 					"end_time": this.rightHandle,
-					"is_charge": 0,
-					"battery_level": 45,
 					"booker": this.booker,
 					"theme": this.theme
 				}
@@ -136,12 +133,12 @@
 						
 						if(code==0){
 							uni.showToast({
-								title: this.$t('message.fast_meeting.success'), //转成字符串
+								title: this.$t('message.fast_meeting.success'),
 								icon: 'none'
 							})
 						}else{
 							uni.showToast({
-								title: this.$t('message.fast_meeting.fail'), //转成字符串
+								title: this.$t('message.fast_meeting.fail'),
 								icon: 'none'
 							})
 						}
@@ -150,7 +147,7 @@
 					.catch((e) => {
 						console.error(e)
 						uni.showToast({
-							title: this.$t('message.fast_meeting.fail'), //转成字符串
+							title: this.$t('message.fast_meeting.fail'),
 							icon: 'none'
 						})
 					})

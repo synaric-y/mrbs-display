@@ -10,6 +10,7 @@
   "description": "",
   "dependencies": {
     "decimal.js": "^10.4.3",
+    "lodash": "^4.17.21",
     "moment-timezone": "^0.5.46",
     "vue-i18n": "^10.0.4"
   }

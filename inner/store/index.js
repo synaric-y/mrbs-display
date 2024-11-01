@@ -65,7 +65,7 @@ if (savedState) {
 
 // 监听 Vuex 的 state 变化，如果有变化就保存到 localStorage 中
 store.subscribe((mutation, state) => {
-  console.log(60);
+  // console.log(60);
   uni.setStorageSync('vuex-state', JSON.stringify(state))
 })
 

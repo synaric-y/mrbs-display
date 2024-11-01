@@ -139,6 +139,8 @@
 import LanguageSelect from '../components/LanguageSelect.vue';
 import {PageMixin} from '@/mixin/index.js'
 import { getAllAreaApi,getAllRoomsApi,activateDeviceApi,getSettingApi,changeBindApi } from '@/api/api';
+import _ from 'lodash'; // lodash，用于数组运算
+	
 export default {
 	mixins:[PageMixin],
 	name:"SettingView",
@@ -199,7 +201,8 @@ export default {
 	created(){
 	
 		console.log("设置页面初始化");
-		this.initAreaAndRoom()
+		this.initArea()
+		
 		
 		// store必须在created初始化
 		this.requestURL = this.currentBaseURL
@@ -228,47 +231,67 @@ export default {
 				}
 			}, '*');
 		},
-		initAreaAndRoom(){
+		initArea(){ // 无论如何，先获取区域
+			const that = this
+			getAllAreaApi(that.currentBaseURL,{
+			}).then(({data})=>{
+				
+				const li = data.data
+				
+				if(!li) throw new Error('')
+				
+				console.log(li);
+				
+				let tempList = []
+				_.forEach(li,item=>{
+					tempList.push({value:item.id, text: item.area_name})
+				})
+				that.areaList = tempList
+				
+				that.initAreaAndRoom()
+				
+
+			})
+		},
+		initAreaAndRoom(){ // 给area和room设置初值，如果getSettings能通的话
+			
 			const that = this
 			getSettingApi(this.currentBaseURL,{})
 			.then(res=>{
 				console.log(res);
 				that.basicInfo.room = res.data.data.room
-				that.basicInfo.area = res.data.data.area
+				that.basicInfo.area = res.data.data.area // 字符串
 				
-				getAllAreaApi(that.currentBaseURL,{
+				const currentArea = _.find(that.areaList, ['text', that.basicInfo.area]);
+				that.area = currentArea.value
+				
+				getAllRoomsApi(that.currentBaseURL,{
+					"type": "area",
+					"id": that.area,
 				}).then(res=>{
-					console.log(res);
 					
-					const li = res.data.data
+					const li = res.data.data?.areas?.rooms ?? null
+					
+					if(!li){
+						return // 如果区域无会议室，直接返回，不报错
+					}
+					
 					let tempList = []
-					for(let item of li) tempList.push({value:item.id, text: item.area_name})
-					that.areaList = tempList
+					for(let item of li) tempList.push({value:item.room_id, text: item.room_name})
+					that.roomList = tempList
 					
-					const areaIdx = that.areaList.findIndex(item=>{return item.text == that.basicInfo.area})
-					console.log(areaIdx);
-					that.area = that.areaList[areaIdx].value
-					console.log(that.area);
+					const currentRoom = _.find(that.roomList, ['text', that.basicInfo.room]);
+					that.room = currentRoom.value
 					
-					getAllRoomsApi(that.currentBaseURL,{
-						"type": "area",
-						"id": that.area,
-					}).then(res=>{
-						console.log(JSON.stringify(res));
-						
-						const li = res.data.data.areas.rooms
-						let tempList = []
-						for(let item of li){
-							tempList.push({value:item.room_id, text: item.room_name})
-						}
-						that.roomList = tempList
-						
-						const roomIdx = that.roomList.findIndex(item=>{return item.text == that.basicInfo.room})
-						console.log(roomIdx);
-						that.room = that.roomList[roomIdx].value
-						console.log(that.room);
-					})
-					
+				})
+				
+				
+				
+			}).catch(e=>{
+				console.log(e);
+				uni.showToast({
+					title: this.$t('message.netDataError'),
+					icon: 'none',
 				})
 			})
 		},
@@ -309,7 +332,11 @@ export default {
 				"type": "area",
 				"id": this.area,
 			}).then(res=>{
-				const li = res.data.data.areas.rooms
+				const li = res.data.data?.areas?.rooms ?? null
+				
+				if(!li){
+					return // 如果区域无会议室，直接返回，不报错
+				}
 				
 				let tempList = []
 				
@@ -342,7 +369,7 @@ export default {
 				return
 			}
 			
-			// 如果有区域和房间就换绑
+			// 如果有区域和房间就换绑，没有则给出提示, 并返回
 			console.log(this.area,this.room);
 			if(this.area && this.area!=-1 && this.room && this.room!=-1){	
 				console.log(347);
@@ -356,6 +383,19 @@ export default {
 						icon: 'none',
 					})
 				})
+			}else{
+				if(!this.area || this.area==-1){
+					uni.showToast({
+						title: this.$t('message.setting.right.area_empty'),
+						icon: 'none',
+					})
+				}else{
+					uni.showToast({
+						title: this.$t('message.setting.right.room_empty'),
+						icon: 'none',
+					})
+				}
+				return
 			}
 			
 			// 修改请求地址

@@ -8,7 +8,7 @@
 		data() {
 			return {
 				wvNode: null,
-				wvURL: '/display/index.html',
+				wvURL: '/display/2.0/index.html', // 默认值
 				baseURL: 'https://meeting-manage-test.businessconnectchina.com:12443'
 			}
 		},
