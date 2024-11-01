@@ -72,7 +72,9 @@ const messages = {
 				"title": '快速会议',
 				"tip_left":'可预定当前', // 有变量，只能分开写，测试发现大括号传参不生效
 				"tip_right":'小时内的空闲时间',
-				"reserved": '已预定',
+				"to_start": '已预定',
+				"in_progress": '进行中',
+				"finished": '已结束',
 				"theme":'请输入会议名称',
 				"name":'预约人姓名',
 				"cancel": '取消',
@@ -173,7 +175,9 @@ const messages = {
 				"title": 'Fast Meetings',
 				"tip_left":'Can reserve spare time in ',
 				"tip_right":' h',
-				"reserved": 'Reserved',
+				"to_start": 'Reserved',
+				"in_progress": 'In meeting',
+				"finished": 'Finished',
 				"theme":'Meeting Theme',
 				"name":'Booker Name',
 				"cancel": 'Cancel',
@@ -212,106 +216,108 @@ const messages = {
 	},
 	"ko": {
 		"message": {
-			"activate":{
+			"activate": {
 				"welcome": "xxx 회의 예약 시스템에 오신 것을 환영합니다",
-				"request_url": "요청 URL",
-				"placeholder":'웹 페이지의 QR코드를 스캔하면 자동으로 서비스 주소를 기입할 수 있다',
+				"request_url": "요청 주소",
+				"placeholder": "웹 페이지의 QR코드를 스캔하면 자동으로 서비스 주소가 입력됩니다.",
 				"verify": "검증",
 				"belong_to_area": "지역",
-				"please_select":'선택하십시오',
+				"please_select": "선택하십시오",
 				"belong_to_meeting_room": "회의실",
-				"finish": "완료",
-				"url_empty":'요청 주소가 비어 있음',
-				"not_verified":'요청 주소가 검증되지 않았습니다',
-				"area_empty":'영역을 선택하지 않았습니다',
-				"room_empty":'방 선택 안 함'
+				"finish": "종료",
+				"url_empty": "요청 주소가 비어 있습니다",
+				"not_verified": "요청 주소가 확인되지 않았습니다",
+				"area_empty": "영역을 선택하지 않았습니다",
+				"room_empty": "방을 선택하지 않았습니다"
 			},
-			"login":{
-				"title":'관리자 암호를 입력하십시오',
-				"account_number":'계정',
-				"password":'암호',
-				"confirm":'확인',
-				"previous":'반환'
+			"login": {
+				"title": "관리자 암호를 입력하십시오",
+				"account_number": "계정",
+				"password": "암호",
+				"confirm": "확인",
+				"previous": "반환"
 			},
-			"setting":{
-				"left":{
-					"basic_info":'프로파일',
-					"unique_id":'장치 고유 일련번호',
-					"equipment_type":'장치 모델',
-					"battery":'전력',
-					"room_area":'소속 공간 및 영역',
-					"online_status":'온라인 상태',
-					"about_us":'우리에 대해',
-					"normal":'정상',
+			"setting": {
+				"left": {
+					"basic_info": "프로파일",
+					"unique_id": "장치 고유 일련번호",
+					"equipment_type": "장치 모델",
+					"battery": "전력",
+					"room_area": "소속 공간 및 영역",
+					"online_status": "온라인 상태",
+					"about_us": "우리에 대해",
+					"normal": "정상",
 					"offline": "오프라인"
 				},
-				"right":{
-					"setting":'설정',
+				"right": {
+					"setting": "설정",
 					"brightness": "밝기",
 					"volume": "볼륨",
 					"area": "지역",
-					"meeting_room":'회의실',
-					"request_url":'요청 주소',
-					"time_format":'시간 형식',
-					"12hour_format":'12시간제',
-					"24hour_format":'24시간제',
-					"theme_color":'주제 색상',
-					"submit":'제출',
+					"meeting_room": "회의실",
+					"request_url": "요청 주소",
+					"time_format": "시간 형식",
+					"12hour_format": "12시간제",
+					"24hour_format": "24시간제",
+					"theme_color": "주제 색상",
+					"submit": "제출",
 					"cancel": "취소",
 					"confirm": "확인",
-					"notice":'알림',
+					"notice": "알림",
 					"restart": "주소 변경 요청은 애플리케이션을 재부팅해야 합니다. 재부팅하시겠습니까?",
-					"setting_success":'설정 수정 성공',
-					"url_empty":'요청 주소가 비어 있음',
-					"not_verified":'요청 주소가 검증되지 않았습니다',
-					"area_empty":'영역을 선택하지 않았습니다',
-					"room_empty":'방 선택 안 함',
-					"invalid_url":'잘못된 요청 주소',
-					"validating":'확인 중...'
+					"setting_success": "설정 수정 성공",
+					"url_empty": "요청 주소가 비어 있습니다",
+					"not_verified": "요청 주소가 확인되지 않았습니다",
+					"area_empty": "영역을 선택하지 않았습니다",
+					"room_empty": "방을 선택하지 않았습니다",
+					"invalid_url": "잘못된 요청 주소",
+					"validating": "확인 중..."
 				}
 			},
-			"fast_meeting":{
-				"title": '빠른 회의',
-				"tip_left":'현재 5',
-				"tip_right":'시간 동안의 유휴 시간 예약 가능',
-				"reserved":'예정됨',
+			"fast_meeting": {
+				"title": "빠른 회의",
+				"tip_left": "현재 ",
+				"tip_right": "시간 동안의 유휴 시간 예약 가능",
+				"to_start": "예정됨",
+				"in_progress": "진행 중",
+				"finished": "종료됨",
 				"theme": "회의 이름을 입력하십시오",
-				"name":'예약자 이름',
+				"name": "예약자 이름",
 				"cancel": "취소",
 				"confirm": "확인",
 				"success": "회의 예약 성공!",
 				"fail": "회의 예약 실패!",
-				"theme_too_long":'회의 주제는 50자를 초과해서는 안 됩니다',
-				"booker_too_long":'예약자 이름은 30자를 초과해서는 안 됩니다',
+				"theme_too_long": "회의 주제는 50자를 초과할 수 없습니다",
+				"booker_too_long": "예약자 이름은 30자를 초과할 수 없습니다"
 			},
-			"index":{
-				"left":{
+			"index": {
+				"left": {
 					"book": "빠른 모임 만들기",
-					"no_free":'현재 시간대 회의실이 가득 찼습니다',
-					"default_name": '빠른 모임',
+					"no_free": "현재 시간대 회의실이 가득 찼습니다",
+					"default_name": "빠른 모임"
 				},
-				"right":{
+				"right": {
 					"meeting": "회의실",
-					"language":'언어',
-					"in_meeting":'회의 중',
-					"no_meeting":'유휴 중',
-					"next_meeting":'곧 시작될 회의',
-					"default_name": '빠른 모임',
-					"default_booker": '/'
+					"language": "언어",
+					"in_meeting": "회의 중",
+					"no_meeting": "유휴 중",
+					"next_meeting": "곧 시작될 회의",
+					"default_name": "빠른 모임",
+					"default_booker": "/"
 				}
 			},
-			"time":{
+			"time": {
 				"minute": "분",
-				"hour":'시간',
+				"hour": "시간",
 				"minutes": "분",
-				"hours":'시간',
-				"not_available": '사용 불가능'
+				"hours": "시간",
+				"not_available": "사용 불가능"
 			},
-			"netDataError": '인터페이스가 데이터 예외를 반환합니다.',
-			"initializing":'초기화 중'
+			"netDataError": "인터페이스가 데이터 예외를 반환합니다.",
+			"initializing": "초기화 중"
 		}
-		
 	}
+
 }
 const i18n = createI18n({
 	legacy: false, // 解决vue2兼容问题

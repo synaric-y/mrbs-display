@@ -4,7 +4,9 @@
 
 import store from '@/store/index.js'
 
-// let HOST = store.state.baseURL
+import RequestManager from '@/utils/requestManager.js' 
+const manager = new RequestManager() //创建请求管理表
+
 
 export default class Request {
     http(param) {
@@ -39,6 +41,12 @@ export default class Request {
         //         };
         //     }
         // }
+		
+		let requestId = manager.generateId(method, url, data)
+		if(!requestId) {
+		  console.log('重复请求')
+		  return false
+		}
 
         //加载圈
         if (!hideLoading) {
@@ -69,6 +77,8 @@ export default class Request {
                 },
                 //请求完成
                 complete() {
+					// 请求完成，清除当前请求的唯一ID
+					manager.deleteById(requestId)
                     //隐藏加载
                     if (!hideLoading) {
                         uni.hideLoading();

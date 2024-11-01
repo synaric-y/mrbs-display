@@ -60,6 +60,7 @@
 	  --color-default: #f5f5f5;
 	
 	  --color-disabled: #e7e7e7;
+	  --color-disabled-1: #c8c8c8;
 	
 	  --color-canceled: #4f4f4f;
 	

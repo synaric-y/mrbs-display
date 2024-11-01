@@ -27,6 +27,10 @@
 	import {
 		Decimal
 	} from 'decimal.js';
+	
+	import _ from 'lodash'; // lodash
+	
+	import i18n from '@/src/i18n.js'
 
 	import store from '@/store/index.js' //需要引入store
 
@@ -126,8 +130,6 @@
 
 		console.log(hrArray.value);
 
-		// 如果是今天，将先前的几个小时清掉
-		invalidatePast()
 
 		formatMeetings()
 
@@ -146,43 +148,55 @@
 	}
 
 
-
-	/*================先前时间失效==================*/
-	const invalidatePast = () => {
+	/*==================格式化==================*/
+	const getEntryStatus = (entry) => {
+		if(_.inRange(props.currentTime, entry.start_time, entry.end_time)) return 1 // 进行中
+		if(props.currentTime > entry.end_time) return 2 // 已结束
+		return 0 // 待开始
+	}
+	
+	const getEntryText = (status) => {
+		const mapping = {
+			0: i18n.global.t('message.fast_meeting.to_start'),
+			1: i18n.global.t('message.fast_meeting.in_progress'),
+			2: i18n.global.t('message.fast_meeting.finished'),
+			3: ''
+		}
+		return mapping[status]
+	}
+	
+	const formatMeetings = () => {
+		const tempList = []
+		
+		// 如果是今天，将先前的几个小时清掉
 		const endTs = nextScaleTs(props.currentTime, props.scale * 60)
-
-
-		timeTable.value.unshift({
+		
+		tempList.push({
 			start_time: props.lb,
 			end_time: Math.max(endTs, props.areaLb),
-			status: 2
+			status: 3, // 已过去的时间
+			text: ''
 		})
-		// timeTable.value.unshift({
-		// 	start_time: Math.min(props.ub - SEC_PER_HOUR, props.areaUb),
-		// 	end_time: props.ub,
-		// 	status: 2
-		// })
-
-		console.log(timeTable.value);
 		
-		
-	}
-
-	/*==================格式化==================*/
-	const formatMeetings = () => {
 		for (let entry of props.meetings) {
 
 			// 去除不在范围内的会议
 			if (entry.start_time > props.ub) continue
 			if (entry.end_time < props.lb) continue
+			
+			const status = getEntryStatus(entry)
 
-			timeTable.value.push({
+			tempList.push({
 				id: entry.id,
 				start_time: Math.max(entry.start_time, props.lb), // 截断越界的部分
 				end_time: Math.min(props.ub, entry.end_time),
-				status: 0
+				status: status, // 待开始，进行中，已结束
+				text: getEntryText(status)
 			})
 		}
+		
+		timeTable.value = tempList
+		console.log(timeTable.value);
 	}
 
 	/*================初始化手柄==================*/
@@ -729,13 +743,14 @@
 					<div class="timeline-bar" ref="refTimeline">
 						<div :class="{
 							'period':true,
+							'invalid': item.status===3,
 							'to-start':item.status===0,
 							'in-progress':item.status===1,
 							'disabled':item.status===2
 						  }" v-for="(item,i) in timeTable" :key="i" :style="{
 						   left:handlePosition(item.start_time),
 						   width:handleWidth(item.start_time,item.end_time)
-						 }">{{item.status!==2 ? $t('message.fast_meeting.reserved'):''}}</div>
+						 }">{{item.text}}</div>
 						<div id="my-period" class="period selecting-period" :style="{
 								left:handlePosition(leftHandle),
 								width:handleWidth(leftHandle,rightHandle)
@@ -878,6 +893,7 @@
 
 					.period {
 						position: absolute;
+						z-index: 10;
 						top: 0;
 						left: 0;
 						height: 100%;
@@ -893,7 +909,13 @@
 					}
 
 					.disabled {
+						background-color: var(--color-disabled-1); /*稍微深一点*/
+						
+					}
+					
+					.invalid {
 						background-color: var(--color-disabled);
+						z-index: 9; /*下层*/
 					}
 
 					.in-progress {
@@ -903,6 +925,7 @@
 					.selecting-period {
 						background-color: var(--color-primary);
 						border-radius: 0;
+						z-index: 11;
 					}
 
 					.handle {
@@ -916,6 +939,7 @@
 						height: 100%;
 						width: 22rpx;
 						transform: translateX(-50%);
+						z-index: 12;
 					}
 
 					.handle-blink {

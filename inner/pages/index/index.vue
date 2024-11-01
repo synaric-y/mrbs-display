@@ -94,14 +94,17 @@
 
 
 				<!-- 预订人、标题、时间 -->
-				<text class="meeting-title">{{ (show_meeting_name&&(meetingInDisplay?.name ?? '-')) || $t('message.index.right.default_name') }}</text>
+				<view class="meeting-detail-item">
+					<image class="meeting-detail-item-icon" src="@/static/meeting-msg.png" mode=""></image>
+					<text class="meeting-title">{{ (show_meeting_name&&(meetingInDisplay?.name ?? '-')) || $t('message.index.right.default_name') }}</text>
+				</view>
 				<view class="meeting-detail-item">
 					<image class="meeting-detail-item-icon" src="@/static/reverse-time.png" mode=""></image>
 					<text class="meeting-detail-item-desc">{{ meetingInDisplay ?(tsHourMinuteFormat(meetingInDisplay.start_time) +' - '+ tsHourMinuteFormat(meetingInDisplay.end_time)):'-'}}</text>
 				</view>
 				<view class="meeting-detail-item">
 					<image class="meeting-detail-item-icon" src="@/static/reverse-person.png" mode=""></image>
-					<text class="meeting-detail-item-desc">{{ (show_book&&(meetingInDisplay?.book_by ?? '-')) || $t('message.index.right.default_booker') }}</text>
+					<text class="meeting-detail-item-desc" style="width: 40%;">{{ (show_book&&(meetingInDisplay?.book_by ?? '-')) || $t('message.index.right.default_booker') }}</text>
 				</view>
 			</view>
 			
@@ -412,6 +415,14 @@
 					// 左侧时间轴同步
 					this.hourList = hourDisplay(this.lb,this.ub, this.currentTimeFormat=='12'?true:false);
 
+					// 处理字符串
+					_.forEach(entries, item=>{
+						
+						const name = item.name+''
+						const res = name.replace(/^"*|"*$/g, '');
+						item.name = res
+						console.log(res);
+					})
 
 					// 寻找当前会议或下一次会议
 					this.getNowOrNextMeeting(entries,this.serverTime)
@@ -785,25 +796,12 @@
 			}
 
 			.nextMeet {
-				line-height: 1.5;
+				line-height: 3;
 				font-size: 14rpx;
+				font-style: italic;
 			}
 
-			.meeting-title {
-				line-height: 2;
-				font-size: 22rpx;
-				width: 50%;
-				font-weight: 500;
-				text-align: left;
-				margin-bottom: 5rpx;
-				
-				word-break: break-all;
-				display: -webkit-box;
-				overflow: hidden;
-				-webkit-line-clamp: 1;
-				-webkit-box-orient: vertical;
-				text-overflow: ellipsis;
-			}
+
 
 			.meeting-detail-item {
 				display: flex;
@@ -811,15 +809,16 @@
 				align-items: center;
 				gap: 10rpx;
 				margin-bottom: 10rpx;
+				font-style: italic;
+				height: 28rpx;
 
 				.meeting-detail-item-icon {
 					width: 17rpx;
 					height: 17rpx;
 				}
-
-				.meeting-detail-item-desc {
-					line-height: 28rpx;
-					font-size: 14rpx;
+				
+				.meeting-detail-item-desc,.meeting-title{
+					padding-right: 5rpx;
 					text-align: left;
 					word-break: break-all;
 					display: -webkit-box;
@@ -827,6 +826,16 @@
 					-webkit-line-clamp: 1;
 					-webkit-box-orient: vertical;
 					text-overflow: ellipsis;
+				}
+
+				.meeting-detail-item-desc {
+					font-size: 14rpx;
+				}
+				
+				.meeting-title {
+					font-size: 22rpx;
+					width: 50%;
+					font-weight: 500;
 				}
 
 			}

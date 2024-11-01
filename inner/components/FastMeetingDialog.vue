@@ -97,6 +97,11 @@
 				
 				this.$emit('close')
 			},
+			testNumber(val){ // 判断是否为纯数字
+				const str = /^[0-9]*$/
+				const reg = new RegExp(str)
+				return reg.test(val)
+			},
 			confirmReserve(){
 				// 校验
 				if(this.theme && this.theme.length>this.inputMaxLength1){
@@ -117,8 +122,8 @@
 				const pack = {
 					"begin_time": this.leftHandle,
 					"end_time": this.rightHandle,
-					"booker": this.booker,
-					"theme": this.theme
+					"booker": this.testNumber(this.booker)?('"'+this.booker+'"'):this.booker,
+					"theme": this.testNumber(this.theme)?('"'+this.theme+'"'):this.theme
 				}
 				
 				console.log(pack);
