@@ -1,5 +1,5 @@
 <template>
-	<web-view id="wv" :src="baseURL+wvURL" @message="handleWebviewMessage"></web-view>
+	<web-view id="wv" :src="wvURL" @message="handleWebviewMessage"></web-view>
 </template>
 
 <script>
@@ -8,7 +8,7 @@
 		data() {
 			return {
 				wvNode: null,
-				wvURL: '/display/2.0/index.html', // 默认值
+				wvURL: uni.getStorageSync('webview-url') || 'https://meeting-manage-test.businessconnectchina.com:12443/display/2.0/index.html', // 默认值
 				baseURL: 'https://meeting-manage-test.businessconnectchina.com:12443'
 			}
 		},
@@ -85,7 +85,13 @@
 				this.baseURL = val
 			},
 			updateWvURL(val){
-				this.wvURL = val
+				// this.wvURL = val
+				
+				uni.setStorageSync('webview-url', val) // 存localStorage, 重启之后就生效了
+				
+				// #ifdef APP-PLUS
+				plus.runtime.restart();
+				// #endif
 			},
 			sendDeviceInfo(){
 				const that = this

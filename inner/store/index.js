@@ -12,6 +12,8 @@ const store = createStore({
 		
 		"deviceInfo": {deviceId:'E37A3ACCCF19E6BD73C03DE47EB1D41B',type:'XiaoMi'},
 		"batteryInfo": {isCharging: 0, level: 64},
+		
+		"innerAddress": "https://meeting-manage-test.businessconnectchina.com:12443/display/2.0/index.html" 
 	},
 	getters: {
 		currentTheme: state => {
@@ -31,7 +33,10 @@ const store = createStore({
 		},
 		currentBatteryInfo: state=>{
 			return state.batteryInfo
-		}
+		},
+		currentInnerAddress: state=>{
+			return state.innerAddress
+		},
 	},
 	mutations: {
 		changeTheme(state, newTheme) { // 变更状态
@@ -51,6 +56,9 @@ const store = createStore({
 		},
 		changeBatteryInfo(state, newBatteryInfo) {
 			state.batteryInfo = newBatteryInfo
+		},
+		changeInnerAddress(state, newInnerAddress) {
+			state.innerAddress = newInnerAddress
 		},
 	}
 })

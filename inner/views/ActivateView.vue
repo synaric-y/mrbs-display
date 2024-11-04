@@ -52,7 +52,7 @@
 <script>
 import LanguageSelect from '../components/LanguageSelect.vue';
 import {mapGetters,mapMutations} from 'vuex';
-import { getAllAreaApi,getAllRoomsApi,activateDeviceApi } from '@/api/api';
+import { getAllAreaApi,getAllRoomsApi,activateDeviceApi,changeBindApi } from '@/api/api';
 import { PageMixin } from '@/mixin';
 export default {
 	name:"ActivateView",
@@ -76,10 +76,10 @@ export default {
 	
 		console.log(79);
 	
-		this.getAllArea()
+		// this.getAllArea()
 		
 		this.windowInfo = uni.getWindowInfo();
-		console.log(this.windowInfo);
+		// console.log(this.windowInfo);
 		
 	},
 	mounted() {
@@ -149,17 +149,20 @@ export default {
 		},
 		verify(){
 			
-			// 改store
-			this.changeBaseURL(this.url)
-			console.log(this.currentBaseURL);
+			
 			
 			// 尝试调这个接口，返回成功就是联通了
-			getAllAreaApi(this.currentBaseURL,{
+			getAllAreaApi(this.url,{
 			}).then(res=>{
 				console.log(JSON.stringify(res));
 				
 				if(res.data.code == 0){
 					this.verified = true
+					
+					// 改store
+					this.changeBaseURL(this.url)
+					console.log(this.currentBaseURL);
+					
 					this.getAllArea() //重新获取区域信息
 					
 					uni.showToast({
@@ -237,23 +240,55 @@ export default {
 			
 			console.log(JSON.stringify(pack));
 			
+			
+			const that = this
 			activateDeviceApi(this.currentBaseURL,pack)
-			.then(res=>{
-				console.log(JSON.stringify(res));
+			.then(({data})=>{
+				console.log(JSON.stringify(data));
 				
-				this.changeBaseURL(this.url)
+				const code = data.code
 				
-				this.url = ''
-				this.area = -1
-				this.room = -1
+				if(code==-49){ // 已激活，就换绑
+					changeBindApi(that.currentBaseURL,{
+						"room_id": that.room,                 //房间id
+					}).then(()=>{
+						
+						this.url = ''
+						this.area = -1
+						this.room = -1
+						
+						uni.showToast({
+							title: this.$t('message.activate.activate_success'),
+							icon: 'none',
+						})
+						
+						this.$emit('activateSuccess')
+						this.$emit('close')
+						
+					}).catch(e=>{
+						uni.showToast({
+							title: this.$t('message.netDataError'),
+							icon: 'none',
+						})
+					})
+				}else{
+					// this.changeBaseURL(this.url)
+					this.url = ''
+					this.area = -1
+					this.room = -1
+					
+					uni.showToast({
+						title: this.$t('message.activate.activate_success'),
+						icon: 'none',
+					})
+					
+					this.$emit('activateSuccess')
+					this.$emit('close')
+				}
 				
-				uni.showToast({
-					title: this.$t('message.activate.activate_success'),
-					icon: 'none',
-				})
 				
-				this.$emit('activateSuccess')
-				this.$emit('close')
+				
+				
 				
 			}).catch(e=>{
 				console.log(e);

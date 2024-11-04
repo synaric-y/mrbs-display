@@ -113,7 +113,12 @@
 				<image class="company-logo" src="@/static/bcc-logo-en.png" mode="aspectFit"></image>
 			</view>
 		</div>
+		<uni-popup ref="popup" type="dialog">
+			<uni-popup-dialog type="warn" :cancelText="$t('message.index.right.cancel')" :confirmText="$t('message.index.right.confirm')" :title="$t('message.index.right.notice')" :content="$t('message.index.right.update')" @confirm="restart"
+				@close="dialogClose"></uni-popup-dialog>
+		</uni-popup>
 	</div>
+	
 </template>
 
 
@@ -272,7 +277,9 @@
 				temporary_meeting: false, // 显示快速会议按钮
 				// resolution: 1800, // 最小预约间隔（s）
 				scale: 15, // 最小预约间隔（min）
+				inner_address: 'https://meeting-manage-test.businessconnectchina.com:12443/display/2.0/index.html', // 内核网页地址
 				
+				cancelUpdate: false // 用户在这次运行中是否取消过更新
 			}
 		},
 		onLoad() {
@@ -325,6 +332,9 @@
 
 		},
 		methods: {
+			test(){
+				console.log('ssss');
+			},
 			// 获取当前或下一次会议
 			getNowOrNextMeeting(entries, ts){
 				
@@ -392,7 +402,7 @@
 
 					this.changeStatus('online') // 在线
 					
-					const {now_timestamp, area, room, entries} = data
+					const {now_timestamp, area, room, entries, global_config} = data
 					
 					this.roomName = room.room_name // 房间名
 					// this.resolution = area.resolution // 最小会议时间
@@ -403,6 +413,22 @@
 					this.show_book = (room?.show_book==1) ?? false // 预定人显示
 					this.show_meeting_name = (room?.show_meeting_name==1) ?? false // 会议主题显示
 					this.temporary_meeting = (room?.temporary_meeting==1) ?? false // 快速会议按钮显示
+					this.inner_address = global_config?.inner_address ?? 'https://meeting-manage-test.businessconnectchina.com:12443/display/2.0/index.html' // 内核网页
+					
+					
+					// 检查更新
+					if(this.inner_address && this.inner_address!='' && (!this.cancelUpdate) && this.inner_address != this.currentInnerAddress){ // 需要更新且用户没有取消过更新
+						// 清除定时器
+						if (this.interval) {
+							clearInterval(this.interval)
+							this.interval = null
+						}
+						
+						// 确认弹窗
+						this.$refs.popup.open()
+						
+					}
+					
 					
 					
 					// 时间主题同步
@@ -460,8 +486,26 @@
 					})
 				}
 			},
+			dialogClose(){ // 用户取消更新，打标记，再次启动定时器
+				console.log(487);
+				this.$refs.popup.close()
+				this.cancelUpdate = true
+				this.startSync()
+				console.log(490);
+			},
+			restart(){ // 用户确认更新，刷新内核的localStorage，发送重启指令
+				console.log(494);
+				this.changeInnerAddress(this.inner_address)
+				this.$refs.popup.close()
+				
+				console.log(495);
+				uni.webView.postMessage({
+					data: {
+						type: 'updateWvURL'
+					}
+				}, '*');
+			},
 		},
-
 		onUnload() {
 			// 清除定时器
 			if (this.interval) {

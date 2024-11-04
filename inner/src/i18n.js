@@ -97,7 +97,11 @@ const messages = {
 					"no_meeting": '空 闲 中',
 					"next_meeting": '即将开始的会议',
 					"default_name": '快速会议',
-					"default_booker": '/'
+					"default_booker": '/',
+					"notice": '通知',
+					"update": '检测到新版本，是否立即重启？',
+					"confirm": '确定',
+					"cancel": '取消'
 				}
 			},
 			"time":{
@@ -200,7 +204,11 @@ const messages = {
 					"no_meeting": 'Free',
 					"next_meeting": 'Upcoming Meetings',
 					"default_name": 'Fast Meeting',
-					"default_booker": '/'
+					"default_booker": '/',
+					"notice": 'Notice',
+					"update": 'Detected a new version, do you want to restart immediately?',
+					"confirm": 'Confirm',
+					"cancel": 'Cancel'
 				}
 			},
 			"time":{
@@ -303,7 +311,11 @@ const messages = {
 					"no_meeting": "유휴 중",
 					"next_meeting": "곧 시작될 회의",
 					"default_name": "빠른 모임",
-					"default_booker": "/"
+					"default_booker": "/",
+					"notice":'알림',
+					"update": "새 버전이 발견되었습니다. 즉시 재부팅하시겠습니까?",
+					"confirm": "확인",
+					"cancel": "취소"
 				}
 			},
 			"time": {
