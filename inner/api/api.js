@@ -17,6 +17,19 @@ function quickMeetApi(host, data, header) {
 	})
 }
 
+function cancelMeetingApi(host, data, header) {
+	return request({
+		host: host,
+		url: "/web/appapi/api.php?act=cancel_fast_meeting",
+		method: "POST", //请求方式
+		data: {
+			...data
+		},
+		header: header // 请求头
+	})
+}
+
+
 /**
  *  心跳包
  * 
@@ -172,6 +185,7 @@ const quickMeetMessageMapping = {
 
 export {
 	quickMeetApi,
+	cancelMeetingApi,
 	syncRoomApi,
 	quickMeetMessageMapping,
 	getAllAreaApi,

@@ -8,14 +8,15 @@
 			<div class="form-row">
 				<div class="label">{{$t('message.activate.request_url')}}</div>
 				<div class="input-wrapper">
-					<input inputmode="url" class="my-input" :placeholder="$t('message.activate.placeholder')" v-model="url"/>
+					<input inputmode="url" class="my-input" :placeholder="$t('message.activate.placeholder')" v-model="url" @input="verifyStatus='none'"/>
 					<uni-icons @click="scan" class="scan" color="#333" type="scan" size="25"></uni-icons>
 				</div>
 
-				<button :class="'btn btn'+(currentTheme!='dark'?'':'-dark')" type="default" @click="verify">
+				<button :loading="verifyStatus=='verifying'" :class="'btn btn'+(currentTheme!='dark'?'':'-dark')" type="default" @click="verify">
 				
-				<uni-icons color="#fff" v-if="verified" type="checkmarkempty" size="30"></uni-icons>
-				<text v-else>{{$t('message.activate.verify')}}</text>
+				<uni-icons color="#fff" v-if="verifyStatus=='verified'" type="checkmarkempty" size="30"></uni-icons>
+				<text v-if="verifyStatus=='verifying'">{{$t('message.activate.verifying')}}</text>
+				<text v-if="verifyStatus=='none'">{{$t('message.activate.verify')}}</text>
 				
 				</button>
 			</div>
@@ -54,6 +55,8 @@ import LanguageSelect from '../components/LanguageSelect.vue';
 import {mapGetters,mapMutations} from 'vuex';
 import { getAllAreaApi,getAllRoomsApi,activateDeviceApi,changeBindApi } from '@/api/api';
 import { PageMixin } from '@/mixin';
+import _ from 'lodash'
+
 export default {
 	name:"ActivateView",
 	components:{
@@ -64,7 +67,7 @@ export default {
 	data() {
 		return {
 			url: '',
-			verified: false,
+			verifyStatus: 'none', // 'verifying','verified'
 			area: -1,
 			areaList:[],
 			room: -1,
@@ -97,42 +100,47 @@ export default {
 			
 			getAllAreaApi(this.currentBaseURL,{
 			}).then(res=>{
+				
 				const li = res.data.data
 				
-				console.log(res);
+				_.forEach(li,item=>{
+					item = {
+						value:item.id,
+						text: item.area_name,
+						...item
+					}
+				})
 				
-				let tempList = []
+				that.areaList = li
 				
-				for(let item of li) tempList.push({value:item.id, text: item.area_name})
-				
-				that.areaList = tempList
+				console.log(li);
 				
 			}).catch(e=>{console.log(e)})
 		},
 		changeArea(e){ 
 			this.roomList = [] // 清空现有房间
 			this.room = -1
+			
+			
 			getAllRoomsApi(this.currentBaseURL,{
 				"type": "area",
 				"id": this.area,
 			}).then(res=>{
-				console.log(JSON.stringify(res));
-				const li = res.data.data.areas.rooms
-				// const li = res.data.areas.rooms
 				
-				let tempList = []
+				const li = res.data.data?.areas?.rooms ?? null
 				
-				for(let item of li) tempList.push({value:item.room_id, text: item.room_name})
+				if(!li){
+					return // 如果区域无会议室，直接返回，不报错
+				}
 				
-				this.roomList = tempList
-				
-			}).catch(e=>{
-				console.log(e)
-				uni.showToast({
-					title: this.$t('message.netDataError'),
-					icon: 'none',
+				// 房间信息赋值
+				this.roomList = _.forEach(li,item=>{
+						item.value = item.room_id,
+						item.text = item.room_name
 				})
+				
 			})
+				
 		},
 		scan(){
 			
@@ -148,50 +156,58 @@ export default {
 
 		},
 		verify(){
+			// 判空
+			if(!this.url){
+				uni.showToast({
+					title: this.$t('message.activate.url_empty'),
+					icon: 'none',
+				})
+				return
+			}
 			
-			
+			const that = this
 			
 			// 尝试调这个接口，返回成功就是联通了
+			this.verifyStatus = 'verifying'
 			getAllAreaApi(this.url,{
-			}).then(res=>{
-				console.log(JSON.stringify(res));
+			}).then(({data})=>{
 				
-				if(res.data.code == 0){
-					this.verified = true
+				const {
+					code,
+					data:li
+				} = data
+				
+				if(code == 0 || code == -49){
+					this.verifyStatus = 'verified'
 					
 					// 改store
 					this.changeBaseURL(this.url)
-					console.log(this.currentBaseURL);
 					
-					this.getAllArea() //重新获取区域信息
+					// 区域信息赋值
+					that.areaList = _.forEach(li,item=>{
+						item.value = item.id, // 不能整体赋值，会无效
+						item.text = item.area_name
+					})
 					
 					uni.showToast({
 						title: this.$t('message.activate.verify_success'),
 						icon: 'none',
 					})
 				}
-				else if(res.data.code == -49){
-					this.verified = true
-					this.getAllArea() //重新获取区域信息
-					
-					uni.showToast({
-						title: this.$t('message.activate.verify_duplicate'),
-						icon: 'none',
-					})
-				}
 				else{
+					this.verifyStatus = 'none'
 					uni.showToast({
 						title: this.$t('message.activate.verify_fail'),
 						icon: 'none',
 					})
 				}
 				
-
 				
 			}).catch(e=>{
 				console.log(e)
+				this.verifyStatus = 'none'
 				uni.showToast({
-					title: this.$t('message.netDataError'),
+					title: this.$t('message.activate.verify_fail'),
 					icon: 'none',
 				})
 			})
@@ -206,7 +222,7 @@ export default {
 				})
 				return
 			}
-			if(!this.verified){
+			if(this.verifyStatus != 'verified'){
 				uni.showToast({
 					title: this.$t('message.activate.not_verified'),
 					icon: 'none',

@@ -3,7 +3,7 @@
 // } from '@/modules/config.js'
 
 import store from '@/store/index.js'
-
+import i18n from '@/src/i18n.js';
 import RequestManager from '@/utils/requestManager.js' 
 const manager = new RequestManager() //创建请求管理表
 
@@ -51,7 +51,7 @@ export default class Request {
         //加载圈
         if (!hideLoading) {
             uni.showLoading({
-                title: '加载中...'
+                title: i18n.global.t('message.loading')
             });
         }
 

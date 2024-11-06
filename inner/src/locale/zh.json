@@ -1,0 +1,124 @@
+{
+  "message": {
+    "activate": {
+      "activate_fail": "设备激活失败！",
+      "activate_success": "设备激活成功！",
+      "area_empty": "区域未选择",
+      "belong_to_area": "所属区域",
+      "belong_to_meeting_room": "所属会议室",
+      "finish": "完成",
+      "not_verified": "请求地址未验证",
+      "placeholder": "扫描web端的二维码即可自动填写服务地址",
+      "please_select": "请选择",
+      "request_url": "请求地址",
+      "room_empty": "房间未选择",
+      "url_empty": "请求地址为空",
+      "verify": "验证",
+      "verify_duplicate": "此设备已激活！",
+      "verify_fail": "请求地址验证失败！",
+      "verify_success": "请求地址验证成功！",
+      "verifying": "验证中...",
+      "welcome": "欢迎使用xxx会议系统"
+    },
+    "fast_meeting": {
+      "booker_too_long": "预订人名称不应超过30字",
+      "cancel": "取消",
+      "confirm": "确定",
+      "fail": "会议预订失败!",
+      "finished": "已结束",
+      "in_progress": "进行中",
+      "name": "预约人姓名",
+      "success": "会议预订成功！",
+      "theme": "请输入会议名称",
+      "theme_too_long": "会议主题不应超过50字",
+      "tip_left": "可预定当前",
+      "tip_right": "小时内的空闲时间",
+      "title": "快速会议",
+      "to_start": "已预定"
+    },
+    "index": {
+      "left": {
+        "book": "创建快速会议",
+        "cancel": "取消",
+        "cancel_tip": "是否确认取消该会议？",
+        "confirm": "确定",
+        "default_name": "快速会议",
+        "fail": "会议取消失败!",
+        "invalid_type": "非平板端预约的快速会议无法取消",
+        "no_free": "当前时段会议室已约满",
+        "notice": "通知",
+        "success": "会议取消成功！"
+      },
+      "right": {
+        "cancel": "取消",
+        "confirm": "确定",
+        "default_booker": "/",
+        "default_name": "快速会议",
+        "in_meeting": "会 议 中",
+        "language": "语言",
+        "meeting": "会议室",
+        "next_meeting": "即将开始的会议",
+        "no_meeting": "空 闲 中",
+        "notice": "通知",
+        "unbind": "检测到设备被解绑，重启后可重新绑定，是否立即重启？",
+        "update": "检测到新版本，是否立即重启？"
+      }
+    },
+    "initializing": "正在初始化...",
+	"loading": "加载中...",
+    "login": {
+      "account_number": "请输入账号",
+      "confirm": "确定",
+      "login_fail": "用户名或密码错误",
+      "login_success": "登录成功",
+      "password": "请输入密码",
+      "previous": "返回",
+      "title": "请输入管理员密码"
+    },
+    "netDataError": "接口返回数据异常",
+    "setting": {
+      "left": {
+        "about_us": "关于我们",
+        "basic_info": "基本信息",
+        "battery": "电量",
+        "equipment_type": "设备型号",
+        "normal": "正常",
+        "offline": "离线",
+        "online_status": "在线状态",
+        "room_area": "所属房间&区域",
+        "unique_id": "设备唯一ID"
+      },
+      "right": {
+        "12hour_format": "12小时制",
+        "24hour_format": "24小时制",
+        "area": "区域",
+        "area_empty": "区域未选择",
+        "brightness": "亮度",
+        "cancel": "取消",
+        "confirm": "确定",
+        "invalid_url": "请求地址无效",
+        "meeting_room": "会议室",
+        "not_verified": "请求地址未验证",
+        "notice": "通知",
+        "request_url": "请求地址",
+        "restart": "请求地址变更需重启应用，是否重启？",
+        "room_empty": "房间未选择",
+        "setting": "设置",
+        "setting_success": "设置修改成功",
+        "submit": "提交",
+        "theme_color": "主题颜色",
+        "time_format": "时间格式",
+        "url_empty": "请求地址为空",
+        "validating": "验证中...",
+        "volume": "音量"
+      }
+    },
+    "time": {
+      "hour": "小时",
+      "hours": "小时",
+      "minute": "分钟",
+      "minutes": "分钟",
+      "not_available": "不可用"
+    }
+  }
+}

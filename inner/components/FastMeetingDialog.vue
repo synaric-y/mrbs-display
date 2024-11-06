@@ -65,7 +65,7 @@
 				disabled: false,
 				theme: "",
 				booker: "",
-				inputMaxLength1: 30,
+				inputMaxLength1: 20,
 				inputMaxLength2: 20,
 				inputBlink1: '',
 				inputBlink2: ''
