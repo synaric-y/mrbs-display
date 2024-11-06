@@ -45,6 +45,7 @@
         "default_name": "Fast Meeting",
         "fail": "Fail to cancel meeting!",
         "invalid_type": "Quick meetings not reserved from a Pad cannot be cancelled",
+		"invalid_time": "Expired or ongoing meetings cannot be cancelled",
         "no_free": "There is no free room at the current time",
         "notice": "Notice",
         "success": "Meeting cancelled successfully!"
@@ -86,7 +87,8 @@
         "offline": "Offline",
         "online_status": "Online Status",
         "room_area": "Room & Area",
-        "unique_id": "Device Unique ID"
+        "unique_id": "Device Unique ID",
+		"unknown_brand": "Unknown"
       },
       "right": {
         "12hour_format": "12 Hour Format",
@@ -109,7 +111,9 @@
         "theme_color": "Theme Color",
         "time_format": "Time Format",
         "url_empty": "Request address is empty",
-        "validating": "Validating...",
+        "verify_fail": "Verification failed!",
+        "verify_success": "Verified successfully!",
+        "verifying": "Verifying...",
         "volume": "Volume"
       }
     },

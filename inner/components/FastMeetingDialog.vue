@@ -98,7 +98,7 @@
 				this.$emit('close')
 			},
 			testNumber(val){ // 判断是否为纯数字
-				const str = /^[0-9]*$/
+				const str = /^[0-9]+$/
 				const reg = new RegExp(str)
 				return reg.test(val)
 			},

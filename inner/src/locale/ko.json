@@ -45,6 +45,7 @@
         "default_name": "빠른 모임",
         "fail": "회의 취소 실패!",
         "invalid_type": "타블렛에서 예약하지 않은 빠른 모임은 취소할 수 없습니다.",
+		"invalid_time": "이전 버전이거나 진행 중인 모임은 취소할 수 없습니다.",
         "no_free": "현재 시간대 회의실이 가득 찼습니다",
         "notice": "알림",
         "success": "회의 취소 성공!"
@@ -86,7 +87,8 @@
         "offline": "오프라인",
         "online_status": "온라인 상태",
         "room_area": "소속 공간 및 영역",
-        "unique_id": "장치 고유 일련번호"
+        "unique_id": "장치 고유 일련번호",
+		"unknown_brand": "알 수 없음"
       },
       "right": {
         "12hour_format": "12시간제",
@@ -109,7 +111,9 @@
         "theme_color": "주제 색상",
         "time_format": "시간 형식",
         "url_empty": "요청 주소가 비어 있습니다",
-        "validating": "확인 중...",
+        "verify_fail": "요청 주소 확인 실패!",
+        "verify_success": "요청 주소 확인 성공!",
+        "verifying": "확인 중...",
         "volume": "볼륨"
       }
     },

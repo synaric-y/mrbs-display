@@ -45,6 +45,7 @@
         "default_name": "快速会议",
         "fail": "会议取消失败!",
         "invalid_type": "非平板端预约的快速会议无法取消",
+		"invalid_time": "已过时或进行中的会议无法取消",
         "no_free": "当前时段会议室已约满",
         "notice": "通知",
         "success": "会议取消成功！"
@@ -86,7 +87,8 @@
         "offline": "离线",
         "online_status": "在线状态",
         "room_area": "所属房间&区域",
-        "unique_id": "设备唯一ID"
+        "unique_id": "设备唯一ID",
+		"unknown_brand": "未知"
       },
       "right": {
         "12hour_format": "12小时制",
@@ -109,7 +111,9 @@
         "theme_color": "主题颜色",
         "time_format": "时间格式",
         "url_empty": "请求地址为空",
-        "validating": "验证中...",
+        "verifying": "验证中...",
+		"verify_fail": "请求地址验证失败！",
+		"verify_success": "请求地址验证成功！",
         "volume": "音量"
       }
     },

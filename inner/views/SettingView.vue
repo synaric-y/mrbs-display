@@ -9,34 +9,27 @@
 
 			<div class="info-list">
 				<div class="info-row">
-					{{$t('message.setting.left.unique_id')}}: {{currentDeviceInfo.deviceId}}
+					<div class="info-title">{{$t('message.setting.left.unique_id')}}</div>
+					<div class="info-desc">{{currentDeviceInfo.deviceId}}</div>
 				</div>
 				<div class="info-row">
-					{{$t('message.setting.left.equipment_type')}}: {{currentDeviceInfo.brand}}
+					<div class="info-title">{{$t('message.setting.left.equipment_type')}}</div>
+					<div class="info-desc">{{currentDeviceInfo.brand || $t('message.setting.left.unknown_brand')}}</div>
 				</div>
 				<div class="info-row">
-					{{$t('message.setting.left.battery')}}: {{currentBatteryInfo.level+'%'}}
+					<div class="info-title">{{$t('message.setting.left.battery')}}</div>
+					<div class="info-desc">{{currentBatteryInfo.level+'%'}}</div>
 				</div>
 				<div class="info-row">
-					
+					<div class="info-title">{{$t('message.setting.left.room_area')}}</div>
+					<div class="info-desc">{{basicInfo.room+" "+basicInfo.area}}</div>
 				</div>
 				<div class="info-row">
-					{{$t('message.setting.left.room_area')}}: {{basicInfo.room+" "+basicInfo.area}}
+					<div class="info-title">{{$t('message.setting.left.online_status')}}</div>
+					<div class="info-desc">{{this.currentStatus=='online'?$t('message.setting.left.normal'):$t('message.setting.left.offline')}}</div>
 				</div>
 				<div class="info-row">
-					
-				</div>
-				<div class="info-row">
-					{{$t('message.setting.left.online_status')}}: {{this.currentStatus=='online'?$t('message.setting.left.normal'):$t('message.setting.left.offline')}}
-				</div>
-				<div class="info-row">
-					
-				</div>
-				<div class="info-row">
-					{{$t('message.setting.left.about_us')}}
-				</div>
-				<div class="info-row">
-					
+					<div class="info-title">{{$t('message.setting.left.about_us')}}</div>
 				</div>
 			</div>
 			
@@ -90,34 +83,14 @@
 				<div class="form-row">
 					<div class="label">{{$t('message.setting.right.request_url')}}</div>
 					<div class="input-wrapper">
-						<input class="my-input" v-model="requestURL"/>
+						<input class="my-input" v-model="requestURL" @input="verifyStatus='none'"/>
+						<button :loading="verifyStatus=='verifying'" :class="'btn btn'+(currentTheme!='dark'?'':'-dark')" type="default" @click="verify">
+							<uni-icons color="#fff" v-if="verifyStatus=='verified'" type="checkmarkempty" size="30"></uni-icons>
+							<text v-if="verifyStatus=='verifying'">{{$t('message.activate.verifying')}}</text>
+							<text v-if="verifyStatus=='none'">{{$t('message.activate.verify')}}</text>
+						</button>
 					</div>
 				</div>
-<!-- 				<div class="form-row">
-					<div class="label">{{$t('message.setting.right.time_format')}}</div>
-					<uni-data-select
-						class="data-select"
-						style="width: 90rpx;"
-						v-model="timeFormat"
-						:localdata="timeFormatList"
-						:placeholder="$t('message.activate.please_select')"
-						:clear="false"
-					></uni-data-select>
-				</div>
-				<div class="form-row">
-					<div class="label">{{$t('message.setting.right.theme_color')}}</div>
-					<div class="checkboxes">
-						<div class="checkbox-group" v-for="item in themeColorList">
-							<div :class="themeColor==item.value?('my-checkbox my-checkbox'+(currentTheme!='dark'?'':'-dark')):'my-checkbox my-checkbox-disabled'" @click="changeThemeColor(item.value)">
-								<uni-icons v-if="themeColor==item.value" type="checkmarkempty" :color="currentTheme!='dark'?'#591BB7':'#285fd4'" size="20"></uni-icons>
-							</div>
-							
-							<div class="colors">
-								<div v-for="color in item.colors" class="color" :style="'background-color:'+color"></div>
-							</div>
-						</div>
-					</div>
-				</div> -->
 				
 				<div class="btns">
 					<button class="btn btn-default" type="default" @click="cancel">{{$t('message.setting.right.cancel')}}</button>
@@ -164,6 +137,7 @@ export default {
 			area: -1,
 			room: -1,
 			
+			verifyStatus: 'none',
 			requestURL: '',
 			oldRequestURL: '',
 			timeFormat: 0,
@@ -201,8 +175,7 @@ export default {
 	created(){
 	
 		console.log("设置页面初始化");
-		this.initArea()
-		
+		this.init();
 		
 		// store必须在created初始化
 		this.requestURL = this.currentBaseURL
@@ -231,63 +204,114 @@ export default {
 				}
 			}, '*');
 		},
-		initArea(){ // 无论如何，先获取区域
-			const that = this
-			getAllAreaApi(that.currentBaseURL,{
-			}).then(({data})=>{
-				
-				const li = data.data
-				
-				if(!li) throw new Error('')
-				
-				console.log(li);
-				
-				let tempList = []
-				_.forEach(li,item=>{
-					tempList.push({value:item.id, text: item.area_name})
-				})
-				that.areaList = tempList
-				
-				that.initAreaAndRoom()
-				
-
-			})
-		},
-		initAreaAndRoom(){ // 给area和room设置初值，如果getSettings能通的话
+		resetRoom(area_id){
+			
+			console.log(area_id);
 			
 			const that = this
-			getSettingApi(this.currentBaseURL,{})
-			.then(res=>{
-				console.log(res);
-				that.basicInfo.room = res.data.data.room
-				that.basicInfo.area = res.data.data.area // 字符串
+			
+			return new Promise((resolve,reject)=>{
 				
-				const currentArea = _.find(that.areaList, ['text', that.basicInfo.area]);
-				that.area = currentArea.value
+				console.log("resetRoom");
+				
+				that.roomList = [] // 清空现有房间
+				that.room = -1 // 恢复默认值
 				
 				getAllRoomsApi(that.currentBaseURL,{
 					"type": "area",
-					"id": that.area,
+					"id": area_id,
 				}).then(res=>{
-					
 					const li = res.data.data?.areas?.rooms ?? null
 					
-					if(!li){
-						return // 如果区域无会议室，直接返回，不报错
-					}
+					if(!li) return // 如果区域无会议室，直接返回，不报错
 					
-					let tempList = []
-					for(let item of li) tempList.push({value:item.room_id, text: item.room_name})
-					that.roomList = tempList
-					
-					const currentRoom = _.find(that.roomList, ['text', that.basicInfo.room]);
-					that.room = currentRoom.value
-					
+					that.roomList = _.forEach(li,item=>{
+						item.value = item.room_id
+						item.text = item.room_name
+					})
+					resolve()
 				})
-				
-				
-				
-			}).catch(e=>{
+				.catch(()=>{
+					reject()
+				})
+			})
+		},
+		initRoom(arr){
+			
+			const roomText = arr[0]
+			const area_id = arr[1]
+			
+			console.log(roomText,area_id);
+			
+			const that = this
+			return new Promise((resolve,reject)=>{
+				that.resetRoom(area_id)
+					.then(()=>{
+						const room_id = that.room = _.find(that.roomList, ['text', roomText]).value
+						resolve(room_id)
+					})
+					.catch(()=>{
+						reject()
+					})
+			})
+		},
+		resetArea(arr){
+			const roomText = arr[0]
+			const areaText = arr[1]
+			console.log("接收参数："+roomText+" "+areaText);
+			
+			const that = this
+			return new Promise((resolve,reject)=>{
+				getAllAreaApi(that.currentBaseURL,{
+				}).then(({data})=>{
+					
+					const {data:li} = data
+					
+					console.log(li);
+					
+					if(!li) reject()
+					
+					that.areaList = _.forEach(li,item=>{
+						item.value = item.id
+						item.text = item.area_name
+					})
+					
+					console.log(that.areaList);
+					
+					console.log(areaText);
+					
+					const area_id = that.area = _.find(that.areaList, ['text', areaText]).value
+					
+					console.log(area_id);
+					
+					resolve([roomText,area_id])
+					
+				}).catch(()=>{
+					reject()
+				})
+			})
+		},
+		resetSetting(){
+			return new Promise((resolve,reject)=>{
+				getSettingApi(this.currentBaseURL,{})
+					.then(({data})=>{
+						const {room:roomText, area:areaText} = data.data // 字符串
+						this.basicInfo.room = roomText
+						this.basicInfo.area = areaText 
+						
+						console.log(roomText,areaText);
+						resolve([roomText,areaText])
+					}).catch(()=>{
+						reject()
+					})
+			})
+		},
+		init(){
+			
+			this.resetSetting()
+			.then(this.resetArea)
+			.then(this.initRoom)
+			.catch((e)=>{
 				console.log(e);
 				uni.showToast({
 					title: this.$t('message.netDataError'),
@@ -326,25 +350,8 @@ export default {
 			}, '*');
 		},
 		changeArea(e){
-			this.roomList = [] // 清空现有房间
-			this.room = -1 // 恢复默认值
-			getAllRoomsApi(this.currentBaseURL,{
-				"type": "area",
-				"id": this.area,
-			}).then(res=>{
-				const li = res.data.data?.areas?.rooms ?? null
-				
-				if(!li){
-					return // 如果区域无会议室，直接返回，不报错
-				}
-				
-				let tempList = []
-				
-				for(let item of li) tempList.push({value:item.room_id, text: item.room_name})
-				
-				this.roomList = tempList
-				
-			}).catch(e=>{
+			this.resetRoom(this.area)
+			.catch(e=>{
 				console.log(e)
 				uni.showToast({
 					title: this.$t('message.netDataError'),
@@ -352,15 +359,8 @@ export default {
 				})
 			})
 		},
-		changeThemeColor(v){
-			this.themeColor = v
-			this.changeTheme(v==0?'default':'dark')
-			console.log(v);
-		},
-		submit: async function(){
-			
-			const that = this
-			
+		verify(){
+			// 判空
 			if(!this.requestURL || this.requestURL==''){
 				uni.showToast({
 					title: this.$t('message.setting.right.url_empty'),
@@ -369,61 +369,105 @@ export default {
 				return
 			}
 			
-			// 如果有区域和房间就换绑，没有则给出提示, 并返回
-			console.log(this.area,this.room);
-			if(this.area && this.area!=-1 && this.room && this.room!=-1){	
-				console.log(347);
-				await changeBindApi(that.currentBaseURL,{
-					"room_id": that.room,                 //房间id
-				}).then(()=>{
+			const that = this
+			
+			// 尝试调这个接口，返回成功就是联通了
+			this.verifyStatus = 'verifying'
+			getAllAreaApi(this.requestURL,{
+			}).then(({data})=>{
+				
+				const {
+					code,
+					data:li
+				} = data
+				
+				if(code == 0){
+					this.verifyStatus = 'verified'
 					
-				}).catch(e=>{
+					// 改store
+					this.changeBaseURL(this.requestURL)
+					
 					uni.showToast({
-						title: this.$t('message.netDataError'),
-						icon: 'none',
-					})
-				})
-			}else{
-				if(!this.area || this.area==-1){
-					uni.showToast({
-						title: this.$t('message.setting.right.area_empty'),
-						icon: 'none',
-					})
-				}else{
-					uni.showToast({
-						title: this.$t('message.setting.right.room_empty'),
+						title: this.$t('message.setting.right.verify_success'),
 						icon: 'none',
 					})
 				}
+				else{
+					this.verifyStatus = 'none'
+					uni.showToast({
+						title: this.$t('message.setting.right.verify_fail'),
+						icon: 'none',
+					})
+				}
+				
+				
+			}).catch(e=>{
+				console.log(e)
+				this.verifyStatus = 'none'
+				uni.showToast({
+					title: this.$t('message.setting.right.verify_fail'),
+					icon: 'none',
+				})
+			})
+			
+		},
+		submit: async function(){
+			
+			const that = this
+			
+			// 判空
+			if(!this.requestURL || this.requestURL==''){
+				uni.showToast({
+					title: this.$t('message.setting.right.url_empty'),
+					icon: 'none',
+				})
 				return
 			}
 			
-			// 修改请求地址
+			// 验证
+			if(this.verifyStatus != 'verified'){
+				uni.showToast({
+					title: this.$t('message.activate.not_verified'),
+					icon: 'none',
+				})
+				return
+			}
+			
+			// 区域
+			if(!this.area || this.area==-1){
+				uni.showToast({
+					title: this.$t('message.setting.right.area_empty'),
+					icon: 'none',
+				})
+				return
+			}
+			
+			//房间
+			if(!this.room || this.room==-1){
+				uni.showToast({
+					title: this.$t('message.setting.right.room_empty'),
+					icon: 'none',
+				})
+				return
+			}
+			
+			
+			// 换绑
+			await changeBindApi(that.currentBaseURL,{
+				"room_id": that.room,
+			}).then((res)=>{
+				console.log(res);
+			}).catch(e=>{
+				uni.showToast({
+					title: this.$t('message.netDataError'),
+					icon: 'none',
+				})
+			})
+			
+			
+			// 修改请求地址重启弹窗（可选）
 			if(that.oldRequestURL!==that.requestURL){
-				uni.showLoading({
-					title:this.$t('message.setting.right.validating')
-				})
-				// 尝试调这个接口，返回成功就是联通了
-				await getAllAreaApi(that.requestURL,{
-				})
-				.then(res=>{
-					if(res.data.code != 0){ // 返回错误
-						throw new Error('invalid url')
-					}else{ // 验证通过
-						that.changeBaseURL(that.requestURL)
-						that.$refs.popup.open()
-					}
-				})
-				.catch(e=>{ // 请求超时
-					uni.showToast({
-						title: this.$t('message.setting.right.invalid_url'),
-						icon: 'none',
-					})
-					console.log(e);
-				}).finally(()=>{
-					uni.hideLoading()
-				})
-				
+				that.$refs.popup.open()
 			}else{
 				uni.showToast({
 					title: that.$t('message.setting.right.setting_success'),
@@ -470,7 +514,7 @@ export default {
 		gap: 30rpx;
 		color: #fff;
 		margin: 0;
-		padding: 20rpx 25rpx 10rpx;
+		padding: 30rpx 25rpx 10rpx;
 		width: 350rpx;
 		height: 100%;
 		background-color: #333333;
@@ -479,7 +523,7 @@ export default {
 		.title{
 			flex-shrink: 0;
 			font-size: 18rpx;
-			font-weight: 700;
+			font-weight: 500;
 		}
 		
 		.info-list{
@@ -488,6 +532,19 @@ export default {
 				min-height: 25rpx;
 				line-height: 25rpx;
 				word-break:break-all;
+				margin-bottom: 15rpx;
+				
+				.info-title{
+					font-size: 14rpx;
+					font-weight: 500;
+					color: #fff;
+				}
+				
+				.info-desc{
+					font-size: 10rpx;
+					color: #ddd;
+					line-height: 1.6;
+				}
 			}
 		}
 		
@@ -622,9 +679,9 @@ export default {
 			.input-wrapper{
 				height: 100%;
 				width: 100%;
-				border-radius: 3rpx;
+				
 				padding: 0 5rpx 0 10rpx;
-				background-color: #fff;
+				
 				display: flex;
 				flex-direction: row;
 				gap: 5rpx;
@@ -634,10 +691,22 @@ export default {
 					line-height: 25rpx;
 					width: 100%;
 					color: #333;
+					background-color: #fff;
+					border-radius: 3rpx;
+					padding: 0 6rpx;
 				}
 				
-				.scan{
+				.btn{
+					min-width: 60rpx;
+					height: 25rpx;
+					line-height: 25rpx;
+					background-color: var(--color-primary);
+					color: #fff;
 					flex-shrink: 0;
+					
+					&-dark{
+						background-color: var(--dark-color-primary);
+					}
 				}
 			}
 			
@@ -683,8 +752,9 @@ export default {
 				background-color: #fff;
 				color: #333;
 			}
-			
 		}
+		
+
 	}
 	
 }

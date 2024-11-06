@@ -21,7 +21,9 @@
 								<div class="meeting-item" :id="'meeting-'+item.id" v-for="(item,index) in meetingList"
 									:key="item.id"
 									:style="{top: calculateY(item.start_time)+'rpx', height: calculateHeight(item.start_time,item.end_time)+'rpx' }"
-									@longpress="prepareCancelQuickMeet(item.id,item.entry_type)">
+									@longpress="prepareCancelQuickMeet(item)"
+									@touchmove="enableCancel=false"
+									@touchend="enableCancel=true">
 									<div :class="'meeting '+item.className">
 										<text class="meeting-theme">
 											{{ item.name || $t('message.index.left.default_name') }}
@@ -278,7 +280,8 @@
 				showQuickMeeting: false, // 快速会议弹窗
 
 				popupCancelQuickMeet: false, // 取消会议对话框
-				toCancelId: null,
+				toCancelId: null, // 待取消会议的id
+				enableCancel: true, // 能触发长按，如果滑动就不要触发长按了
 
 				avaliableHours: 1, // 可预约一小时内的时间
 				lb: 8, // 会议室开始时间
@@ -506,6 +509,10 @@
 				})
 			},
 			prepareSetting() { // 预先请求一下，成功则跳过登录
+			
+				// this.settingViewShow = true
+				// return
+			
 				const that = this
 				getSettingApi(this.currentBaseURL, {}).then(res => {
 					// that.loginViewShow = true
@@ -529,9 +536,24 @@
 					})
 				}
 			},
-			prepareCancelQuickMeet(id, type) {
+			prepareCancelQuickMeet(item) {
 				
-				console.log(id,type);
+				if(!this.enableCancel) return // 滑动则不要触发此事件
+				
+				const {
+					id,
+					entry_type:type,
+					start_time,
+					end_time
+				} = item
+				
+				if(!(this.serverTime<start_time && this.serverTime<end_time)){
+					uni.showToast({
+						title: this.$t('message.index.left.invalid_time'),
+						icon: 'none'
+					})
+					return
+				}
 				
 				if (type != 99) {
 					uni.showToast({
@@ -612,6 +634,11 @@
 	/*去除scroll-view默认的滚动条，但是还能滚动*/
 	::v-deep .uni-scroll-view .uni-scroll-view::-webkit-scrollbar {
 		display: none;
+	}
+	
+	/* 对话框按钮主颜色 */
+	::v-deep .uni-button-color{
+		color: var(--color-primary);
 	}
 
 	* {
