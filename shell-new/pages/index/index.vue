@@ -1,5 +1,6 @@
 <template>
 	<web-view id="wv" :src="wvURL" @message="handleWebviewMessage"></web-view>
+	<!-- <div style="width: 100vw;height: 100vh;background-color: #ccc;">aaa</div> -->
 </template>
 
 <script>
@@ -8,8 +9,10 @@
 		data() {
 			return {
 				wvNode: null,
-				wvURL: uni.getStorageSync('webview-url') || 'https://meeting-manage-test.businessconnectchina.com:12443/display/2.0/index.html', // 默认值
-				baseURL: 'https://meeting-manage-test.businessconnectchina.com:12443'
+				wvURL: uni.getStorageSync('webview-url') || 'https://meeting-manage-dev.businessconnectchina.com:11443/display/2.0/index.html', // 默认值
+				// wvURL: 'https://meeting-manage-dev.businessconnectchina.com:11443/display/2.0/index.html', // 正式环境
+				// wvURL: 'https://meeting-manage-test.businessconnectchina.com:12443/display/2.0/index.html', // 测试环境
+				// wvURL: 'https://meeting-manage-test.businessconnectchina.com:12443/display/2.1/index.html', // 测试环境
 			}
 		},
 		onLoad() {
@@ -73,19 +76,13 @@
 					case 'restart':{
 						that.restart()
 					}break;
-					case 'updateBaseURL':{
-						that.updateBaseURL(val)
-					}break;
 					case 'updateWvURL':{
 						that.updateWvURL(val)
 					}break;
 				}
 			},
-			updateBaseURL(val){
-				this.baseURL = val
-			},
 			updateWvURL(val){
-				// this.wvURL = val
+				this.wvURL = val
 				
 				uni.setStorageSync('webview-url', val) // 存localStorage, 重启之后就生效了
 				

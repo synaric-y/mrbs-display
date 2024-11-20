@@ -264,31 +264,10 @@ export default {
 				
 				const code = data.code
 				
-				if(code==-49){ // 已激活，就换绑
-					changeBindApi(that.currentBaseURL,{
-						"room_id": that.room,                 //房间id
-					}).then(()=>{
-						
-						this.url = ''
-						this.area = -1
-						this.room = -1
-						
-						uni.showToast({
-							title: this.$t('message.activate.activate_success'),
-							icon: 'none',
-						})
-						
-						this.$emit('activateSuccess')
-						this.$emit('close')
-						
-					}).catch(e=>{
-						uni.showToast({
-							title: this.$t('message.netDataError'),
-							icon: 'none',
-						})
-					})
-				}else{
-					// this.changeBaseURL(this.url)
+				changeBindApi(that.currentBaseURL,{
+					"room_id": that.room,                 //房间id
+				}).then(()=>{
+					
 					this.url = ''
 					this.area = -1
 					this.room = -1
@@ -300,9 +279,14 @@ export default {
 					
 					this.$emit('activateSuccess')
 					this.$emit('close')
-				}
-				
-				
+					
+					
+				}).catch(e=>{
+					uni.showToast({
+						title: this.$t('message.netDataError'),
+						icon: 'none',
+					})
+				})
 				
 				
 				

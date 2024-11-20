@@ -7,13 +7,10 @@ const store = createStore({
 		"theme": "default", // 主题 "default" | "dark"
 		"status": "online", // 在线状态 "online" | "offline"
 		"timeFormat": "24", // 时间格式 "12"（有AM的） | "24"
-		// "baseURL": "http://172.16.89.161:82", // 请求地址
-		"baseURL": "https://meeting-manage-test.businessconnectchina.com:12443", // 请求地址
-		
-		"deviceInfo": {deviceId:'E37A3ACCCF19E6BD73C03DE47EB1D41B',type:'XiaoMi'},
-		"batteryInfo": {isCharging: 0, level: 64},
-		
-		"innerAddress": "https://meeting-manage-test.businessconnectchina.com:12443/display/2.0/index.html" 
+		"baseURL": "", // 请求地址
+		"deviceInfo": {},
+		"batteryInfo": {},
+		"innerAddress": "" 
 	},
 	getters: {
 		currentTheme: state => {

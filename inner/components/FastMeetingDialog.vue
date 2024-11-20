@@ -55,7 +55,7 @@
 			TimeStepperScroll
 		},
 		props:['currentTime','meetings','avaliableHours','areaLb','areaUb','scale'], // 当前时间戳（10位），会议数组，可预约多少小时
-		emits:['close'],
+		emits:['close','success','fail'],
 		data() {
 			return {
 				leftHandle: nextScaleTs(this.currentTime,this.scale*SEC_PER_MINUTE),
@@ -136,30 +136,20 @@
 					
 					console.log(code,data);
 						
-						if(code==0){
-							uni.showToast({
-								title: this.$t('message.fast_meeting.success'),
-								icon: 'none'
-							})
-						}else{
-							uni.showToast({
-								title: this.$t('message.fast_meeting.fail'),
-								icon: 'none'
-							})
-						}
+					if(code==0) this.$emit('success') 
+					else this.$emit('fail')
+
+				})
+				.catch((e) => {
+					console.error(e)
+					this.$emit('fail')
+				})
+				.finally(()=>{
+					this.theme = ''
+					this.booker = ''
+				})
 				
-					})
-					.catch((e) => {
-						console.error(e)
-						uni.showToast({
-							title: this.$t('message.fast_meeting.fail'),
-							icon: 'none'
-						})
-					})
 				
-				this.theme = ''
-				this.booker = ''
-				this.$emit('close')
 			},
 		}
 	}

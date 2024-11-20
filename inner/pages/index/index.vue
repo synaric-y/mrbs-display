@@ -50,7 +50,7 @@
 					{{$t('message.index.left.book')}}
 				</view>
 				<!-- 预约会议对话框 -->
-				<FastMeetingDialog v-if="showQuickMeeting" @close="showQuickMeeting=false"
+				<FastMeetingDialog v-if="showQuickMeeting" @close="showQuickMeeting=false" @success="quickMeetingSuccess" @fail="quickMeetingFail"
 					:currentTime="serverTime ?? Math.trunc(new Date().getTime()/1000)" :areaLb="lb" :areaUb="ub"
 					:meetings="meetingList ?? []" :avaliableHours="avaliableHours" :scale="scale" />
 			</view>
@@ -301,12 +301,20 @@
 				temporary_meeting: false, // 显示快速会议按钮
 				// resolution: 1800, // 最小预约间隔（s）
 				scale: 15, // 最小预约间隔（min）
-				inner_address: 'https://meeting-manage-test.businessconnectchina.com:12443/display/2.0/index.html', // 内核网页地址
+				inner_address: '', // 内核网页地址（默认）
 
-				cancelUpdate: false // 用户在这次运行中是否取消过更新
+				cancelUpdate: false, // 用户在这次运行中是否取消过更新
+				cancelUnbindRestart: false // 用户在这次运行中是否取消过解绑的重启(为true时不弹出对话框，但是每2min会变为false，再弹)
 			}
 		},
 		onLoad() {
+			
+			// 获取是否为第一次打开（无请求地址）
+			if(!this.currentBaseURL){
+				this.activateViewShow = true // 打开激活页面
+				return
+			}
+			
 
 			// 获取是否激活（尝试调一下syncRoom接口），需要等电量和设备信息传过来才行，等待5秒
 			uni.showLoading({
@@ -415,13 +423,33 @@
 						data:allData
 					} = data;
 					
-					// 检查是否解绑
-					if(code == -60){
+					// 未激活
+					if (code == -59){
 						// 暂停同步
 						this.stopSync()
 						
-						// 确认弹窗
-						this.$refs.popupUnbind.open()
+						// 打开激活页面
+						this.activateViewShow = true 
+					}
+					
+					// 检查是否解绑
+					if(code == -60){
+						
+						if(this.cancelUnbindRestart){ // 取消重启，只弹小提示
+							uni.showToast({
+								title: this.$t('message.index.right.unbind_error'),
+								icon: 'none'
+							})
+						}
+						else{ // 弹对话框
+						
+							// 暂停同步
+							this.stopSync()
+							
+							// 确认弹窗
+							this.$refs.popupUnbind.open()
+						}
+						
 						
 						return
 					}
@@ -456,22 +484,18 @@
 					this.show_book = (room?.show_book == 1) ?? false // 预定人显示
 					this.show_meeting_name = (room?.show_meeting_name == 1) ?? false // 会议主题显示
 					this.temporary_meeting = (room?.temporary_meeting == 1) ?? false // 快速会议按钮显示
-					this.inner_address = global_config?.inner_address ??
-						'https://meeting-manage-test.businessconnectchina.com:12443/display/2.0/index.html' // 内核网页
-
-
+					this.inner_address = global_config?.inner_address ?? ''
+					
 					// 检查更新
-					if (this.inner_address && this.inner_address != '' && (!this.cancelUpdate) && this
-						.inner_address != this.currentInnerAddress) { // 需要更新且用户没有取消过更新
-						
+					if(!this.currentInnerAddress){ // 缓存中无这个网页，则自动添加，不重启
+						this.changeInnerAddress(this.inner_address)
+					}else if((!this.cancelUpdate) && (this.inner_address) && this.currentInnerAddress != this.inner_address){ // 需要更新且用户没有取消过更新
 						// 暂停同步
 						this.stopSync()
-
+						
 						// 确认弹窗
 						this.$refs.popup.open()
-
 					}
-
 
 
 					// 时间主题同步
@@ -510,21 +534,21 @@
 			},
 			prepareSetting() { // 预先请求一下，成功则跳过登录
 			
-				// this.settingViewShow = true
+				this.loginViewShow = true
 				// return
 			
-				const that = this
-				getSettingApi(this.currentBaseURL, {}).then(res => {
-					// that.loginViewShow = true
-					if (res.data.data == null) { // 未登录，则打开登录页面
-						that.loginViewShow = true
-					} else { // 已登录，直接进
-						that.settingViewShow = true
-					}
+				// const that = this
+				// getSettingApi(this.currentBaseURL, {}).then(res => {
+				// 	// that.loginViewShow = true
+				// 	if (res.data.data == null) { // 未登录，则打开登录页面
+				// 		that.loginViewShow = true
+				// 	} else { // 已登录，直接进
+				// 		that.settingViewShow = true
+				// 	}
 
-				}).catch(e => {
-					console.log(e);
-				})
+				// }).catch(e => {
+				// 	console.log(e);
+				// })
 			},
 			prepareQuickMeet(opt) {
 				if (opt) {
@@ -535,6 +559,22 @@
 						icon: 'none'
 					})
 				}
+			},
+			quickMeetingSuccess(){
+				uni.showToast({
+					title: this.$t('message.fast_meeting.success'),
+					icon: 'none',
+					duration: 2000
+				})
+				this.showQuickMeeting = false;
+			},
+			quickMeetingFail(){
+				uni.showToast({
+					title: this.$t('message.fast_meeting.fail'),
+					icon: 'none',
+					duration: 2000
+				})
+				this.showQuickMeeting = false;
 			},
 			prepareCancelQuickMeet(item) {
 				
@@ -598,9 +638,17 @@
 				this.startSync()
 				console.log(490);
 			},
-			unbindClose(){ // 用户取消重启，不启动定时器
+			unbindClose(){ // 用户取消重启，打标记，再次启动定时器
 				console.log('取消重启');
 				this.$refs.popupUnbind.close()
+				
+				this.cancelUnbindRestart=true
+				this.startSync()
+				
+				const that = this
+				setTimeout(()=>{
+					that.cancelUnbindRestart=false
+				},2*60*1000); // 2分钟后这个变为false，对话框又会弹出来
 			},
 			unbindRestart(){ // 用户确认重启
 				this.$refs.popupUnbind.close()
@@ -619,7 +667,8 @@
 				console.log(495);
 				uni.webView.postMessage({
 					data: {
-						type: 'updateWvURL'
+						type: 'updateWvURL',
+						value: this.inner_address
 					}
 				}, '*');
 			},

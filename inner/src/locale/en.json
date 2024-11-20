@@ -62,7 +62,8 @@
         "no_meeting": "Free",
         "notice": "Notice",
         "unbind": "Detected that the device has been unbound. It can be rebind after restarting. Do you want to restart now?",
-        "update": "Detected a new version, do you want to restart immediately?"
+        "update": "Detected a new version, do you want to restart immediately?",
+		"unbind_error": "Device unbinding, attempting to reconnect"
       }
     },
     "initializing": "Initializing...",
