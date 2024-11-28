@@ -14,11 +14,7 @@
 
 <style>
 	/*每个页面公共css */
-	
-	@font-face {
-		font-family: 'pingfang';
-		src: url('./static/fonts/PingFang-SC-Regular.ttf')
-	}
+
 	
 	/* color palette from <https://github.com/vuejs/theme> */
 	:root {
@@ -125,7 +121,6 @@
 	    background-color 0.5s;
 	  line-height: 1.6;
 	  font-family:
-	   'pingfang',
 	    Inter,
 	    -apple-system,
 	    BlinkMacSystemFont,

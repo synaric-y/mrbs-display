@@ -36,11 +36,16 @@
       "title": "빠른 회의",
       "to_start": "예정됨"
     },
+	"scan_meeting":{
+		"line1": "현재 방에 인증이 켜져 있습니다.",
+		"line2": "기업 위챗을 사용하여 코드를 스캔하여 예약하십시오."
+	},
     "index": {
       "left": {
         "book": "빠른 모임 만들기",
         "cancel": "취소",
         "cancel_tip": "회의를 취소하시겠습니까?",
+		"force_end_tip": "이 모임의 조기 종료 여부?",
         "confirm": "확인",
         "default_name": "빠른 모임",
         "fail": "회의 취소 실패!",

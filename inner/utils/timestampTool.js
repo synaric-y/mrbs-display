@@ -24,6 +24,23 @@ const nextScaleTs=(ts,scale)=>{
 }
 
 /**
+ * param: ts,scale(900,1800，单位：秒)
+ * return: 最近的下一个能被scale整除的时间戳, 含上界
+ */
+const ceilScaleTs=(ts,scale)=>{
+	
+	if((Number)(new Decimal(ts).mod(scale))==0) return ts
+
+    let res = new Decimal(ts).dividedBy(scale).floor().times(scale).plus(scale);
+
+    // console.log(res);
+
+    return Number(res)
+}
+
+
+
+/**
  * param: begTs,endTs,scale(秒)
  * return: 一个闭区间数组，间隔为scale
 */
@@ -120,5 +137,6 @@ export {
 	nextScaleTs,
 	nearestScaleTs,
 	hourDisplay,
-	hourToTimestamp
+	hourToTimestamp,
+	ceilScaleTs
 }

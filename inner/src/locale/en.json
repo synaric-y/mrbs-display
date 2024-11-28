@@ -36,11 +36,16 @@
       "title": "Fast Meetings",
       "to_start": "Reserved"
     },
+	"scan_meeting":{
+		"line1": "The current room has enabled authentication",
+		"line2": "Scan the code in WeCom and make a reservation"
+	},
     "index": {
       "left": {
         "book": "Create Fast Meeting",
         "cancel": "Cancel",
         "cancel_tip": "Are you sure to cancel the meeting?",
+		"force_end_tip": "Are you sure to end the meeting early?",
         "confirm": "Confirm",
         "default_name": "Fast Meeting",
         "fail": "Fail to cancel meeting!",

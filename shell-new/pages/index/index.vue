@@ -9,7 +9,8 @@
 		data() {
 			return {
 				wvNode: null,
-				wvURL: uni.getStorageSync('webview-url') || 'https://meeting-manage-dev.businessconnectchina.com:11443/display/2.0/index.html', // 默认值
+				// wvURL: uni.getStorageSync('webview-url') || 'https://meeting-manage-dev.businessconnectchina.com:11443/display/2.0/index.html', // 默认值
+				wvURL: uni.getStorageSync('webview-url') || 'https://meeting-manage-test.businessconnectchina.com:12443/display/2.1/index.html', // 默认值
 				// wvURL: 'https://meeting-manage-dev.businessconnectchina.com:11443/display/2.0/index.html', // 正式环境
 				// wvURL: 'https://meeting-manage-test.businessconnectchina.com:12443/display/2.0/index.html', // 测试环境
 				// wvURL: 'https://meeting-manage-test.businessconnectchina.com:12443/display/2.1/index.html', // 测试环境

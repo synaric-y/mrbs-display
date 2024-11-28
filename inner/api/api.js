@@ -29,6 +29,28 @@ function cancelMeetingApi(host, data, header) {
 	})
 }
 
+function forceEndMeetingApi(host, data) {
+    return request({
+		host: host,
+        url: '/web/call.php?act=entry%2Fforce_end_entry',
+		method: "POST",
+		data: {
+			...data
+		}
+    })
+}
+
+function wxOauth2Url(host, data) {
+    return request({
+		host: host,
+        url: '/web/wxwork_login_url.php',
+        method: 'POST',
+		data: {
+			...data
+		}
+    })
+}
+
 
 /**
  *  心跳包
@@ -186,6 +208,8 @@ const quickMeetMessageMapping = {
 export {
 	quickMeetApi,
 	cancelMeetingApi,
+	forceEndMeetingApi,
+	wxOauth2Url,
 	syncRoomApi,
 	quickMeetMessageMapping,
 	getAllAreaApi,

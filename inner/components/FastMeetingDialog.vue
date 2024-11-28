@@ -24,7 +24,8 @@
 			v-model:disabled="disabled"
 			:isFirst="false"
 			:avaliableHours="avaliableHours"
-			:scale="scale"/>
+			:scale="scale"
+			@changing="autoCloseRefresh"/>
 			<input @input="wordLimit1" :class="'my-input '+inputBlink1" :maxlength="inputMaxLength1"  :placeholder="$t('message.fast_meeting.theme')" v-model="theme"/>
 			<input @input="wordLimit2" :class="'my-input '+inputBlink2" :maxlength="inputMaxLength2" :placeholder="$t('message.fast_meeting.name')" v-model="booker"/>
 			
@@ -58,6 +59,7 @@
 		emits:['close','success','fail'],
 		data() {
 			return {
+				autoCloseTimer: null, // 自动关闭弹窗定时器
 				leftHandle: nextScaleTs(this.currentTime,this.scale*SEC_PER_MINUTE),
 				rightHandle: nextScaleTs(this.currentTime,this.scale*SEC_PER_MINUTE),
 				// lb: nextScaleTs(this.currentTime,15*60) - SEC_PER_HOUR,
@@ -71,8 +73,40 @@
 				inputBlink2: ''
 			};
 		},
+		mounted() {
+			
+			this.autoCloseRefresh() // 开启定时器
+			console.log(this.autoCloseTimer);
+			
+		},
+		unmounted(){
+			console.log('组件销毁');
+			
+			// 清空旧的定时器
+			if(this.autoCloseTimer){ 
+				clearTimeout(this.autoCloseTimer)
+				this.autoCloseTimer = null
+			}
+		},
 		methods:{
+			autoCloseRefresh(){
+				
+				console.log('刷新定时器');
+				
+				// 清空旧的定时器
+				if(this.autoCloseTimer){ 
+					clearTimeout(this.autoCloseTimer)
+					this.autoCloseTimer = null
+				}
+				
+				// 开启新的定时器
+				this.autoCloseTimer = setTimeout(()=>{
+					this.$emit('close')
+				},30*1000) // 30s自动关闭
+			},
 			wordLimit1(e){
+				
+				this.autoCloseRefresh() // 刷新定时器
 				
 				const len = e.detail.value.length
 				console.log(len);
@@ -81,6 +115,8 @@
 				else this.inputBlink1 = ''
 			},
 			wordLimit2(e){
+				
+				this.autoCloseRefresh() // 刷新定时器
 				
 				const len = e.detail.value.length
 				console.log(len);

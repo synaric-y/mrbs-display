@@ -36,11 +36,16 @@
       "title": "快速会议",
       "to_start": "已预定"
     },
+	"scan_meeting":{
+		"line1": "当前房间已开启身份验证",
+		"line2": "请使用企业微信扫码预定",
+	},
     "index": {
       "left": {
         "book": "创建快速会议",
         "cancel": "取消",
         "cancel_tip": "是否确认取消该会议？",
+		"force_end_tip": "是否确认提前结束该会议？",
         "confirm": "确定",
         "default_name": "快速会议",
         "fail": "会议取消失败!",

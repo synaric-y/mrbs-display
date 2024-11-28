@@ -32,7 +32,7 @@
 											{{ tsHourMinuteFormat(item.start_time) +' - '+ tsHourMinuteFormat(item.end_time)}}
 										</text>
 									</div>
-									<image v-if="displayStatus=='in-progress'&&item.id==meetingInDisplay.id"
+									<image @click="prepareForceEndEntry(item)" v-if="displayStatus=='in-progress'&&item.id==meetingInDisplay.id"
 										class="in-meeting-icon" src="@/static/in-meeting.png" mode="aspectFit">
 									</image>
 								</div>
@@ -97,18 +97,29 @@
 				<!-- 预订人、标题、时间 -->
 				<view class="meeting-detail-item">
 					<image class="meeting-detail-item-icon" src="@/static/meeting-msg.png" mode=""></image>
-					<text
-						class="meeting-title">{{ (show_meeting_name&&(meetingInDisplay?.name ?? '-')) || $t('message.index.right.default_name') }}</text>
+					<div style="width: 70%;background-color: transparent;">
+						<ocMarquee :class="{
+								'meeting-title':true,
+								'meeting-title-small':(show_meeting_name&&(!(meetingInDisplay?.name)))
+							}" style="font-size: 22rpx; font-weight: 500;" v-if="!initializing" :marqueeId="1" :text="(show_meeting_name&&(meetingInDisplay?.name ?? '-')) || $t('message.index.right.default_name')" />
+					</div>
+<!-- 					<text
+						:class="{
+							'meeting-title':true,
+							'meeting-title-small':(show_meeting_name&&(!(meetingInDisplay?.name)))
+						}">{{ (show_meeting_name&&(meetingInDisplay?.name ?? '-')) || $t('message.index.right.default_name') }}</text> -->
 				</view>
 				<view class="meeting-detail-item">
 					<image class="meeting-detail-item-icon" src="@/static/reverse-time.png" mode=""></image>
+					
 					<text
 						class="meeting-detail-item-desc">{{ meetingInDisplay ?(tsHourMinuteFormat(meetingInDisplay.start_time) +' - '+ tsHourMinuteFormat(meetingInDisplay.end_time)):'-'}}</text>
 				</view>
 				<view class="meeting-detail-item">
 					<image class="meeting-detail-item-icon" src="@/static/reverse-person.png" mode=""></image>
-					<text class="meeting-detail-item-desc"
-						style="width: 40%;">{{ (show_book&&(meetingInDisplay?.book_by ?? '-')) || $t('message.index.right.default_booker') }}</text>
+					<div style="width: 70%;background-color: transparent;">
+						<ocMarquee style="font-size: 14rpx;font-weight: normal;" v-if="!initializing" :marqueeId="2" :text="(show_book&&(meetingInDisplay?.book_by ?? '-')) || $t('message.index.right.default_booker')" />
+					</div>
 				</view>
 			</view>
 
@@ -133,6 +144,23 @@
 				:content="$t('message.index.left.cancel_tip')" @confirm="cancelQuickMeet()"
 				@close="popupCancelQuickMeetClose()"></uni-popup-dialog>
 		</uni-popup>
+		<uni-popup ref="popupForceEndQuickMeet" type="dialog">
+			<uni-popup-dialog type="warn" :cancelText="$t('message.index.left.cancel')"
+				:confirmText="$t('message.index.left.confirm')" :title="$t('message.index.left.notice')"
+				:content="$t('message.index.left.force_end_tip')" @confirm="forceEndQuickMeet()"
+				@close="popupForceEndQuickMeetClose()"></uni-popup-dialog>
+		</uni-popup>
+		<uni-popup ref="popupQRCode">
+			<div class="qrcode-container" @click="popupQRCodeClose()">
+				<div class="qrcode-bg" @click.stop="()=>{}">
+					<uni-icons class="icon" type="closeempty" size="30" color="#666" @click="popupQRCodeClose()"></uni-icons>
+
+					<div style="width: 300px;height: 300px" id="qrcode"></div>
+					<div class="text">{{ $t('message.scan_meeting.line1') }}</div>
+					<div class="text">{{ $t('message.scan_meeting.line2') }}</div>
+				</div>
+			</div>
+		</uni-popup>
 	</div>
 
 </template>
@@ -140,6 +168,7 @@
 
 <script>
 	import moment from 'moment-timezone';
+	import AraleQRCode from 'arale-qrcode'
 	import {
 		dateDisplayLocale,
 		dateDisplayLocaleOnly,
@@ -165,12 +194,15 @@
 	import SettingView from '@/views/SettingView.vue';
 	import ActivateView from '@/views/ActivateView.vue';
 	import BatteryShow from '../../components/BatteryShow.vue';
+	import ocMarquee from '../../components/oc-marquee.vue';
 	import {
 		quickMeetApi,
 		quickMeetMessageMapping,
 		syncRoomApi,
 		getSettingApi,
-		cancelMeetingApi
+		cancelMeetingApi,
+		forceEndMeetingApi,
+		wxOauth2Url
 	} from '../../api/api.js'
 	import {
 		Decimal
@@ -182,6 +214,12 @@
 	import {
 		PageMixin
 	} from '@/mixin/index.js'
+	import {
+		PAD_QUICK_MEETING_TYPE,
+		TEMPORARY_MEETING_NONE,
+		TEMPORARY_MEETING_LEGACY,
+		TEMPORARY_MEETING_VERIFIED
+	} from '@/constants/meeting.js'
 
 	import _ from 'lodash'; // lodash，用于数组运算
 
@@ -198,7 +236,8 @@
 			LanguageSelect,
 			BatteryShow,
 			LoginView,
-			ActivateView
+			ActivateView,
+			ocMarquee
 		},
 		mounted() {
 			// webview接收uniapp传过来的信息
@@ -215,8 +254,20 @@
 				console.log('batteryInfo', e.detail.value)
 				this.changeBatteryInfo(JSON.parse(e.detail.value))
 			}, false)
+			
+			
+		},
+		unmounted(){
+			console.log('组件销毁');
+			
+			// 清空旧的定时器
+			if(this.autoCloseTimer){ 
+				clearTimeout(this.autoCloseTimer)
+				this.autoCloseTimer = null
+			}
 		},
 		computed: {
+			
 			calculateY() {
 				return (startTs) => {
 					const len = this.hourList.length
@@ -241,6 +292,7 @@
 			},
 			meetingClass() { // 根据会议起止时间获取类名
 				return (startTs, endTs) => {
+					const min10 = SEC_PER_MINUTE * 10
 					const min15 = SEC_PER_MINUTE * 15
 					const min60 = SEC_PER_MINUTE * 60
 					const min90 = SEC_PER_MINUTE * 90
@@ -249,7 +301,8 @@
 
 					let res = ''
 
-					if (diff <= min15) res = 'min15'
+					if (diff <= min10) res = 'none' // 小于10分钟，不显示任何东西
+					else if (diff <= min15) res = 'min15'
 					else if (diff <= min60) res = 'min60'
 					else res = 'min90'
 
@@ -274,6 +327,9 @@
 		},
 		data() {
 			return {
+				initializing: true, // 正在初始化
+				autoCloseTimer: null, // 自动关闭弹窗定时器
+				
 				activateViewShow: false, // 激活页面弹窗
 				loginViewShow: false, // 登录页面弹窗
 				settingViewShow: false, // 设置页面弹窗
@@ -292,6 +348,9 @@
 				displayStatus: 'none', // 会议状态：none无会议 in-progress进行中 to-start待开始
 				serverTime: new Date().getTime() / 1000, // 服务器时间（s）
 				roomName: '', // 房间名
+				
+				area_id: '', // 区域id
+				room_id: '', // 房间id
 
 				timezore: 'Asia/Shanghai',
 				languageSet: 'zh-CN,zh;q=0.9',
@@ -299,6 +358,9 @@
 				show_book: false, // 显示预定人
 				show_meeting_name: false, // 显示会议主题
 				temporary_meeting: false, // 显示快速会议按钮
+				
+				temporary_meeting_verified: false, // 快速会议是否需要验证
+				
 				// resolution: 1800, // 最小预约间隔（s）
 				scale: 15, // 最小预约间隔（min）
 				inner_address: '', // 内核网页地址（默认）
@@ -317,6 +379,7 @@
 			
 
 			// 获取是否激活（尝试调一下syncRoom接口），需要等电量和设备信息传过来才行，等待5秒
+			this.initializing = true
 			uni.showLoading({
 				title: this.$t('message.initializing')
 			})
@@ -328,6 +391,7 @@
 					console.log(JSON.stringify(res));
 					let data = res.data.data;
 					let code = res.data.code
+					this.initializing = false
 					uni.hideLoading()
 
 					// this.activateViewShow = true // 打开激活页面
@@ -351,6 +415,7 @@
 						// this.syncRoom()
 					}
 				}).catch(e => {
+					this.initializing = false
 					uni.hideLoading()
 					console.error(JSON.stringify(e))
 					// this.activateViewShow = true // 打开激活页面
@@ -365,6 +430,21 @@
 		methods: {
 			test() {
 				console.log('ssss');
+			},
+			autoCloseRefresh(){
+				
+				console.log('刷新定时器');
+				
+				// 清空旧的定时器
+				if(this.autoCloseTimer){ 
+					clearTimeout(this.autoCloseTimer)
+					this.autoCloseTimer = null
+				}
+				
+				// 开启新的定时器
+				this.autoCloseTimer = setTimeout(()=>{
+					this.popupQRCodeClose() // 关闭扫码弹窗
+				},30*1000) // 30s自动关闭
 			},
 			// 获取当前或下一次会议
 			getNowOrNextMeeting(entries, ts) {
@@ -474,7 +554,12 @@
 						entries,
 						global_config
 					} = allData
+					
+					// console.log(area,room);
 
+					this.room_id = room.id
+					this.area_id = area.id
+					
 					this.roomName = room.room_name // 房间名
 					// this.resolution = area.resolution // 最小会议时间
 					this.scale = area.resolution / SEC_PER_MINUTE // 最小会议时间
@@ -483,13 +568,25 @@
 					this.ub = hourToTimestamp(area?.eveningends ?? 21) // 区域结束时间
 					this.show_book = (room?.show_book == 1) ?? false // 预定人显示
 					this.show_meeting_name = (room?.show_meeting_name == 1) ?? false // 会议主题显示
-					this.temporary_meeting = (room?.temporary_meeting == 1) ?? false // 快速会议按钮显示
-					this.inner_address = global_config?.inner_address ?? ''
+					this.temporary_meeting = (room?.temporary_meeting == TEMPORARY_MEETING_LEGACY || room?.temporary_meeting == TEMPORARY_MEETING_VERIFIED) ?? false // 快速会议按钮显示
+					this.temporary_meeting_verified = (room?.temporary_meeting == TEMPORARY_MEETING_VERIFIED) ?? false // 快速会议是否验证
+					
+					this.inner_address = global_config?.inner_address ?? '' // 内核网页最新地址
+					
+					const time_type = global_config?.time_type == 12 ? "12" : "24" // 时间格式
+					this.changeTimeFormat(time_type)
+					
+					const theme_type = global_config?.theme_type == 0 ? 'default' : 'dark' // 主题
+					this.changeTheme(theme_type)
+					
+					
+					// uni.showToast({
+					// 	title: window.location.href,
+					// 	icon:'none'
+					// })
 					
 					// 检查更新
-					if(!this.currentInnerAddress){ // 缓存中无这个网页，则自动添加，不重启
-						this.changeInnerAddress(this.inner_address)
-					}else if((!this.cancelUpdate) && (this.inner_address) && this.currentInnerAddress != this.inner_address){ // 需要更新且用户没有取消过更新
+					if((!this.cancelUpdate) && (this.inner_address) && window.location.href != this.inner_address){ // 需要更新且用户没有取消过更新
 						// 暂停同步
 						this.stopSync()
 						
@@ -498,11 +595,7 @@
 					}
 
 
-					// 时间主题同步
-					const time_type = room?.time_type == 12 ? "12" : "24" // 时间格式
-					const theme_type = room?.theme_type == 0 ? 'default' : 'dark' // 主题
-					this.changeTheme(theme_type)
-					this.changeTimeFormat(time_type)
+					
 
 
 					// 左侧时间轴同步
@@ -552,13 +645,67 @@
 			},
 			prepareQuickMeet(opt) {
 				if (opt) {
-					this.showQuickMeeting = true;
+					
+					// this.pendingShowQRCode()
+					// return
+					
+					if(this.temporary_meeting_verified){
+						this.pendingShowQRCode()
+					}else{
+						this.showQuickMeeting = true;
+					}
+					
+					
 				} else {
 					uni.showToast({
 						title: this.$t('message.index.left.no_free'),
 						icon: 'none'
 					})
 				}
+			},
+			pendingShowQRCode() {
+				
+			  this.autoCloseRefresh() // 开启定时器
+			  console.log(this.autoCloseTimer);
+				
+			  this.$refs.popupQRCode.open()
+			  
+			  const that = this
+			  
+			  console.log(this.area_id,this.room_id);
+			  
+			  wxOauth2Url(this.currentBaseURL, {
+				  area_id: this.area_id,
+				  room_id: this.room_id,
+				  // area_id: 20, // 测试
+				  // room_id: 18, // 测试
+			  }).then(({data})=>{
+				  console.log(data);
+				  
+				  that.$nextTick(() => {
+				    const codeFigure = new AraleQRCode({
+				      "render": "svg", // 生成的类型 'svg' or 'table'
+				      "text": data, // 需要生成二维码的链接
+				      "size": 300 // 生成二维码大小
+				    });
+				    const qrcodeContainer = document.querySelector('#qrcode')
+				    while (qrcodeContainer.firstChild) { // 移除所有子元素
+				      qrcodeContainer.removeChild(qrcodeContainer.firstChild);
+				    }
+				    qrcodeContainer.appendChild(codeFigure); // 增加新的子元素
+				  })
+			  }).catch(e=>{
+				  console.log(e);
+				  uni.showToast({
+				  	title: this.$t('message.netDataError'),
+				  	icon: 'none'
+				  })
+			  })
+			  
+
+			},
+			popupQRCodeClose(){
+				this.$refs.popupQRCode.close()
 			},
 			quickMeetingSuccess(){
 				uni.showToast({
@@ -595,7 +742,7 @@
 					return
 				}
 				
-				if (type != 99) {
+				if (type != PAD_QUICK_MEETING_TYPE) {
 					uni.showToast({
 						title: this.$t('message.index.left.invalid_type'),
 						icon: 'none'
@@ -627,6 +774,64 @@
 						this.syncRoom() // 手动刷新
 						this.popupCancelQuickMeetClose()
 					})
+			},
+			prepareForceEndEntry(item){
+				if(!this.enableCancel) return // 滑动则不要触发此事件
+				
+				const {
+					id,
+					entry_type:type,
+					start_time,
+					end_time
+				} = item
+				
+				// 检查是否为进行中会议
+				if(!(this.serverTime>=start_time && this.serverTime<end_time)){
+					uni.showToast({
+						title: this.$t('message.index.left.invalid_time'),
+						icon: 'none'
+					})
+					return
+				}
+				
+				// 检查是否为平板端快速会议
+				if (type != PAD_QUICK_MEETING_TYPE) {
+					uni.showToast({
+						title: this.$t('message.index.left.invalid_type'),
+						icon: 'none'
+					})
+					return
+				}
+				
+				
+				this.toCancelId = id // 准备删除的会议id
+				this.$refs.popupForceEndQuickMeet.open()
+				
+			},
+			forceEndQuickMeet(){
+				forceEndMeetingApi(this.currentBaseURL,{
+						"id": this.toCancelId,
+					}).then(res => {
+						console.log(res)
+						uni.showToast({
+							title: this.$t('message.index.left.success'),
+							icon: 'none'
+						})
+					})
+					.catch((e) => {
+						console.log(e);
+						uni.showToast({
+							title: this.$t('message.index.left.fail'),
+							icon: 'none'
+						})
+					})
+					.finally(()=>{
+						this.syncRoom() // 手动刷新
+						this.popupForceEndQuickMeetClose()
+					})
+			},
+			popupForceEndQuickMeetClose(){
+				this.$refs.popupForceEndQuickMeet.close()
 			},
 			popupCancelQuickMeetClose(){
 				this.$refs.popupCancelQuickMeet.close()
@@ -661,7 +866,7 @@
 			},
 			restart() { // 用户确认更新，刷新内核的localStorage，发送重启指令
 				console.log(494);
-				this.changeInnerAddress(this.inner_address)
+				// this.changeInnerAddress(this.inner_address)
 				this.$refs.popup.close()
 
 				console.log(495);
@@ -774,7 +979,8 @@
 								height: 60rpx;
 								width: 100%;
 								padding: 4rpx 8rpx;
-								background-color: rgba(255, 255, 255, 0.12);
+								// background-color: rgba(255, 255, 255, 0.12);
+								background-color: #4c4c4c;
 								font-size: 9rpx;
 								border: 1rpx solid #333;
 								/*产生空隙，防止会议黏在一起*/
@@ -811,6 +1017,16 @@
 									.meeting-theme,
 									.meeting-span {
 										line-height: 1.5;
+									}
+								}
+								
+								.none{
+									.meeting-theme {
+										display: none;
+									}
+									
+									.meeting-span {
+										display: none;
 									}
 								}
 
@@ -1033,6 +1249,7 @@
 				}
 
 				.meeting-detail-item-desc,
+				
 				.meeting-title {
 					padding-right: 5rpx;
 					text-align: left;
@@ -1046,12 +1263,17 @@
 
 				.meeting-detail-item-desc {
 					font-size: 14rpx;
+					width: 75%;
 				}
 
 				.meeting-title {
 					font-size: 22rpx;
-					width: 50%;
+					// width: 75%;
 					font-weight: 500;
+				}
+				
+				.meeting-title-small{
+					font-size: 14rpx;
 				}
 
 			}
@@ -1105,4 +1327,41 @@
 		}
 
 	}
+	
+	.qrcode-container{
+		width: 100vw;
+		height: 100vh;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		
+		.qrcode-bg{
+			width: 80%;
+			height: 80%;
+			background-color: #fff;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			border-radius: 8rpx;
+			box-shadow: 0 4rpx 10rpx 2rpx rgba(0, 0, 0, 0.15);
+			position: relative;
+			
+			.icon{
+				position: absolute;
+				top: 5rpx;
+				right: 10rpx;
+			}
+			
+			#qrcode{
+				margin-bottom: 30rpx;
+			}
+			
+			.text{
+				font-size: 14rpx;
+				line-height: 2;
+			}
+		}
+	}
+	
 </style>

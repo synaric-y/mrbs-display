@@ -8,13 +8,13 @@
 			<div class="form-row">
 				<div class="label">{{$t('message.login.account_number')}}</div>
 				<div class="input-wrapper">
-					<input class="my-input" v-model="accountNumber"/>
+					<input @input="autoCloseRefresh" class="my-input" v-model="accountNumber"/>
 				</div>
 			</div>
 			<div class="form-row">
 				<div class="label">{{$t('message.login.password')}}</div>
 				<div class="input-wrapper">
-					<input :password="isHidePassword" class="my-input" v-model="password"/>
+					<input @input="autoCloseRefresh" :password="isHidePassword" class="my-input" v-model="password"/>
 					<uni-icons class="scan" :type="isHidePassword?'eye':'eye-slash'" size="25" color="#5e6d82" @click="isHidePassword=!isHidePassword"></uni-icons>
 				</div>
 				<!-- <button class="btn btn-default" type="default" @click="$emit('close')">{{$t('message.login.previous')}}</button> -->
@@ -43,12 +43,43 @@ export default {
 	},
 	data() {
 		return {
+			autoCloseTimer: null, // 自动关闭弹窗定时器
 			accountNumber: '',
 			password: '',
 			isHidePassword: true
 		};
 	},
+	mounted() {
+		
+		this.autoCloseRefresh() // 开启定时器
+		console.log(this.autoCloseTimer);
+		
+	},
+	unmounted(){
+		console.log('组件销毁');
+		
+		// 清空旧的定时器
+		if(this.autoCloseTimer){ 
+			clearTimeout(this.autoCloseTimer)
+			this.autoCloseTimer = null
+		}
+	},
 	methods:{
+		autoCloseRefresh(){
+			
+			console.log('刷新定时器');
+			
+			// 清空旧的定时器
+			if(this.autoCloseTimer){ 
+				clearTimeout(this.autoCloseTimer)
+				this.autoCloseTimer = null
+			}
+			
+			// 开启新的定时器
+			this.autoCloseTimer = setTimeout(()=>{
+				this.$emit('close')
+			},30*1000) // 30s自动关闭
+		},
 		finish(){
 			loginApi(this.currentBaseURL,
 				{
