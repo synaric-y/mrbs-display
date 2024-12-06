@@ -1,3 +1,10 @@
+/** @module MeetingFormat */
+
+/**
+ * @author Octene
+ * @file 会议格式化
+ */
+
 import _ from 'lodash'
 import i18n from '@/src/i18n.js'
 import {
@@ -6,8 +13,31 @@ import {
 	MEETING_FINISHED,
 	MEETING_EXPIRED
 } from "@/constants/meeting.js"
+import { SEC_PER_MINUTE } from '@/constants/time.js'
 
-// 时间表初始化
+/**
+ *
+ * @typedef TimelineMeeting
+ * @type {Object} 
+ * @property {?Number} id 会议id
+ * @property {Number} start_time 开始时间戳
+ * @property {Number} end_time 结束时间戳
+ * @property {0|1|2|3} status 会议状态：待开始|进行中|已结束|已过时（表示过去的时间）
+ * @property {String} text 描述文字
+ * @property {String} className 显示的类名
+ */
+
+
+/**
+ * @function
+ * @author Octene
+ * @description 计算可供时间滚动选择器使用的会议列表
+ * @param {Number} currentTime 当前时间戳
+ * @param {Number} lb 时间下界（含），时间戳
+ * @param {Number} ub 时间上界（含），时间戳
+ * @param {Array} meetings 待格式化的会议列表
+ * @returns {TimelineMeeting[]} 格式化之后的会议列表
+*/
 const formatMeetings = (currentTime,lb,ub,meetings) => {
 	
 
@@ -56,11 +86,11 @@ const formatMeetings = (currentTime,lb,ub,meetings) => {
 		if (entry.end_time < lb) return
 
 		const status = getEntryStatus(entry)
-		const text = getEntryText(status)
+		const text = (entry.end_time-entry.start_time>=SEC_PER_MINUTE*15)?getEntryText(status):'' // 大于等于15分钟展示文字
 		const className = getEntryClassName(status)
 		
 		tempList.push({
-			id: entry.entry_id,
+			id: entry.id,
 			start_time: Math.max(entry.start_time, lb), // 截断越界的部分
 			end_time: Math.min(ub, entry.end_time),
 			status: status, // 待开始，进行中，已结束

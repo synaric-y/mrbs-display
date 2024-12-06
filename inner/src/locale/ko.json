@@ -18,7 +18,7 @@
       "verify_fail": "요청 주소 확인 실패!",
       "verify_success": "요청 주소 확인 성공!",
       "verifying": "확인 중...",
-      "welcome": "xxx 회의 예약 시스템에 오신 것을 환영합니다"
+      "welcome": "회의 시스템 시작"
     },
     "fast_meeting": {
       "booker_too_long": "예약자 이름은 30자를 초과할 수 없습니다",
@@ -34,7 +34,8 @@
       "tip_left": "현재 ",
       "tip_right": "시간 동안의 유휴 시간 예약 가능",
       "title": "빠른 회의",
-      "to_start": "예정됨"
+      "to_start": "예정됨",
+	  "not_available": "사용 가능한 시간 없음"
     },
 	"scan_meeting":{
 		"line1": "현재 방에 인증이 켜져 있습니다.",
@@ -42,7 +43,7 @@
 	},
     "index": {
       "left": {
-        "book": "빠른 모임 만들기",
+        "book": "모임 만들기",
         "cancel": "취소",
         "cancel_tip": "회의를 취소하시겠습니까?",
 		"force_end_tip": "이 모임의 조기 종료 여부?",
@@ -79,7 +80,7 @@
       "login_fail": "사용자 이름 또는 암호 오류",
       "login_success": "로그인 성공",
       "password": "암호",
-      "previous": "반환",
+      "cancel": "취소",
       "title": "관리자 암호를 입력하십시오"
     },
     "netDataError": "인터페이스가 데이터 예외를 반환합니다.",

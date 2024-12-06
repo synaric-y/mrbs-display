@@ -58,7 +58,7 @@
 
 			contentPositionLeft.value = _.clamp((- props.initPos * contentWidth.value)+(contentWidth.value/(zoomIn/100))/2+fringe,minX.value,maxX.value)
 			
-			// console.log(rect);
+			console.log(props.initPos,rect);
 		}).exec()
 	
 	
@@ -105,7 +105,7 @@
 	
 			let tempLeft = Math.round(startPosition + deltaX) // 浮点数坐标会影响渲染速度
 			
-			console.log(tempLeft, minX.value, maxX.value);
+			// console.log(tempLeft, minX.value, maxX.value);
 	
 			if (!_.inRange(tempLeft, minX.value, maxX.value)) return // 超出边界返回
 	
@@ -177,8 +177,8 @@
 				.tags {
 					position: relative;
 					width: 100%;
-					padding-bottom: 0.3rem;
-					height: 1.3rem;
+					padding-bottom: 0.1rem;
+					height: 0.85rem;
 				}
 
 				.timeline-bar {

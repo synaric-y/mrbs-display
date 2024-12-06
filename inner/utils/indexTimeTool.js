@@ -50,36 +50,6 @@ function displayHMOnly(timestamp,locale,is12) {
 	return zhDate
 }
 
-function dateDisplayLocale(timestamp,locale,is12) {
-	// console.log('dateDisplay now_timestamp', timestamp);
-	
-	// console.log(is12);
-	let dateFormat = 'YYYY年MM月DD日';
-	if (locale == 'en') {
-		dateFormat = 'MMMM D, YYYY';
-	} else if (locale == 'ko') {
-		dateFormat = 'YYYY년MM월DD일';
-	} else {
-		dateFormat = 'YYYY年MM月DD日';
-	}
-	
-	const displayAP = displayHM(timestamp,locale,is12);
-	const koDate = formatDate(timestamp, 'Asia/Seoul', 'ko', dateFormat);
-	const enDate = formatDate(timestamp, 'America/New_York', 'en', dateFormat);
-	const zhDate = formatDate(timestamp, 'Asia/Shanghai', 'zh-cn', dateFormat);
-	
-	let nowlanguageTime = displayAP + '  '
-	if (locale == 'en') {
-		nowlanguageTime += enDate;
-	} else if (locale == 'ko') {
-		nowlanguageTime += koDate;
-	} else {
-		nowlanguageTime += zhDate;
-	}
-	// console.log('dateDisplay now_timestamp currenlanguageTime', nowlanguageTime);
-	
-	return nowlanguageTime
-}
 
 function dateDisplayLocaleOnly(timestamp,locale,is12) { // 不切时区
 	// console.log('dateDisplay now_timestamp', timestamp);
@@ -122,17 +92,10 @@ function formatTime(timestamp) {
 	return hours + ':' + minutes;
 }
 
-function getTimestamp(year, month, day, hour, minute) {
-	// 注意：JavaScript 中的月份从 0 开始，所以需要减 1
-	const date = new Date(year, month - 1, day, hour, minute, 0, 0); // 秒和毫秒设置为0
-	return Math.floor(date.getTime() / 1000); // 将毫秒转为秒
-}
 
 export {
-	dateDisplayLocale,
 	dateDisplayLocaleOnly,
 	formatDate,
 	formatTime,
-	getTimestamp,
 	displayHM
 }

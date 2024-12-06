@@ -97,17 +97,17 @@
 				<!-- 预订人、标题、时间 -->
 				<view class="meeting-detail-item">
 					<image class="meeting-detail-item-icon" src="@/static/meeting-msg.png" mode=""></image>
-					<div style="width: 70%;background-color: transparent;">
+<!-- 					<div style="width: 70%;background-color: transparent;">
 						<ocMarquee :class="{
 								'meeting-title':true,
 								'meeting-title-small':(show_meeting_name&&(!(meetingInDisplay?.name)))
 							}" style="font-size: 22rpx; font-weight: 500;" v-if="!initializing" :marqueeId="1" :text="(show_meeting_name&&(meetingInDisplay?.name ?? '-')) || $t('message.index.right.default_name')" />
-					</div>
-<!-- 					<text
+					</div> -->
+					<text
 						:class="{
 							'meeting-title':true,
 							'meeting-title-small':(show_meeting_name&&(!(meetingInDisplay?.name)))
-						}">{{ (show_meeting_name&&(meetingInDisplay?.name ?? '-')) || $t('message.index.right.default_name') }}</text> -->
+						}">{{ (show_meeting_name&&(meetingInDisplay?.name ?? '-')) || $t('message.index.right.default_name') }}</text>
 				</view>
 				<view class="meeting-detail-item">
 					<image class="meeting-detail-item-icon" src="@/static/reverse-time.png" mode=""></image>
@@ -117,9 +117,11 @@
 				</view>
 				<view class="meeting-detail-item">
 					<image class="meeting-detail-item-icon" src="@/static/reverse-person.png" mode=""></image>
-					<div style="width: 70%;background-color: transparent;">
+<!-- 					<div style="width: 70%;background-color: transparent;">
 						<ocMarquee style="font-size: 14rpx;font-weight: normal;" v-if="!initializing" :marqueeId="2" :text="(show_book&&(meetingInDisplay?.book_by ?? '-')) || $t('message.index.right.default_booker')" />
-					</div>
+					</div> -->
+					<text
+						class="meeting-detail-item-desc">{{ (show_book&&(meetingInDisplay?.book_by ?? '-')) || $t('message.index.right.default_booker')}}</text>
 				</view>
 			</view>
 
@@ -170,20 +172,18 @@
 	import moment from 'moment-timezone';
 	import AraleQRCode from 'arale-qrcode'
 	import {
-		dateDisplayLocale,
 		dateDisplayLocaleOnly,
 		formatDate,
 		formatTime,
-		getTimestamp,
 		displayHM
 	} from '../../utils/indexTimeTool.js'
+	import { datetimeFormatTzLocale,localHourToTs,localHourList,localTsToHour } from '@/utils/tzDateTimeFormat.js' 
 	import {
 		hourDisplay,
 		nextScaleTs,
 		hourToTimestamp,
-		SEC_PER_MINUTE,
-		SEC_PER_HOUR
 	} from '@/utils/timestampTool.js'
+	import { SEC_PER_MINUTE } from '@/constants/time.js';
 	import LanguageSelect from '../../components/LanguageSelect.vue';
 	import {
 		timeZoneMapping,
@@ -207,10 +207,6 @@
 	import {
 		Decimal
 	} from 'decimal.js';
-	import {
-		isBetween,
-		clamp
-	} from "@/utils/mathUtil";
 	import {
 		PageMixin
 	} from '@/mixin/index.js'
@@ -254,6 +250,9 @@
 				console.log('batteryInfo', e.detail.value)
 				this.changeBatteryInfo(JSON.parse(e.detail.value))
 			}, false)
+			
+			
+			
 			
 			
 		},
@@ -313,16 +312,16 @@
 			},
 			tsHourMinuteFormat() {
 				return (ts) => {
-					return displayHM(ts, 'zh-cn', this.currentTimeFormat == '12' ? true : false);
+					return localTsToHour(ts, this.timezone, this.currentTimeFormat == '12' ? true : false);
 				}
 			},
 			hasTimeInCurrentAvaliable() { // 下一个15分钟(scale)在不在区域可用时间内
-				return (this.serverTime && isBetween(nextScaleTs(this.serverTime, this.scale * SEC_PER_MINUTE), this.lb,
-					this.ub))
+				return true
+				const next15 = nextScaleTs(this.serverTime, this.scale * SEC_PER_MINUTE)
+				return (this.serverTime && (this.lb<=next15) && (next15<=this.ub))
 			},
 			nowlanguageTime() {
-				return dateDisplayLocaleOnly(this.serverTime, this.$i18n.locale, this.currentTimeFormat == '12' ? true :
-					false)
+				return datetimeFormatTzLocale(this.serverTime, this.timezone, this.$i18n.locale, this.currentTimeFormat == '12' ? true : false)
 			}
 		},
 		data() {
@@ -352,7 +351,7 @@
 				area_id: '', // 区域id
 				room_id: '', // 房间id
 
-				timezore: 'Asia/Shanghai',
+				timezone: 'Asia/Shanghai',
 				languageSet: 'zh-CN,zh;q=0.9',
 
 				show_book: false, // 显示预定人
@@ -484,9 +483,8 @@
 				this.interval && clearInterval(this.interval)
 				this.interval = null
 			},
-			changeLang(index) {
+			changeLang(index) { // 更改语言，时区不变
 				const locale = this.$i18n.locale
-				this.timezore = timeZoneMapping[locale]
 				this.languageSet = languageSetMapping[locale]
 
 				this.syncRoom()
@@ -555,36 +553,51 @@
 						global_config
 					} = allData
 					
+					const {
+						timezone,
+						resolution,
+						morningstarts,
+						eveningends
+					} = area
+					
+					const {
+						room_name,
+						show_meeting_name,
+						temporary_meeting,
+						show_book
+					} = room
+					
+					const {
+						inner_address,
+						time_type,
+						theme_type
+					} = global_config
+					
 					// console.log(area,room);
 
 					this.room_id = room.id
 					this.area_id = area.id
 					
-					this.roomName = room.room_name // 房间名
+					this.timezone = timezone // 区域时区
+					this.changeTimezone(timezone) // 全局缓存时区
+					
+					this.roomName = room_name // 房间名
 					// this.resolution = area.resolution // 最小会议时间
-					this.scale = area.resolution / SEC_PER_MINUTE // 最小会议时间
+					this.scale = resolution / SEC_PER_MINUTE // 最小会议时间
 					this.serverTime = now_timestamp // 服务器时间(s)
-					this.lb = hourToTimestamp(area?.morningstarts ?? 8) // 区域开始时间
-					this.ub = hourToTimestamp(area?.eveningends ?? 21) // 区域结束时间
-					this.show_book = (room?.show_book == 1) ?? false // 预定人显示
-					this.show_meeting_name = (room?.show_meeting_name == 1) ?? false // 会议主题显示
-					this.temporary_meeting = (room?.temporary_meeting == TEMPORARY_MEETING_LEGACY || room?.temporary_meeting == TEMPORARY_MEETING_VERIFIED) ?? false // 快速会议按钮显示
-					this.temporary_meeting_verified = (room?.temporary_meeting == TEMPORARY_MEETING_VERIFIED) ?? false // 快速会议是否验证
+					this.lb = localHourToTs(now_timestamp, timezone, morningstarts ?? 8) // 区域开始时间
+					this.ub = localHourToTs(now_timestamp, timezone, eveningends ?? 21) // 区域结束时间
+					this.show_book = (show_book == 1) ?? false // 预定人显示
+					this.show_meeting_name = (show_meeting_name == 1) ?? false // 会议主题显示
+					this.temporary_meeting = (temporary_meeting == TEMPORARY_MEETING_LEGACY || temporary_meeting == TEMPORARY_MEETING_VERIFIED) ?? false // 快速会议按钮显示
+					this.temporary_meeting_verified = (temporary_meeting == TEMPORARY_MEETING_VERIFIED) ?? false // 快速会议是否验证
 					
-					this.inner_address = global_config?.inner_address ?? '' // 内核网页最新地址
+					this.changeTimeFormat(time_type == 12 ? "12" : "24") // 时间格式
 					
-					const time_type = global_config?.time_type == 12 ? "12" : "24" // 时间格式
-					this.changeTimeFormat(time_type)
+					this.changeTheme(theme_type == 0 ? 'default' : 'dark' ) // 主题
 					
-					const theme_type = global_config?.theme_type == 0 ? 'default' : 'dark' // 主题
-					this.changeTheme(theme_type)
-					
-					
-					// uni.showToast({
-					// 	title: window.location.href,
-					// 	icon:'none'
-					// })
-					
+					this.inner_address = inner_address ?? '' // 内核网页最新地址
+
 					// 检查更新
 					if((!this.cancelUpdate) && (this.inner_address) && window.location.href != this.inner_address){ // 需要更新且用户没有取消过更新
 						// 暂停同步
@@ -599,7 +612,7 @@
 
 
 					// 左侧时间轴同步
-					this.hourList = hourDisplay(this.lb, this.ub, this.currentTimeFormat == '12' ? true : false);
+					this.hourList = localHourList(this.lb, this.ub, this.timezone, this.currentTimeFormat == '12' ? true : false);
 
 					
 					_.forEach(entries, item => {
@@ -1273,7 +1286,7 @@
 				}
 				
 				.meeting-title-small{
-					font-size: 14rpx;
+					font-size: 14rpx!important;
 				}
 
 			}

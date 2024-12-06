@@ -7,6 +7,7 @@ const store = createStore({
 		"theme": "default", // 主题 "default" | "dark"
 		"status": "online", // 在线状态 "online" | "offline"
 		"timeFormat": "24", // 时间格式 "12"（有AM的） | "24"
+		"timezone": 'Asia/Shanghai', // 时区代码
 		"baseURL": "", // 请求地址
 		"deviceInfo": {},
 		"batteryInfo": {},
@@ -21,6 +22,9 @@ const store = createStore({
 		},
 		currentTimeFormat: state=>{
 			return state.timeFormat
+		},
+		currentTimezone: state=>{
+			return state.timezone
 		},
 		currentBaseURL: state=>{
 			return state.baseURL
@@ -44,6 +48,9 @@ const store = createStore({
 		},
 		changeTimeFormat(state, newTimeFormat) {
 			state.timeFormat = newTimeFormat
+		},
+		changeTimezone(state, newTimezone) {
+			state.timezone = newTimezone
 		},
 		changeBaseURL(state, newBaseURL) {
 			state.baseURL = newBaseURL

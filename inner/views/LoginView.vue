@@ -21,7 +21,7 @@
 			</div>
 			
 			<div class="btns">
-				<button class="btn btn-default" type="default" @click="$emit('close')">{{$t('message.login.previous')}}</button>
+				<button class="btn btn-default" type="default" @click="$emit('close')">{{$t('message.login.cancel')}}</button>
 				<button :class="'btn btn'+(currentTheme!='dark'?'':'-dark')" type="default" @click="finish">{{$t('message.login.confirm')}}</button>
 			</div>
 		</div>

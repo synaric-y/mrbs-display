@@ -2,7 +2,7 @@
 	<div :id="'scroll-outer'+marqueeId" class="scroll__outer">
 		<div class="scroll__inner" :id="'scroll-inner'+marqueeId" :style="'transform: translateX(-'+currentX+'px)'">
 			<p class="scroll__text">{{text}}</p>
-			<p class="scroll__text" v-if="needScroll">{{text}}</p>
+			<p :class="showText2?'scroll__text':'scroll__text scroll__text2'" v-if="needScroll">{{text}}</p>
 		</div>
 	</div>
 </template>
@@ -20,9 +20,10 @@
 	const outerWidth = ref(0)
 	const innerWidth = ref(0)
 	const padding = 20
-
+	
 
 	const needScroll = ref(true)
+	const showText2 = ref(true)
 	const currentX = ref(0)
 	
 	// 监听标题变化
@@ -37,6 +38,7 @@
 			scrollTimer.value = null
 		}
 		needScroll.value = true // 恢复两次，用于计算宽度
+		showText2.value = false // 隐藏显示
 		currentX.value = 0 // 恢复初始位置
 		
 		// DOM is not updated yet
@@ -65,6 +67,7 @@
 			console.log(middle, outerWidth.value);
 			
 			if (middle - padding > outerWidth.value) { // 需要开启滚动
+				showText2.value = true // 这时显示第二段文字
 				scrollTimer.value = setInterval(() => {
 					currentX.value = (currentX.value >= middle) ? 1 : (currentX.value + 1)
 				}, 50)
@@ -101,6 +104,10 @@
 				padding-right: 20px;
 				white-space: nowrap;
 				color: #fff;
+			}
+			
+			.scroll__text2{
+				opacity: 0;
 			}
 
 		}

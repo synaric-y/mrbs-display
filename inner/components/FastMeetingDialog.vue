@@ -39,8 +39,8 @@
 
 <script>
 	import TimeStepperScroll from './TimeStepperScroll.vue';
-	import {getNearestNextTime} from '@/utils/timeTool.js'
-	import {SEC_PER_HOUR,SEC_PER_MINUTE,nextScaleTs} from '@/utils/timestampTool.js'
+	import {SEC_PER_HOUR,SEC_PER_MINUTE} from '@/constants/time.js'
+	import {nextScaleTs} from '@/utils/timestampTool.js'
 	import { PageMixin } from '@/mixin';
 	import {
 		quickMeetApi,

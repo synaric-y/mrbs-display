@@ -1,10 +1,23 @@
+
+/**
+ * @author LongJin {@link https://xie.infoq.cn/article/2a7a2a91e4c9520ee18e7e2d3 Infoq}
+ * @file 取消重复请求
+ */
+
+
+/**
+ * @class
+ * @description 请求管理器
+ */
 class RequestManager {
-    constructor() {
-        this.idMap = new Map()
-    }
-	
-   /**
-	 * 生成唯一ID，并将ID和请求信息存储到map对象中
+	constructor() {
+		this.idMap = new Map()
+	}
+
+	/**
+	 * @function
+	 * @author LongJin
+	 * @description 生成唯一ID，并将ID和请求信息存储到map对象中
 	 * @param {string} method - 请求方法
 	 * @param {string} url - 请求URL
 	 * @param {object} params - 请求参数
@@ -15,12 +28,18 @@ class RequestManager {
 		if (this.idMap.has(id)) {
 			return false
 		}
-		this.idMap.set(id, { method, url, params })
+		this.idMap.set(id, {
+			method,
+			url,
+			params
+		})
 		return id
 	}
-	
+
 	/**
-	 * 生成唯一ID的方法
+	 * @function
+	 * @author LongJin
+	 * @description 生成唯一ID的方法
 	 * @param {string} method - 请求方法
 	 * @param {string} url - 请求URL
 	 * @param {object} params - 请求参数
@@ -36,8 +55,10 @@ class RequestManager {
 		return id.toString()
 	}
 
-   /**
-	 * 序列化对象为字符串（递归地）
+	/**
+	 * @function
+	 * @author LongJin
+	 * @description 序列化对象为字符串（递归地）
 	 * @param {object} obj - 要序列化的对象
 	 * @returns {string} - 序列化后的字符串
 	 */
@@ -54,9 +75,11 @@ class RequestManager {
 		}
 		return JSON.stringify(serializedObj)
 	}
-	
+
 	/**
-	 * 根据ID删除map对象中的请求信息
+	 * @function
+	 * @author LongJin
+	 * @description 根据ID删除map对象中的请求信息
 	 * @param {string} id - 要删除的唯一ID
 	 */
 	deleteById(id) {

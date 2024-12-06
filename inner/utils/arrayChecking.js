@@ -1,25 +1,27 @@
+/**
+ * @author Octene
+ * @file 传入Entry数组和两个手柄，判断手柄是否和数组中某个entry冲突
+*/
+
+/** @module Timeline */
+
 import _ from 'lodash'
 
 /**
- * @author Octene
- * @description 传入一些具有起始结束时间的数组和两个手柄，判断手柄是否和这些数组冲突
-*/
-
-/*
-Entry 类型定义
-{
-	start_time: ts,
-	end_time: ts
-}
-
-*/
+ * @typedef Entry
+ * @type {Object} 
+ * @property {Number} start_time 开始时间戳
+ * @property {Number} end_time 结束时间戳
+ */
 
 /**
+ * @function
+ * @author Octene
  * @description 检查左值是否合法
- * @return boolean
- * @param left 左值 ts
- * @param arr 待检查的数组 Entry[]
- * @param lb 下界 ts
+ * @param {Number} left 左值
+ * @param {Entry[]} arr 会议数组
+ * @param {Number} lb 时间下界（含），时间戳
+ * @returns {Boolean} 左值是否合法
 */
 const isLeftHandleValid = (left,arr,lb) => {
   if (left < lb) return false // 检查是否越界
@@ -28,11 +30,13 @@ const isLeftHandleValid = (left,arr,lb) => {
 }
 
 /**
+ * @function
+ * @author Octene
  * @description 检查右值是否合法
- * @return boolean
- * @param right 右值 ts
- * @param arr 待检查的数组 Entry[]
- * @param ub 上界 ts
+ * @param {Number} right 右值
+ * @param {Entry[]} arr 会议数组
+ * @param {Number} ub 时间上界（含），时间戳
+ * @returns {Boolean} 右值是否合法
 */
 const isRightHandleValid = (right,arr,ub) => {
   if (right > ub) return false // 检查是否越界
@@ -41,11 +45,13 @@ const isRightHandleValid = (right,arr,ub) => {
 }
 
 /**
+ * @function
+ * @author Octene
  * @description 检查两手柄之间是否有会议
- * @return boolean
- * @param left 左值 ts
- * @param right 右值 ts
- * @param arr 待检查的数组 Entry[]
+ * @param {Number} left 左值
+ * @param {Number} right 右值
+ * @param {Entry[]} arr 会议数组
+ * @returns {Boolean} 两手柄之间无会议返回true
 */
 const isBothValid = (left, right, arr) => {
   return _.every(arr, (item)=>{return !(left <= item.start_time && right >= item.end_time)});
@@ -53,11 +59,13 @@ const isBothValid = (left, right, arr) => {
 
 
 /**
+ * @function
+ * @author Octene
  * @description 检查两手柄之间的关系
- * @return boolean
- * @param left 左值 ts
- * @param right 右值 ts
- * @param resolution 最小间隔 ts
+ * @param {Number} left 左值
+ * @param {Number} right 右值
+ * @param {Number} resolution 最小间隔，时间戳
+ * @returns {Boolean} 左手柄严格小于右手柄，差值大于等于最小间隔，返回true
 */
 const isCorrectOrder = (left, right, resolution) => {
   return (right > left) && (right - left >= resolution)
@@ -65,14 +73,16 @@ const isCorrectOrder = (left, right, resolution) => {
 
 
 /**
+ * @function
+ * @author Octene
  * @description 全部检查
- * @return boolean
- * @param left 左值 ts
- * @param right 右值 ts
- * @param arr 待检查的数组 Entry[]
- * @param lb 下界 ts
- * @param ub 上界 ts
- * @param resolution 最小间隔 ts
+ * @param {Number} left 左值
+ * @param {Number} right 右值
+ * @param {Entry[]} arr 会议数组
+ * @param {Number} lb 时间下界（含），时间戳
+ * @param {Number} ub 时间上界（含），时间戳
+ * @param {Number} resolution 最小间隔，时间戳
+ * @returns {Boolean} 全部检查完成返回true
 */
 const fullCheck = (left, right, arr, lb, ub, resolution) => {
   return isLeftHandleValid(left,arr,lb) &&
@@ -81,31 +91,10 @@ const fullCheck = (left, right, arr, lb, ub, resolution) => {
       isCorrectOrder(left, right, resolution)
 }
 
-const findNextLargerTime=(arr,target,lb,ub)=>{
-	for(let i=0;i<arr.length;i++){
-		if(arr[i].start_time>=target) return arr[i].start_time
-	}
-	return ub
-}
-
-const findPreviousSmallerTime=(arr,target,lb,ub)=>{
-	
-	// 排序，按每个会议结束时间（防止找到错误的最小值）
-	const tempArr = _.sortBy(arr,['end_time'])
-	
-	// console.log(arr);
-	for(let i = tempArr.length-1;i>=0;i--){
-		if(arr[i].end_time<=target) return tempArr[i].end_time
-	}
-	return lb
-}
-
 export {
 	isLeftHandleValid,
 	isRightHandleValid,
 	isBothValid,
 	isCorrectOrder,
-	fullCheck,
-	findNextLargerTime,
-	findPreviousSmallerTime
+	fullCheck
 }

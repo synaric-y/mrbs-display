@@ -10,10 +10,13 @@ const SEC_PER_HOUR = 3600
 const SEC_PER_MINUTE = 60
 
 /**
- * param: ts,scale(900,1800，单位：秒)
- * return: 最近的下一个能被scale整除的时间戳
- * 似乎有浮点误差问题，稍微转一下
-*/
+ * @function
+ * @author Octene
+ * @description 寻找下一个整点(正好是0、15、30、45分钟的时间戳)
+ * @param {Number} ts 当前点位
+ * @param {Number} resolution 最小会议间隔，秒
+ * @return {Number} 下一个整点时间戳（向上取整）
+ * */
 const nextScaleTs=(ts,scale)=>{
 	
 	let res = new Decimal(ts).dividedBy(scale).floor().times(scale).plus(scale);
@@ -24,9 +27,13 @@ const nextScaleTs=(ts,scale)=>{
 }
 
 /**
- * param: ts,scale(900,1800，单位：秒)
- * return: 最近的下一个能被scale整除的时间戳, 含上界
- */
+ * @function
+ * @author Octene
+ * @description 寻找下一个整点(正好是0、15、30、45分钟的时间戳)
+ * @param {Number} ts 当前点位
+ * @param {Number} resolution 最小会议间隔，秒
+ * @return {Number} 下一个整点时间戳（向上取整），如果现在正好是整点则返回
+ * */
 const ceilScaleTs=(ts,scale)=>{
 	
 	if((Number)(new Decimal(ts).mod(scale))==0) return ts
@@ -38,12 +45,37 @@ const ceilScaleTs=(ts,scale)=>{
     return Number(res)
 }
 
-
+/**
+ * @function
+ * @author Octene
+ * @description 寻找当前点位附近最近的整点，超出边界的则返回边界
+ * @param {Number} ts 当前点位
+ * @param {Number} lb 时间下界（含）
+ * @param {Number} ub 时间上界（含）
+ * @param {Number} resolution 最小会议间隔，秒
+ * @return {Number} 最近的整点时间戳
+ * */
+const nearestScaleTs = (ts,lb,ub,scale)=>{
+	
+	if(ts<=lb) return lb
+	if(ts>=ub) return ub
+	
+	const nextScaleTs = Number(new Decimal(ts).dividedBy(scale).floor().times(scale).plus(scale));
+	const previousScaleTs = nextScaleTs - scale
+	
+	if(Math.abs(ts - nextScaleTs) <= Math.abs(ts - previousScaleTs)) return nextScaleTs
+	return previousScaleTs
+}
 
 /**
- * param: begTs,endTs,scale(秒)
- * return: 一个闭区间数组，间隔为scale
-*/
+ * @function
+ * @author Octene
+ * @description 生成一个闭区间数组，间隔为scale
+ * @param {Number} begTs 起始时间戳
+ * @param {Number} endTs 结束时间戳
+ * @param {Number} scale 最小会议间隔，秒
+ * @return {Number[]} 时间戳数组
+ * */
 const generateTsSequence=(begTs,endTs,scale)=>{
 	console.log(begTs,endTs,scale);
 	let res = []
@@ -54,8 +86,12 @@ const generateTsSequence=(begTs,endTs,scale)=>{
 }
 
 /**
- * param: begTs,endTs
- * return: 两时间戳之差（国际化字符串，小时+分钟）
+ * @function
+ * @author Octene
+ * @description 计算两个时间戳的差值，并将差值转换为可读的字符串
+ * @param {Number} begTs 较小的时间戳
+ * @param {Number} endTs 较大的时间戳
+ * @return {String} 最小单位为分钟的字符串，如“1小时23分”
  * */
 const tsDiff=(begTs,endTs)=>{
     const tsDiff = endTs - begTs
@@ -72,22 +108,15 @@ const tsDiff=(begTs,endTs)=>{
     return res
 }
 
-/**
- * param: ts,lb,ub,scale(秒)
- * return: 离ts最近的能被scale整除的时间戳，且在上下界内
- * */
-const nearestScaleTs = (ts,lb,ub,scale)=>{
-	
-	if(ts<=lb) return lb
-	if(ts>=ub) return ub
-	
-	const nextScaleTs = Number(new Decimal(ts).dividedBy(scale).floor().times(scale).plus(scale));
-	const previousScaleTs = nextScaleTs - scale
-	
-	if(Math.abs(ts - nextScaleTs) <= Math.abs(ts - previousScaleTs)) return nextScaleTs
-	return previousScaleTs
-}
 
+
+/**
+ * @function
+ * @author Octene
+ * @description 给定一个小时浮点数，将其转换为当天的时间戳
+ * @param {Number} hr 小时浮点数
+ * @return {Number} 时间戳
+ * */
 function hourToTimestamp(hr){
 	
 	const now = new Date();

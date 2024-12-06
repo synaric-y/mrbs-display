@@ -9,8 +9,8 @@
 		data() {
 			return {
 				wvNode: null,
-				// wvURL: uni.getStorageSync('webview-url') || 'https://meeting-manage-dev.businessconnectchina.com:11443/display/2.0/index.html', // 默认值
-				wvURL: uni.getStorageSync('webview-url') || 'https://meeting-manage-test.businessconnectchina.com:12443/display/2.1/index.html', // 默认值
+				wvURL: uni.getStorageSync('webview-url') || 'https://meeting-manage-dev.businessconnectchina.com:11443/display/v2.1/index.html', // 默认值
+				// wvURL: uni.getStorageSync('webview-url') || 'https://meeting-manage-test.businessconnectchina.com:12443/display/2.1/index.html', // 默认值
 				// wvURL: 'https://meeting-manage-dev.businessconnectchina.com:11443/display/2.0/index.html', // 正式环境
 				// wvURL: 'https://meeting-manage-test.businessconnectchina.com:12443/display/2.0/index.html', // 测试环境
 				// wvURL: 'https://meeting-manage-test.businessconnectchina.com:12443/display/2.1/index.html', // 测试环境
@@ -109,21 +109,19 @@
 			sendBatteryInfo(){
 				const that = this
 				// 获取电量信息
-				uni.getBatteryInfo({
-					success: (res) => {
-						console.log('获取电量信息res:', res);
-						const batteryInfo = res;
-						
-						// 传batteryInfo
-						that.wvNode.evalJS(
-						`document.dispatchEvent(new CustomEvent('getBatteryInfo', {
-							detail: {
-								value: '${JSON.stringify(batteryInfo)}'
-							}
-						}))`
-						);
+				const res = this.getBatteryInfo()
+				
+				console.log('新api获取电量信息res:', res);
+				const batteryInfo = res;
+				
+				// 传batteryInfo
+				that.wvNode.evalJS(
+				`document.dispatchEvent(new CustomEvent('getBatteryInfo', {
+					detail: {
+						value: '${JSON.stringify(batteryInfo)}'
 					}
-				})
+				}))`
+				);
 			},
 			sendQRCodeResult(){
 				const that = this
@@ -212,6 +210,43 @@
 			restart(){
 				// #ifdef APP-PLUS
 				plus.runtime.restart();
+				// #endif
+			},
+			getBatteryInfo(){
+				// #ifdef APP-PLUS
+				const activity = plus.android.runtimeMainActivity();
+				
+				var Intent = plus.android.importClass('android.content.Intent')
+				
+				var IntentFilter = plus.android.importClass('android.content.IntentFilter');//引入过滤器 
+				
+				const applicationContext = plus.android.invoke(activity, "getApplicationContext");
+				console.log(applicationContext);
+				
+				const BatteryManager = plus.android.importClass('android.os.BatteryManager')
+				console.log(BatteryManager);
+				
+				const ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+				console.log(ifilter);
+				
+				const batteryStatus = applicationContext.registerReceiver(null, ifilter);
+				console.log(batteryStatus);
+				
+				var status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+				var level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+				var isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
+				                     status == BatteryManager.BATTERY_STATUS_FULL;
+				
+				console.log(status);
+				console.log(level);
+				console.log(isCharging);
+				
+				return {
+				    "isCharging": isCharging,
+				    "errMsg": "getBatteryInfo:ok",
+				    "level": level
+				}
+				
 				// #endif
 			}
 		},

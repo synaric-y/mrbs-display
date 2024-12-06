@@ -18,7 +18,7 @@
       "verify_fail": "请求地址验证失败！",
       "verify_success": "请求地址验证成功！",
       "verifying": "验证中...",
-      "welcome": "欢迎使用xxx会议系统"
+      "welcome": "欢迎使用会议系统"
     },
     "fast_meeting": {
       "booker_too_long": "预订人名称不应超过30字",
@@ -34,15 +34,16 @@
       "tip_left": "可预定当前",
       "tip_right": "小时内的空闲时间",
       "title": "快速会议",
-      "to_start": "已预定"
+      "to_start": "已预定",
+	  "not_available": "暂无可用时间"
     },
 	"scan_meeting":{
 		"line1": "当前房间已开启身份验证",
-		"line2": "请使用企业微信扫码预定",
+		"line2": "请使用企业微信扫码预定"
 	},
     "index": {
       "left": {
-        "book": "创建快速会议",
+        "book": "创建会议",
         "cancel": "取消",
         "cancel_tip": "是否确认取消该会议？",
 		"force_end_tip": "是否确认提前结束该会议？",
@@ -79,7 +80,7 @@
       "login_fail": "用户名或密码错误",
       "login_success": "登录成功",
       "password": "请输入密码",
-      "previous": "返回",
+      "cancel": "取消",
       "title": "请输入管理员密码"
     },
     "netDataError": "接口返回数据异常",

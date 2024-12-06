@@ -3,11 +3,12 @@
 		SEC_PER_HOUR,
 		generateTsSequence,
 		tsDiff,
-		nextScaleTs,
 		nearestScaleTs,
 		SEC_PER_MINUTE,
 		ceilScaleTs
 	} from "@/utils/timestampTool.js";
+	
+	import { datetimeFormatTzLocale,localHourToTs,localHourList,localTsToHour,localHourListScroll } from '@/utils/tzDateTimeFormat.js' 
 
 	import {
 		formatTime
@@ -17,13 +18,10 @@
 		formatMeetings
 	} from '@/utils/meeting.js'
 	
-	import {fullCheck,	findNextLargerTime,
-	findPreviousSmallerTime} from '@/utils/arrayChecking.js'
+	import {fullCheck} from '@/utils/arrayChecking.js'
+	
+	import { findNextLargerTime, findPreviousSmallerTime } from "../utils/arraySearching";
 
-	import {
-		isBetween,
-		clamp
-	} from "@/utils/mathUtil";
 
 	import {
 		computed,
@@ -70,6 +68,10 @@
 		return store.getters.currentTheme
 	})
 	
+	const currentTimezone = computed(() => {
+		return store.getters.currentTimezone
+	})
+	
 	/**
 	 * left: 左值 ts
 	 * right: 右值 ts
@@ -81,16 +83,24 @@
 
 	onMounted(() => {
 		
+		console.log(props.lb, props.ub, currentTimezone.value);
+		
 		// 初始化刻度
-		hrArray.value = generateTsSequence(props.lb, props.ub, props.scale * 60)
-		console.log(hrArray.value);
+		hrArray.value = localHourListScroll(props.lb, props.ub, currentTimezone.value);
+		// generateTsSequence(props.lb, props.ub, props.scale * 60)
+		// console.log(hrArray.value);
 
 		// 初始化会议
-		timeTable.value = formatMeetings(props.currentTime,props.lb, props.ub,props.meetings)
+		const test = 1733500976
+		timeTable.value = formatMeetings(test,props.lb, props.ub,props.meetings)
+		// timeTable.value = formatMeetings(props.currentTime,props.lb, props.ub,props.meetings)
 		console.log(timeTable.value);
 
 		// 初始化手柄
 		getInitialHandle()
+		
+		
+		console.log(handlePositionFloat(props.leftHandle));
 	})
 
 	
@@ -173,7 +183,7 @@
 	const selectionTranslationStart = (event) => {
 		emits('changing')
 
-		console.log(290);
+		// console.log(290);
 
 		selectionStartX.value = event.changedTouches?.[0].clientX ?? event.clientX
 		selectionStartLeftHr.value = props.leftHandle
@@ -428,11 +438,11 @@
 			
 			<template #tags>
 				<div class="tag tag-left" :style="'left:'+((leftHandle-lb)/span)*100+'%;'" v-if="!disabled">
-					<div class="tag-text no-select">{{formatTime(leftHandle)}}</div>
+					<div class="tag-text no-select">{{localTsToHour(leftHandle,currentTimezone,false)}}</div>
 					<div class="triangle"></div>
 				</div>
 				<div class="tag tag-right" :style="'left:'+((rightHandle-lb)/span)*100+'%;'" v-if="!disabled">
-					<div class="tag-text no-select">{{formatTime(rightHandle)}}</div>
+					<div class="tag-text no-select">{{localTsToHour(rightHandle,currentTimezone,false)}}</div>
 					<div class="triangle"></div>
 				</div>
 			</template>
@@ -462,25 +472,29 @@
 			</template>
 			
 			<template #timeline-scale>
-				<div class="number no-select" v-for="(item,i) in hrArray" :key="item">
-					{{(item%SEC_PER_HOUR===0)?(new Date(item*1000).getHours()):'.'}}
+				<div class="number no-select" v-for="(item,i) in hrArray" :key="i">
+					{{item}}
 				</div>
 			</template>
 			
 		</ScrollContainer>
 		
 		<div class="time-stepper">
-			<uni-icons type="minus" size="30" @click="minusHalf" v-if="!disabled"></uni-icons>
+			<template v-if="!disabled">
+				<uni-icons type="minus" size="30" @click="minusHalf"></uni-icons>
+				
+				<div class="title">
+					{{localTsToHour(leftHandle,currentTimezone,false)}}-{{localTsToHour(rightHandle,currentTimezone,false)}},&nbsp;{{tsDiff(leftHandle,rightHandle)}}
+				</div>
 
-			<div class="title" v-if="!disabled">
-				{{formatTime(leftHandle)}}-{{formatTime(rightHandle)}},&nbsp;{{tsDiff(leftHandle,rightHandle)}}
-			</div>
-			<div class="title" v-else>
-				{{$t('time.not_available')}}
-			</div>
-
-
-			<uni-icons type="plus" size="30" @click="addHalf" v-if="!disabled"></uni-icons>
+				<uni-icons type="plus" size="30" @click="addHalf"></uni-icons>
+			</template>
+			
+			<template v-else>
+				<div class="title">
+					{{$t('message.fast_meeting.not_available')}}
+				</div>
+			</template>
 
 		</div>
 	</div>
@@ -545,38 +559,32 @@
 				width: 100%;
 				position: relative;
 
-				.tags {
-					position: relative;
-					width: 100%;
-					padding-bottom: 0.3rem;
-					height: 1.3rem;
-
-					.tag {
-						position: absolute;
-						top: 0;
-						left: 0;
-						display: flex;
-						flex-direction: column;
-						align-items: center;
-						transform: translateX(-50%);
-
-						.tag-text {
-							background-color: var(--color-primary);
-							border-radius: 4rpx;
-							color: #fff;
-							font-size: var(--time-stepper-font-size);
-							padding: 0 5rpx;
-							height: 20rpx;
-							line-height: 20rpx;
-						}
-
-						.triangle {
-							width: 0;
-							height: 0;
-							border-left: 0.25rem solid transparent;
-							border-right: 0.25rem solid transparent;
-							border-top: 0.4rem solid var(--color-primary);
-						}
+				.tag {
+					position: absolute;
+					top: 0;
+					left: 0;
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+					transform: translateX(-50%);
+				
+					.tag-text {
+						background-color: var(--color-primary);
+						border-radius: 4rpx;
+						color: #fff;
+						font-size: var(--time-stepper-font-size);
+						padding: 0 5rpx;
+						height: 20rpx;
+						line-height: 20rpx;
+					}
+				
+					.triangle {
+						width: 0;
+						height: 0;
+						border-left: 0.15rem solid transparent;
+						border-right: 0.15rem solid transparent;
+						border-top: 0.3rem solid var(--color-primary);
+						transform: translateY(-0.1rem);
 					}
 				}
 
@@ -696,6 +704,8 @@
 		.title {
 			font-size: 14rpx;
 			font-weight: 500;
+			width: 100%;
+			text-align: center;
 		}
 	}
 </style>

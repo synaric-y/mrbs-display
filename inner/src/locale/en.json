@@ -18,7 +18,7 @@
       "verify_fail": "Verification failed!",
       "verify_success": "Verified successfully!",
       "verifying": "Verifying...",
-      "welcome": "Welcome to xxx Meeting Reservation System"
+      "welcome": "Welcome to Meeting Reservation System"
     },
     "fast_meeting": {
       "booker_too_long": "Booker name should not exceed 30 words",
@@ -34,7 +34,8 @@
       "tip_left": "Can reserve spare time in ",
       "tip_right": " h",
       "title": "Fast Meetings",
-      "to_start": "Reserved"
+      "to_start": "Reserved",
+	  "not_available": "No available time at the moment"
     },
 	"scan_meeting":{
 		"line1": "The current room has enabled authentication",
@@ -42,7 +43,7 @@
 	},
     "index": {
       "left": {
-        "book": "Create Fast Meeting",
+        "book": "Create Meeting",
         "cancel": "Cancel",
         "cancel_tip": "Are you sure to cancel the meeting?",
 		"force_end_tip": "Are you sure to end the meeting early?",
@@ -79,7 +80,7 @@
       "login_fail": "Invalid username or password",
       "login_success": "Login success!",
       "password": "Password",
-      "previous": "Previous",
+      "cancel": "Cancel",
       "title": "Please enter the administrator password"
     },
     "netDataError": "The interface returns abnormal data",

@@ -16,6 +16,7 @@
             "autoclose" : true,
             "delay" : 0
         },
+		"screenOrientation":["landscape-primary"],
         /* 模块配置 */
         "modules" : {},
         /* 应用发布信息 */
@@ -24,6 +25,7 @@
             "android" : {
                 "permissions" : [
                     "<uses-permission android:name=\"android.permission.CHANGE_NETWORK_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.MANAGE_ACTIVITY_STACKS\" />",
                     "<uses-permission android:name=\"android.permission.MOUNT_UNMOUNT_FILESYSTEMS\"/>",
                     "<uses-permission android:name=\"android.permission.VIBRATE\"/>",
                     "<uses-permission android:name=\"android.permission.READ_LOGS\"/>",
