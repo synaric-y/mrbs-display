@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>utils/meeting.js - Documentation</title>
+    <title>api/meeting.js - Documentation</title>
     
     
     <script src="scripts/prettify/prettify.js"></script>
@@ -35,7 +35,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">utils/meeting.js</h1>
+    <h1 class="page-title">api/meeting.js</h1>
     
 
     
@@ -45,119 +45,216 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/** @module MeetingFormat */
-
-/**
+            <pre class="prettyprint source linenums"><code>/**
  * @author Octene
- * @file 会议格式化
- */
+ * @file 会议相关api
+*/
 
-import _ from 'lodash'
-import i18n from '@/src/i18n.js'
-import {
-	MEETING_TO_START,
-	MEETING_IN_PROGRESS,
-	MEETING_FINISHED,
-	MEETING_EXPIRED
-} from "@/constants/meeting.js"
-import { SEC_PER_MINUTE } from '@/constants/time.js'
+/**@module Meeting*/
+
+import Request from '@/utils/request.js'
+import store from '../store/index.js';
+import i18n from '@/src/i18n.js';
+
+let request = new Request().http
+
 
 /**
- *
- * @typedef TimelineMeeting
- * @type {Object} 
- * @property {?Number} id 会议id
- * @property {Number} start_time 开始时间戳
- * @property {Number} end_time 结束时间戳
- * @property {0|1|2|3} status 会议状态：待开始|进行中|已结束|已过时（表示过去的时间）
- * @property {String} text 描述文字
- * @property {String} className 显示的类名
- */
+ * @private
+ * @function
+ * @author Octene
+ * @description 新版快速预约，获取二维码
+*/
+function wxOauth2Url(data) {
+    return request({
+        url: '/web/wxwork_login_url.php',
+		data: {
+			...data
+		}
+    })
+}
 
+
+/**
+ * @deprecated
+ * @private
+ * @function
+ * @author Octene
+ * @description 旧版快速预约
+*/
+function quickMeetingApi(data) {
+	return request({
+		url: "/web/appapi/api.php?act=book_fast_meeting",
+		data: {
+			...data,
+			'device_id': store.state.deviceInfo.deviceId,
+			"is_charge": store.state.batteryInfo.isCharging?1:0,
+			"battery_level": store.state.batteryInfo.level,
+		}
+	})
+}
+
+/**
+ * @private
+ * @function
+ * @author Octene
+ * @description 取消会议
+*/
+function cancelMeetingApi(data) {
+	return request({
+		url: "/web/appapi/api.php?act=cancel_fast_meeting",
+		data: {
+			...data
+		}
+	})
+}
+
+/**
+ * @private
+ * @function
+ * @author Octene
+ * @description 提前结束会议
+*/
+function forceEndMeetingApi(data) {
+    return request({
+        url: '/web/call.php?act=entry%2Fforce_end_entry',
+		data: {
+			...data
+		}
+    })
+}
+
+
+// ==================================包装函数====================================
 
 /**
  * @function
  * @author Octene
- * @description 计算可供时间滚动选择器使用的会议列表
- * @param {Number} currentTime 当前时间戳
- * @param {Number} lb 时间下界（含），时间戳
- * @param {Number} ub 时间上界（含），时间戳
- * @param {Array} meetings 待格式化的会议列表
- * @returns {TimelineMeeting[]} 格式化之后的会议列表
+ * @description 获取新版预约二维码
+ * @param {Number} area_id 区域id
+ * @param {Number} room_id 房间id
 */
-const formatMeetings = (currentTime,lb,ub,meetings) => {
-	
-
-	// 计算状态
-	function getEntryStatus(entry) {
-		if (_.inRange(currentTime, entry.start_time, entry.end_time)) return MEETING_IN_PROGRESS // 进行中
-		if (currentTime > entry.end_time) return MEETING_FINISHED // 已结束
-		return MEETING_TO_START // 待开始
-	}
-
-	// 计算文字
-	function getEntryText(status) {
-		switch(status){
-			case MEETING_TO_START: return i18n.global.t('message.fast_meeting.to_start')
-			case MEETING_IN_PROGRESS: return i18n.global.t('message.fast_meeting.in_progress')
-			case MEETING_FINISHED: return i18n.global.t('message.fast_meeting.finished')
-			default: return ''
-		}
+function wrappedGetQRCode(area_id,room_id){
+	const query = {
+		"area_id": area_id,
+		"room_id": room_id,
 	}
 	
-	function getEntryClassName(status) {
-		switch(status){
-			case MEETING_TO_START: return 'to-start'
-			case MEETING_IN_PROGRESS: return 'in-progress'
-			case MEETING_FINISHED: return 'disabled'
-			case MEETING_EXPIRED: return 'overdue'
-			default: return ''
-		}
-	}
-	
-	const tempList = [] // 临时数组
-	
-	// 如果是今天，将先前的几个小时清掉
-	tempList.push({
-		start_time: lb,
-		end_time: Math.min(currentTime, ub),
-		status: MEETING_EXPIRED, // 已过去的时间
-		text: '',
-		className: getEntryClassName(MEETING_EXPIRED)
+	return new Promise((resolve,reject)=>{
+		wxOauth2Url(query)
+			.then((res)=>{
+				resolve(res)
+			})
+			.catch((e)=>{
+				reject(e)
+			})
 	})
+}
 
-	_.forEach(meetings, entry => {
-
-		// 去除不在范围内的会议
-		if (entry.start_time > ub) return
-		if (entry.end_time &lt; lb) return
-
-		const status = getEntryStatus(entry)
-		const text = (entry.end_time-entry.start_time>=SEC_PER_MINUTE*15)?getEntryText(status):'' // 大于等于15分钟展示文字
-		const className = getEntryClassName(status)
-		
-		tempList.push({
-			id: entry.id,
-			start_time: Math.max(entry.start_time, lb), // 截断越界的部分
-			end_time: Math.min(ub, entry.end_time),
-			status: status, // 待开始，进行中，已结束
-			text: text,
-			className: className
-		})
-
-	})
-
-
-	// 排序，按每个会议起始时间（防止乱序导致手柄初始化问题）
-	const res = _.sortBy(tempList, ['start_time'])
-	console.log(res);
+/**
+ * @deprecated 平板端现需使用企业微信扫码认证才能预约会议
+ * @function
+ * @author Octene
+ * @description 根据起止时间、主题、预订人预约快速会议（旧版）
+ * @param {Number} begin_time 开始时间，s
+ * @param {Number} end_time 结束时间，s
+ * @param {String} booker 预订人
+ * @param {String} theme 会议主题
+*/
+function wrappedQuickMeeting(begin_time,end_time,booker,theme){
+	function testNumber(val){ // 判断是否为纯数字
+		const str = /^[0-9]+$/
+		const reg = new RegExp(str)
+		return reg.test(val)
+	}
 	
-	return res
+	const query = {
+		"begin_time": begin_time,
+		"end_time": end_time,
+		"booker": testNumber(booker)?('"'+booker+'"'):booker,
+		"theme": testNumber(theme)?('"'+theme+'"'):theme
+	}
+	
+	return new Promise((resolve,reject)=>{
+		quickMeetingApi(query)
+			.then((res)=>{
+				resolve(res)
+			})
+			.catch((e)=>{
+				reject(e)
+			})
+	})
+}
 
+/**
+ * @function
+ * @author Octene
+ * @description 取消特定id的会议，注意只能取消平板端预约的快速会议
+ * @param {Number} meeting_id 会议id
+*/
+function wrappedCancelMeetingApi(meeting_id){
+	const query = {
+		"meeting_id": meeting_id,
+	}
+	
+	return new Promise((resolve,reject)=>{
+		cancelMeetingApi(query)
+			.then(res => {
+				console.log(res)
+				uni.showToast({
+					title: i18n.global.t('message.index.left.success'),
+					icon: 'none'
+				})
+				resolve()
+			})
+			.catch((e) => {
+				console.log(e);
+				uni.showToast({
+					title:i18n.global.t('message.index.left.fail'),
+					icon: 'none'
+				})
+				reject()
+			})
+	})
+}
+
+/**
+ * @function
+ * @author Octene
+ * @description 提前结束特定id的会议，注意只能提前结束平板端预约的快速会议
+ * @param {Number} id 会议id
+*/
+function wrappedForceEndMeetingApi(id){
+	const query = {
+		"id": id,
+	}
+	
+	return new Promise((resolve,reject)=>{
+		forceEndMeetingApi(query)
+			.then(res => {
+				console.log(res)
+				uni.showToast({
+					title: i18n.global.t('message.index.left.success'),
+					icon: 'none'
+				})
+				resolve()
+			})
+			.catch((e) => {
+				console.log(e);
+				uni.showToast({
+					title: i18n.global.t('message.index.left.fail'),
+					icon: 'none'
+				})
+				reject()
+			})
+	})
 }
 
 export {
-	formatMeetings
+	wrappedGetQRCode,
+	wrappedQuickMeeting,
+	wrappedCancelMeetingApi,
+	wrappedForceEndMeetingApi
 }</code></pre>
         </article>
     </section>

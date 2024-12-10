@@ -1,9 +1,11 @@
-/** @module MeetingFormat */
+
 
 /**
  * @author Octene
  * @file 会议格式化
  */
+
+/** @module MeetingFormat */
 
 import _ from 'lodash'
 import i18n from '@/src/i18n.js'

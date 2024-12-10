@@ -3,11 +3,14 @@
  * @file 会议相关的常量
 */
 
+/**@module meeting*/
+
 /** 
  * @constant
  * @type {Number}
  * @default
  * @description 平板端快速会议
+ * @default
 */ 
 const PAD_QUICK_MEETING_TYPE = 99
 
@@ -16,6 +19,7 @@ const PAD_QUICK_MEETING_TYPE = 99
  * @type {Number}
  * @default
  * @description 不开启快速会议，不显示会议按钮
+ * @default
 */ 
 const TEMPORARY_MEETING_NONE = 0
 /** 
@@ -23,6 +27,7 @@ const TEMPORARY_MEETING_NONE = 0
  * @type {Number}
  * @default
  * @description 开启不记名快速会议（旧版）
+ * @default
 */ 
 const TEMPORARY_MEETING_LEGACY = 1
 /** 
@@ -30,6 +35,7 @@ const TEMPORARY_MEETING_LEGACY = 1
  * @type {Number}
  * @default
  * @description 需扫码预约（新版）
+ * @default
 */ 
 const TEMPORARY_MEETING_VERIFIED = 2
 
@@ -39,6 +45,7 @@ const TEMPORARY_MEETING_VERIFIED = 2
  * @type {Number}
  * @default
  * @description 会议状态：待开始
+ * @default
 */ 
 const MEETING_TO_START = 0
 /** 
@@ -46,6 +53,7 @@ const MEETING_TO_START = 0
  * @type {Number}
  * @default
  * @description 会议状态：进行中
+ * @default
 */ 
 const MEETING_IN_PROGRESS = 1
 /** 
@@ -53,6 +61,7 @@ const MEETING_IN_PROGRESS = 1
  * @type {Number}
  * @default
  * @description 会议状态：已结束
+ * @default
 */ 
 const MEETING_FINISHED = 2
 /** 
@@ -60,6 +69,7 @@ const MEETING_FINISHED = 2
  * @type {Number}
  * @default
  * @description 会议状态：已过时，仅lb到servertime的时间条使用
+ * @default
 */ 
 const MEETING_EXPIRED = 3
 

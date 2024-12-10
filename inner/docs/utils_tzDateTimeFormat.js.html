@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>utils/meeting.js - Documentation</title>
+    <title>utils/tzDateTimeFormat.js - Documentation</title>
     
     
     <script src="scripts/prettify/prettify.js"></script>
@@ -35,7 +35,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">utils/meeting.js</h1>
+    <h1 class="page-title">utils/tzDateTimeFormat.js</h1>
     
 
     
@@ -45,119 +45,164 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/** @module MeetingFormat */
+            <pre class="prettyprint source linenums"><code>/** @module DateTime */
 
 /**
  * @author Octene
- * @file 会议格式化
+ * @file 特定时区的时间与unix时间戳互转
  */
 
-import _ from 'lodash'
-import i18n from '@/src/i18n.js'
 import {
-	MEETING_TO_START,
-	MEETING_IN_PROGRESS,
-	MEETING_FINISHED,
-	MEETING_EXPIRED
-} from "@/constants/meeting.js"
-import { SEC_PER_MINUTE } from '@/constants/time.js'
+	DATE_FORMAT_LIST
+} from '@/constants/time.js'
+
+import moment from 'moment-timezone';
+import {Decimal} from 'decimal.js';
+import { SEC_PER_HOUR,SEC_PER_MINUTE } from '@/constants/time.js';
 
 /**
- *
- * @typedef TimelineMeeting
- * @type {Object} 
- * @property {?Number} id 会议id
- * @property {Number} start_time 开始时间戳
- * @property {Number} end_time 结束时间戳
- * @property {0|1|2|3} status 会议状态：待开始|进行中|已结束|已过时（表示过去的时间）
- * @property {String} text 描述文字
- * @property {String} className 显示的类名
- */
-
+ * @private
+ * @function
+ * @author Joy Cheng
+ * @description 根据语言、时区、unix时间戳显示格式化字符串
+ * @param {Number} timestamp unix时间戳
+ * @param {String} timezone 区域所在的时区
+ * @param {String} dateFormat 格式化字符串
+ * @returns {String} 格式化结果
+*/
+function formatUnixTs(timestamp, timezone, dateFormat) {
+	return moment.unix(timestamp).tz(timezone).format(dateFormat);
+}
 
 /**
  * @function
  * @author Octene
- * @description 计算可供时间滚动选择器使用的会议列表
- * @param {Number} currentTime 当前时间戳
- * @param {Number} lb 时间下界（含），时间戳
- * @param {Number} ub 时间上界（含），时间戳
- * @param {Array} meetings 待格式化的会议列表
- * @returns {TimelineMeeting[]} 格式化之后的会议列表
+ * @description 根据语言、时区、unix时间戳显示格式化字符串
+ * @param {Number} serverTime 服务器时间, unix时间戳
+ * @param {String} timezone 区域所在的时区
+ * @param {String} locale 当前的语言
+ * @param {Boolean} is12 是否为12小时制
+ * @returns {String} 格式化完成的字符串，年月日按locale显示，时、分按固定格式显示
 */
-const formatMeetings = (currentTime,lb,ub,meetings) => {
+function datetimeFormatTzLocale(serverTime,timezone,locale,is12) {
+
+	const fullFormat = (is12?'hh:mm A':'HH:mm') + ' ' + (DATE_FORMAT_LIST[locale]??DATE_FORMAT_LIST['zh'])
 	
+	return formatUnixTs(serverTime,timezone,fullFormat)
+}
 
-	// 计算状态
-	function getEntryStatus(entry) {
-		if (_.inRange(currentTime, entry.start_time, entry.end_time)) return MEETING_IN_PROGRESS // 进行中
-		if (currentTime > entry.end_time) return MEETING_FINISHED // 已结束
-		return MEETING_TO_START // 待开始
-	}
-
-	// 计算文字
-	function getEntryText(status) {
-		switch(status){
-			case MEETING_TO_START: return i18n.global.t('message.fast_meeting.to_start')
-			case MEETING_IN_PROGRESS: return i18n.global.t('message.fast_meeting.in_progress')
-			case MEETING_FINISHED: return i18n.global.t('message.fast_meeting.finished')
-			default: return ''
-		}
-	}
+/**
+ * @function
+ * @author Octene
+ * @description 计算在当地的某个小时的时间戳（例如纽约早上8:00和我们的早上8:00实际上是两个时间戳）
+ * @param {Number} serverTime 服务器时间
+ * @param {String} timezone 区域所在的时区
+ * @param {Number} hr 当地小时
+ * @returns {Number} 当地时间戳
+*/
+function localHourToTs(serverTime,timezone,hr){
+	const localDateTime = moment.unix(serverTime).tz(timezone).startOf('d').add(hr,'h')
 	
-	function getEntryClassName(status) {
-		switch(status){
-			case MEETING_TO_START: return 'to-start'
-			case MEETING_IN_PROGRESS: return 'in-progress'
-			case MEETING_FINISHED: return 'disabled'
-			case MEETING_EXPIRED: return 'overdue'
-			default: return ''
-		}
-	}
+	return localDateTime.unix()
+}
+
+/**
+ * @function
+ * @author Octene
+ * @description 计算当地时间戳的小时和分钟
+ * @param {Number} localTs 当地时间戳
+ * @param {String} timezone 区域所在的时区
+ * @param {Boolean} is12 是否为12小时制
+ * @returns {String} 格式化字符串，12或24小时制
+*/
+function localTsToHour(localTs,timezone,is12){
+	const localHourStr = moment.unix(localTs).tz(timezone).format(is12?'hh:mm A':'HH:mm');
 	
-	const tempList = [] // 临时数组
+	return localHourStr
+}
+
+/**
+ * @function
+ * @author Octene
+ * @description 计算当地时间戳与当地显示时间的组合
+ * @param {Number} begTs 当地区域开始时间戳
+ * @param {Number} endTs 当地区域结束时间戳
+ * @param {String} timezone 区域所在的时区
+ * @param {Boolean} is12 是否为12小时制，否则是24小时
+ * @returns {Array} 时间列表
+*/
+function localHourList(begTs,endTs,timezone,is12=true){
 	
-	// 如果是今天，将先前的几个小时清掉
-	tempList.push({
-		start_time: lb,
-		end_time: Math.min(currentTime, ub),
-		status: MEETING_EXPIRED, // 已过去的时间
-		text: '',
-		className: getEntryClassName(MEETING_EXPIRED)
-	})
-
-	_.forEach(meetings, entry => {
-
-		// 去除不在范围内的会议
-		if (entry.start_time > ub) return
-		if (entry.end_time &lt; lb) return
-
-		const status = getEntryStatus(entry)
-		const text = (entry.end_time-entry.start_time>=SEC_PER_MINUTE*15)?getEntryText(status):'' // 大于等于15分钟展示文字
-		const className = getEntryClassName(status)
+	
+	let res = [] // 结果数组
+	
+	let todayBegTs = new Decimal(begTs)
+	let todayEndTs = new Decimal(endTs)
+	
+	const slice = SEC_PER_HOUR / 2
+	
+	while(Number(todayBegTs) &lt;= Number(todayEndTs)){
 		
-		tempList.push({
-			id: entry.id,
-			start_time: Math.max(entry.start_time, lb), // 截断越界的部分
-			end_time: Math.min(ub, entry.end_time),
-			status: status, // 待开始，进行中，已结束
-			text: text,
-			className: className
+		let text = '.' 
+		
+		if(todayBegTs.mod(slice)==0) // 能被半小时整除，则格式化成小时-分钟
+			text = localTsToHour(Number(todayBegTs), timezone, is12)
+			
+			
+		res.push({
+			ts: todayBegTs,
+			text: text
 		})
-
-	})
-
-
-	// 排序，按每个会议起始时间（防止乱序导致手柄初始化问题）
-	const res = _.sortBy(tempList, ['start_time'])
-	console.log(res);
+		
+		todayBegTs = todayBegTs.plus(15 * SEC_PER_MINUTE)
+		
+	}
 	
 	return res
+}
 
+/**
+ * @function
+ * @author Octene
+ * @description 计算当地显示时间
+ * @param {Number} begTs 当地区域开始时间戳
+ * @param {Number} endTs 当地区域结束时间戳
+ * @param {String} timezone 区域所在的时区
+ * @returns {Array} 时间列表
+*/
+function localHourListScroll(begTs,endTs,timezone){
+	
+	
+	let res = [] // 结果数组
+	
+	let todayBegTs = new Decimal(begTs)
+	let todayEndTs = new Decimal(endTs)
+	
+	const slice = SEC_PER_HOUR
+	
+	while(Number(todayBegTs) &lt;= Number(todayEndTs)){
+		
+		let text = '.' 
+		
+		if(todayBegTs.mod(slice)==0) // 能被半小时整除
+			text = moment.unix(todayBegTs).tz(timezone).hour()
+			
+			
+		res.push(text)
+		
+		todayBegTs = todayBegTs.plus(15 * SEC_PER_MINUTE)
+		
+	}
+	
+	return res
 }
 
 export {
-	formatMeetings
+	datetimeFormatTzLocale,
+	localHourToTs,
+	localTsToHour,
+	localHourList,
+	localHourListScroll
 }</code></pre>
         </article>
     </section>

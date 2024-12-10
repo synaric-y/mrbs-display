@@ -53,7 +53,8 @@
 <script>
 import LanguageSelect from '../components/LanguageSelect.vue';
 import {mapGetters,mapMutations} from 'vuex';
-import { getAllAreaApi,getAllRoomsApi,activateDeviceApi,changeBindApi } from '@/api/api';
+import { getAllAreaApi,getAllRoomsApi,testBaseUrl } from '@/api/api';
+import { activateDeviceApi,changeBindApi } from '@/api/device.js'
 import { PageMixin } from '@/mixin';
 import _ from 'lodash'
 
@@ -98,8 +99,8 @@ export default {
 		getAllArea(){
 			const that = this;
 			
-			getAllAreaApi(this.currentBaseURL,{
-			}).then(res=>{
+			getAllAreaApi()
+			.then(res=>{
 				
 				const li = res.data.data
 				
@@ -122,10 +123,8 @@ export default {
 			this.room = -1
 			
 			
-			getAllRoomsApi(this.currentBaseURL,{
-				"type": "area",
-				"id": this.area,
-			}).then(res=>{
+			getAllRoomsApi(this.area)
+			.then(res=>{
 				
 				const li = res.data.data?.areas?.rooms ?? null
 				
@@ -169,8 +168,8 @@ export default {
 			
 			// 尝试调这个接口，返回成功就是联通了
 			this.verifyStatus = 'verifying'
-			getAllAreaApi(this.url,{
-			}).then(({data})=>{
+			testBaseUrl(this.url)
+			.then(({data})=>{
 				
 				const {
 					code,
@@ -244,29 +243,16 @@ export default {
 				return
 			}
 			
-			const pack = {              //实际设备id
-				"version": "1.0.0",                     //设备使用的软件版本？激活时是否直接使用全局的软件版本，还是由前端传入
-				"description": "",                      //设备信息
-				"resolution": `${this.windowInfo.screenWidth}*${this.windowInfo.screenHeight}`,              //分辨率
-				"status": 1,                            //是否在线
-				"is_set": 0,                            //是否绑定
-				"set_time": Math.trunc(new Date().getTime() / 1000),               //绑定时间（时间戳）
-				"room_id": this.room                       //绑定的房间号，数据库中的房间号
-			}
-			
-			console.log(JSON.stringify(pack));
-			
 			
 			const that = this
-			activateDeviceApi(this.currentBaseURL,pack)
+			activateDeviceApi(this.windowInfo.screenWidth, this.windowInfo.screenHeight, this.room)
 			.then(({data})=>{
 				console.log(JSON.stringify(data));
 				
 				const code = data.code
 				
-				changeBindApi(that.currentBaseURL,{
-					"room_id": that.room,                 //房间id
-				}).then(()=>{
+				changeBindApi(that.room)
+				.then(()=>{
 					
 					this.url = ''
 					this.area = -1
