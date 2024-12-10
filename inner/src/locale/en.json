@@ -1,0 +1,138 @@
+{
+  "message": {
+    "activate": {
+      "activate_fail": "Activate failed!",
+      "activate_success": "Activate success!",
+      "area_empty": "Area not selected",
+      "belong_to_area": "Area",
+      "belong_to_meeting_room": "Room",
+      "finish": "Finish",
+      "not_verified": "Request address unverified",
+      "placeholder": "Scan the QRCode from the Web platform",
+      "please_select": "Please Select",
+      "request_url": "Request URL",
+      "room_empty": "Room not selected",
+      "url_empty": "Request address is empty",
+      "verify": "Verify",
+      "verify_duplicate": "This device is already activated!",
+      "verify_fail": "Verification failed!",
+      "verify_success": "Verified successfully!",
+      "verifying": "Verifying...",
+      "welcome": "Welcome to Meeting Reservation System"
+    },
+    "fast_meeting": {
+      "booker_too_long": "Booker name should not exceed 30 words",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "fail": "Reservation failed!",
+      "finished": "Finished",
+      "in_progress": "In meeting",
+      "name": "Booker Name",
+      "success": "Fast meeting is successfully reserved",
+      "theme": "Meeting Theme",
+      "theme_too_long": "Theme should not exceed 50 words",
+      "tip_left": "Can reserve spare time in ",
+      "tip_right": " h",
+      "title": "Fast Meetings",
+      "to_start": "Reserved",
+	  "not_available": "No available time at the moment"
+    },
+	"scan_meeting":{
+		"line1": "The current room has enabled authentication",
+		"line2": "Scan the code in WeCom and make a reservation"
+	},
+    "index": {
+      "left": {
+        "book": "Create Meeting",
+        "cancel": "Cancel",
+        "cancel_tip": "Are you sure to cancel the meeting?",
+		"force_end_tip": "Are you sure to end the meeting early?",
+        "confirm": "Confirm",
+        "default_name": "Fast Meeting",
+        "fail": "Fail to cancel meeting!",
+        "invalid_type": "Quick meetings not reserved from a Pad cannot be cancelled",
+		"invalid_time": "Expired or ongoing meetings cannot be cancelled",
+        "no_free": "There is no free room at the current time",
+        "notice": "Notice",
+        "success": "Meeting cancelled successfully!"
+      },
+      "right": {
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "default_booker": "/",
+        "default_name": "Fast Meeting",
+        "in_meeting": "In meeting",
+        "language": "Language",
+        "meeting": "Room",
+        "next_meeting": "Upcoming Meetings",
+        "no_meeting": "Free",
+        "notice": "Notice",
+        "unbind": "Detected that the device has been unbound. It can be rebind after restarting. Do you want to restart now?",
+        "update": "Detected a new version, do you want to restart immediately?",
+		"unbind_error": "Device unbinding, attempting to reconnect"
+      }
+    },
+    "initializing": "Initializing...",
+	"loading": "Loading...",
+    "login": {
+      "account_number": "Account",
+      "confirm": "Confirm",
+      "login_fail": "Invalid username or password",
+      "login_success": "Login success!",
+      "password": "Password",
+      "cancel": "Cancel",
+      "title": "Please enter the administrator password"
+    },
+    "netDataError": "The interface returns abnormal data",
+    "setting": {
+      "left": {
+        "about_us": "About",
+        "basic_info": "Basic Infomation",
+        "battery": "Battery",
+        "equipment_type": "Equipment Type",
+        "normal": "Normal",
+        "offline": "Offline",
+        "online_status": "Online Status",
+        "room_area": "Room & Area",
+        "unique_id": "Device Unique ID",
+		"unknown_brand": "Unknown",
+		"version": "Version"
+      },
+      "right": {
+        "12hour_format": "12 Hour Format",
+        "24hour_format": "24 Hour Format",
+        "area": "Area",
+        "area_empty": "Area not selected",
+        "brightness": "Brightness",
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "invalid_url": "Invalid URL",
+        "meeting_room": "Meeting Room",
+        "not_verified": "Request address unverified",
+        "notice": "Notice",
+        "request_url": "Request URL",
+        "restart": "Request URL change requires restarting the application. Do you want to restart it?",
+        "room_empty": "Room not selected",
+        "setting": "Settings",
+        "setting_success": "Setting modified successfully",
+        "submit": "Submit",
+        "theme_color": "Theme Color",
+        "time_format": "Time Format",
+        "url_empty": "Request address is empty",
+        "verify_fail": "Verification failed!",
+        "verify_success": "Verified successfully!",
+        "verifying": "Verifying...",
+        "volume": "Volume"
+      }
+    },
+    "time": {
+      "hour": "h",
+      "hours": "h",
+      "minute": "min",
+      "minutes": "min",
+	  "second": "s",
+	  "seconds": "s",
+      "not_available": "Not Available"
+    }
+  }
+}

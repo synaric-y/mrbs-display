@@ -1,0 +1,138 @@
+{
+  "message": {
+    "activate": {
+      "activate_fail": "장치 활성화 실패!",
+      "activate_success": "장치 활성화 성공!",
+      "area_empty": "영역을 선택하지 않았습니다",
+      "belong_to_area": "지역",
+      "belong_to_meeting_room": "회의실",
+      "finish": "종료",
+      "not_verified": "요청 주소가 확인되지 않았습니다",
+      "placeholder": "웹 페이지의 QR코드를 스캔하면 자동으로 서비스 주소가 입력됩니다.",
+      "please_select": "선택하십시오",
+      "request_url": "요청 주소",
+      "room_empty": "방을 선택하지 않았습니다",
+      "url_empty": "요청 주소가 비어 있습니다",
+      "verify": "검증",
+      "verify_duplicate": "이 장치가 활성화되었습니다!",
+      "verify_fail": "요청 주소 확인 실패!",
+      "verify_success": "요청 주소 확인 성공!",
+      "verifying": "확인 중...",
+      "welcome": "회의 시스템 시작"
+    },
+    "fast_meeting": {
+      "booker_too_long": "예약자 이름은 30자를 초과할 수 없습니다",
+      "cancel": "취소",
+      "confirm": "확인",
+      "fail": "회의 예약 실패!",
+      "finished": "종료됨",
+      "in_progress": "진행 중",
+      "name": "예약자 이름",
+      "success": "회의 예약 성공!",
+      "theme": "회의 이름을 입력하십시오",
+      "theme_too_long": "회의 주제는 50자를 초과할 수 없습니다",
+      "tip_left": "현재 ",
+      "tip_right": "시간 동안의 유휴 시간 예약 가능",
+      "title": "빠른 회의",
+      "to_start": "예정됨",
+	  "not_available": "사용 가능한 시간 없음"
+    },
+	"scan_meeting":{
+		"line1": "현재 방에 인증이 켜져 있습니다.",
+		"line2": "기업 위챗을 사용하여 코드를 스캔하여 예약하십시오."
+	},
+    "index": {
+      "left": {
+        "book": "모임 만들기",
+        "cancel": "취소",
+        "cancel_tip": "회의를 취소하시겠습니까?",
+		"force_end_tip": "이 모임의 조기 종료 여부?",
+        "confirm": "확인",
+        "default_name": "빠른 모임",
+        "fail": "회의 취소 실패!",
+        "invalid_type": "타블렛에서 예약하지 않은 빠른 모임은 취소할 수 없습니다.",
+		"invalid_time": "이전 버전이거나 진행 중인 모임은 취소할 수 없습니다.",
+        "no_free": "현재 시간대 회의실이 가득 찼습니다",
+        "notice": "알림",
+        "success": "회의 취소 성공!"
+      },
+      "right": {
+        "cancel": "취소",
+        "confirm": "확인",
+        "default_booker": "/",
+        "default_name": "빠른 모임",
+        "in_meeting": "회의 중",
+        "language": "언어",
+        "meeting": "회의실",
+        "next_meeting": "곧 시작될 회의",
+        "no_meeting": "유휴 중",
+        "notice": "알림",
+        "unbind": "장치가 해제된 것을 감지했습니다. 재부팅 후 다시 바인딩할 수 있습니다. 즉시 재부팅하시겠습니까?",
+        "update": "새 버전이 발견되었습니다. 즉시 재부팅하시겠습니까?",
+		"unbind_error": "장치 분리, 다시 연결 시도"
+      }
+    },
+    "initializing": "초기화 중",
+	"loading": "로드 중...",
+    "login": {
+      "account_number": "계정",
+      "confirm": "확인",
+      "login_fail": "사용자 이름 또는 암호 오류",
+      "login_success": "로그인 성공",
+      "password": "암호",
+      "cancel": "취소",
+      "title": "관리자 암호를 입력하십시오"
+    },
+    "netDataError": "인터페이스가 데이터 예외를 반환합니다.",
+    "setting": {
+      "left": {
+        "about_us": "우리에 대해",
+        "basic_info": "프로파일",
+        "battery": "전력",
+        "equipment_type": "장치 모델",
+        "normal": "정상",
+        "offline": "오프라인",
+        "online_status": "온라인 상태",
+        "room_area": "소속 공간 및 영역",
+        "unique_id": "장치 고유 일련번호",
+		"unknown_brand": "알 수 없음",
+		"version": "버전 번호"
+      },
+      "right": {
+        "12hour_format": "12시간제",
+        "24hour_format": "24시간제",
+        "area": "지역",
+        "area_empty": "영역을 선택하지 않았습니다",
+        "brightness": "밝기",
+        "cancel": "취소",
+        "confirm": "확인",
+        "invalid_url": "잘못된 요청 주소",
+        "meeting_room": "회의실",
+        "not_verified": "요청 주소가 확인되지 않았습니다",
+        "notice": "알림",
+        "request_url": "요청 주소",
+        "restart": "주소 변경 요청은 애플리케이션을 재부팅해야 합니다. 재부팅하시겠습니까?",
+        "room_empty": "방을 선택하지 않았습니다",
+        "setting": "설정",
+        "setting_success": "설정 수정 성공",
+        "submit": "제출",
+        "theme_color": "주제 색상",
+        "time_format": "시간 형식",
+        "url_empty": "요청 주소가 비어 있습니다",
+        "verify_fail": "요청 주소 확인 실패!",
+        "verify_success": "요청 주소 확인 성공!",
+        "verifying": "확인 중...",
+        "volume": "볼륨"
+      }
+    },
+    "time": {
+      "hour": "시간",
+      "hours": "시간",
+      "minute": "분",
+      "minutes": "분",
+	  "second": "초",
+	  "seconds": "초",
+      "not_available": "사용 불가능"
+    }
+  }
+}
