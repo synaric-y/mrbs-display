@@ -1,7 +1,13 @@
+
+
+/**
+ * @author Octene
+ * @file 特定时区的时间与unix时间戳互转
+ */
+
+/** @module DateTime */
+
 import {
-	TIMEZONE_ZH,
-	TIMEZONE_KO,
-	TIMEZONE_EN,
 	DATE_FORMAT_LIST
 } from '@/constants/time.js'
 

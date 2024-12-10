@@ -1,19 +1,14 @@
 <script setup>
 	import {
-		SEC_PER_HOUR,
-		generateTsSequence,
 		tsDiff,
 		nearestScaleTs,
-		SEC_PER_MINUTE,
 		ceilScaleTs
 	} from "@/utils/timestampTool.js";
 	
-	import { datetimeFormatTzLocale,localHourToTs,localHourList,localTsToHour,localHourListScroll } from '@/utils/tzDateTimeFormat.js' 
-
-	import {
-		formatTime
-	} from "@/utils/indexTimeTool.js";
+	import { SEC_PER_MINUTE,SEC_PER_HOUR } from "@/constants/time.js";
 	
+	import { localTsToHour,localHourListScroll } from '@/utils/tzDateTimeFormat.js' 
+
 	import {
 		formatMeetings
 	} from '@/utils/meeting.js'
@@ -87,13 +82,12 @@
 		
 		// 初始化刻度
 		hrArray.value = localHourListScroll(props.lb, props.ub, currentTimezone.value);
-		// generateTsSequence(props.lb, props.ub, props.scale * 60)
-		// console.log(hrArray.value);
+
 
 		// 初始化会议
-		const test = 1733500976
-		timeTable.value = formatMeetings(test,props.lb, props.ub,props.meetings)
-		// timeTable.value = formatMeetings(props.currentTime,props.lb, props.ub,props.meetings)
+		// const test = 1733500976
+		// timeTable.value = formatMeetings(test,props.lb, props.ub,props.meetings)
+		timeTable.value = formatMeetings(props.currentTime,props.lb, props.ub,props.meetings)
 		console.log(timeTable.value);
 
 		// 初始化手柄

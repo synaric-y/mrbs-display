@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>Timeline - Documentation</title>
+    <title>DateTime - Documentation</title>
     
     
     <script src="scripts/prettify/prettify.js"></script>
@@ -35,7 +35,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Timeline</h1>
+    <h1 class="page-title">DateTime</h1>
     
 
     
@@ -84,7 +84,7 @@
 
     
 
-    <h4 class="name" id=".findNextLargerTime"><span class="type-signature type-signature-static">(static) </span>findNextLargerTime<span class="signature">(arr, target, lb, ub)</span><span class="type-signature"> &rarr; {Number}</span></h4>
+    <h4 class="name" id="~ceilScaleTs"><span class="type-signature type-signature-inner">(inner) </span>ceilScaleTs<span class="signature">(ts, resolution)</span><span class="type-signature"> &rarr; {Number}</span></h4>
 
     
 
@@ -94,13 +94,13 @@
 <dl class="details">
     
     <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>下一个较大值</p></li></ul></dd>
+    <dd class="tag-description"><ul class="dummy"><li><p>寻找下一个整点(正好是0、15、30、45分钟的时间戳)</p></li></ul></dd>
     
 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_arraySearching.js.html">utils/arraySearching.js</a>, <a href="utils_arraySearching.js.html#line20">line 20</a>
+        <a href="utils_timestampTool.js.html">utils/timestampTool.js</a>, <a href="utils_timestampTool.js.html#line40">line 40</a>
     </li></ul></dd>
     
 
@@ -179,13 +179,13 @@
 
         <tr>
             
-                <td class="name"><code>arr</code></td>
+                <td class="name"><code>ts</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Array.&lt;Entry></span>
+<span class="param-type">Number</span>
 
 
 
@@ -196,14 +196,1312 @@
 
             
 
-            <td class="description last"><p>会议数组</p></td>
+            <td class="description last"><p>当前点位</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>target</code></td>
+                <td class="name"><code>resolution</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>最小会议间隔，秒</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>下一个整点时间戳（向上取整），如果现在正好是整点则返回</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Number</span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~datetimeFormatTzLocale"><span class="type-signature type-signature-inner">(inner) </span>datetimeFormatTzLocale<span class="signature">(serverTime, timezone, locale, is12)</span><span class="type-signature"> &rarr; {String}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>根据语言、时区、unix时间戳显示格式化字符串</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_tzDateTimeFormat.js.html">utils/tzDateTimeFormat.js</a>, <a href="utils_tzDateTimeFormat.js.html#line42">line 42</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li>Octene</li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>serverTime</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>服务器时间, unix时间戳</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>timezone</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>区域所在的时区</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>locale</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>当前的语言</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>is12</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>是否为12小时制</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>格式化完成的字符串，年月日按locale显示，时、分按固定格式显示</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">String</span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~localHourList"><span class="type-signature type-signature-inner">(inner) </span>localHourList<span class="signature">(begTs, endTs, timezone, is12)</span><span class="type-signature"> &rarr; {Array}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>计算当地时间戳与当地显示时间的组合</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_tzDateTimeFormat.js.html">utils/tzDateTimeFormat.js</a>, <a href="utils_tzDateTimeFormat.js.html#line89">line 89</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li>Octene</li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>begTs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>当地区域开始时间戳</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>endTs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>当地区域结束时间戳</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>timezone</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>区域所在的时区</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>is12</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    <code>true</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>是否为12小时制，否则是24小时</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>时间列表</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array</span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~localHourListScroll"><span class="type-signature type-signature-inner">(inner) </span>localHourListScroll<span class="signature">(begTs, endTs, timezone)</span><span class="type-signature"> &rarr; {Array}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>计算当地显示时间</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_tzDateTimeFormat.js.html">utils/tzDateTimeFormat.js</a>, <a href="utils_tzDateTimeFormat.js.html#line128">line 128</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li>Octene</li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>begTs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>当地区域开始时间戳</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>endTs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>当地区域结束时间戳</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>timezone</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>区域所在的时区</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>时间列表</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array</span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~localHourToTs"><span class="type-signature type-signature-inner">(inner) </span>localHourToTs<span class="signature">(serverTime, timezone, hr)</span><span class="type-signature"> &rarr; {Number}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>计算在当地的某个小时的时间戳（例如纽约早上8:00和我们的早上8:00实际上是两个时间戳）</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_tzDateTimeFormat.js.html">utils/tzDateTimeFormat.js</a>, <a href="utils_tzDateTimeFormat.js.html#line58">line 58</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li>Octene</li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>serverTime</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>服务器时间</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>timezone</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>区域所在的时区</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>hr</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>当地小时</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>当地时间戳</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Number</span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~localTsToHour"><span class="type-signature type-signature-inner">(inner) </span>localTsToHour<span class="signature">(localTs, timezone, is12)</span><span class="type-signature"> &rarr; {String}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>计算当地时间戳的小时和分钟</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_tzDateTimeFormat.js.html">utils/tzDateTimeFormat.js</a>, <a href="utils_tzDateTimeFormat.js.html#line73">line 73</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li>Octene</li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>localTs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>当地时间戳</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>timezone</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>区域所在的时区</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>is12</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>是否为12小时制</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>格式化字符串，12或24小时制</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">String</span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~nearestScaleTs"><span class="type-signature type-signature-inner">(inner) </span>nearestScaleTs<span class="signature">(ts, lb, ub, resolution)</span><span class="type-signature"> &rarr; {Number}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>寻找当前点位附近最近的整点，超出边界的则返回边界</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_timestampTool.js.html">utils/timestampTool.js</a>, <a href="utils_timestampTool.js.html#line61">line 61</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li>Octene</li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>ts</code></td>
             
 
             <td class="type">
@@ -244,7 +1542,7 @@
 
             
 
-            <td class="description last"><p>时间下界（含），时间戳</p></td>
+            <td class="description last"><p>时间下界（含）</p></td>
         </tr>
 
     
@@ -268,7 +1566,31 @@
 
             
 
-            <td class="description last"><p>时间上界（含），时间戳</p></td>
+            <td class="description last"><p>时间上界（含）</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>resolution</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>最小会议间隔，秒</p></td>
         </tr>
 
     
@@ -294,7 +1616,7 @@
 
         
 <div class="param-desc">
-    <p>当前点位的下一个较大值</p>
+    <p>最近的整点时间戳</p>
 </div>
 
 
@@ -321,7 +1643,7 @@
 
     
 
-    <h4 class="name" id=".findPreviousSmallerTime"><span class="type-signature type-signature-static">(static) </span>findPreviousSmallerTime<span class="signature">(arr, target, lb, ub)</span><span class="type-signature"> &rarr; {Number}</span></h4>
+    <h4 class="name" id="~nextScaleTs"><span class="type-signature type-signature-inner">(inner) </span>nextScaleTs<span class="signature">(ts, resolution)</span><span class="type-signature"> &rarr; {Number}</span></h4>
 
     
 
@@ -331,13 +1653,13 @@
 <dl class="details">
     
     <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>上一个较小值</p></li></ul></dd>
+    <dd class="tag-description"><ul class="dummy"><li><p>寻找下一个整点(正好是0、15、30、45分钟的时间戳)</p></li></ul></dd>
     
 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_arraySearching.js.html">utils/arraySearching.js</a>, <a href="utils_arraySearching.js.html#line37">line 37</a>
+        <a href="utils_timestampTool.js.html">utils/timestampTool.js</a>, <a href="utils_timestampTool.js.html#line23">line 23</a>
     </li></ul></dd>
     
 
@@ -416,31 +1738,7 @@
 
         <tr>
             
-                <td class="name"><code>arr</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array.&lt;Entry></span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>会议数组</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>target</code></td>
+                <td class="name"><code>ts</code></td>
             
 
             <td class="type">
@@ -464,315 +1762,6 @@
 
         <tr>
             
-                <td class="name"><code>lb</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>时间下界（含），时间戳</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>ub</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>时间上界（含），时间戳</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5 class="h5-returns">Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>当前点位的上一个较小值</p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Number</span>
-
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="~fullCheck"><span class="type-signature type-signature-inner">(inner) </span>fullCheck<span class="signature">(left, right, arr, lb, ub, resolution)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-    
-    <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>全部检查</p></li></ul></dd>
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_arrayChecking.js.html">utils/arrayChecking.js</a>, <a href="utils_arrayChecking.js.html#line87">line 87</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-author">Author:</dt>
-    <dd class="tag-author">
-        <ul>
-            <li>Octene</li>
-        </ul>
-    </dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <h5 class="h5-parameters">Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>left</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>左值</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>right</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>右值</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>arr</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array.&lt;Entry></span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>会议数组</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>lb</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>时间下界（含），时间戳</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>ub</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>时间上界（含），时间戳</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
                 <td class="name"><code>resolution</code></td>
             
 
@@ -790,7 +1779,7 @@
 
             
 
-            <td class="description last"><p>最小间隔，时间戳</p></td>
+            <td class="description last"><p>最小会议间隔，秒</p></td>
         </tr>
 
     
@@ -816,7 +1805,7 @@
 
         
 <div class="param-desc">
-    <p>全部检查完成返回true</p>
+    <p>下一个整点时间戳（向上取整）</p>
 </div>
 
 
@@ -827,7 +1816,7 @@
     </dt>
     <dd>
         
-<span class="param-type">Boolean</span>
+<span class="param-type">Number</span>
 
 
 
@@ -843,7 +1832,7 @@
 
     
 
-    <h4 class="name" id="~isBothValid"><span class="type-signature type-signature-inner">(inner) </span>isBothValid<span class="signature">(left, right, arr)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
+    <h4 class="name" id="~tsDiff"><span class="type-signature type-signature-inner">(inner) </span>tsDiff<span class="signature">(begTs, endTs)</span><span class="type-signature"> &rarr; {String}</span></h4>
 
     
 
@@ -853,13 +1842,13 @@
 <dl class="details">
     
     <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>检查两手柄之间是否有会议</p></li></ul></dd>
+    <dd class="tag-description"><ul class="dummy"><li><p>计算两个时间戳的差值，并将差值转换为可读的字符串</p></li></ul></dd>
     
 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_arrayChecking.js.html">utils/arrayChecking.js</a>, <a href="utils_arrayChecking.js.html#line56">line 56</a>
+        <a href="utils_timestampTool.js.html">utils/timestampTool.js</a>, <a href="utils_timestampTool.js.html#line82">line 82</a>
     </li></ul></dd>
     
 
@@ -938,7 +1927,7 @@
 
         <tr>
             
-                <td class="name"><code>left</code></td>
+                <td class="name"><code>begTs</code></td>
             
 
             <td class="type">
@@ -955,14 +1944,14 @@
 
             
 
-            <td class="description last"><p>左值</p></td>
+            <td class="description last"><p>较小的时间戳</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>right</code></td>
+                <td class="name"><code>endTs</code></td>
             
 
             <td class="type">
@@ -979,31 +1968,7 @@
 
             
 
-            <td class="description last"><p>右值</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>arr</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array.&lt;Entry></span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>会议数组</p></td>
+            <td class="description last"><p>较大的时间戳</p></td>
         </tr>
 
     
@@ -1029,7 +1994,7 @@
 
         
 <div class="param-desc">
-    <p>两手柄之间无会议返回true</p>
+    <p>最小单位为分钟的字符串，如“1小时23分”</p>
 </div>
 
 
@@ -1040,7 +2005,7 @@
     </dt>
     <dd>
         
-<span class="param-type">Boolean</span>
+<span class="param-type">String</span>
 
 
 
@@ -1052,799 +2017,8 @@
 
 
         
-            
-
-    
-
-    <h4 class="name" id="~isCorrectOrder"><span class="type-signature type-signature-inner">(inner) </span>isCorrectOrder<span class="signature">(left, right, resolution)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-    
-    <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>检查两手柄之间的关系</p></li></ul></dd>
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_arrayChecking.js.html">utils/arrayChecking.js</a>, <a href="utils_arrayChecking.js.html#line70">line 70</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-author">Author:</dt>
-    <dd class="tag-author">
-        <ul>
-            <li>Octene</li>
-        </ul>
-    </dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <h5 class="h5-parameters">Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>left</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>左值</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>right</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>右值</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>resolution</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>最小间隔，时间戳</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5 class="h5-returns">Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>左手柄严格小于右手柄，差值大于等于最小间隔，返回true</p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Boolean</span>
-
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="~isLeftHandleValid"><span class="type-signature type-signature-inner">(inner) </span>isLeftHandleValid<span class="signature">(left, arr, lb)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-    
-    <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>检查左值是否合法</p></li></ul></dd>
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_arrayChecking.js.html">utils/arrayChecking.js</a>, <a href="utils_arrayChecking.js.html#line26">line 26</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-author">Author:</dt>
-    <dd class="tag-author">
-        <ul>
-            <li>Octene</li>
-        </ul>
-    </dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <h5 class="h5-parameters">Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>left</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>左值</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>arr</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array.&lt;Entry></span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>会议数组</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>lb</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>时间下界（含），时间戳</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5 class="h5-returns">Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>左值是否合法</p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Boolean</span>
-
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="~isRightHandleValid"><span class="type-signature type-signature-inner">(inner) </span>isRightHandleValid<span class="signature">(right, arr, ub)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-    
-    <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>检查右值是否合法</p></li></ul></dd>
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_arrayChecking.js.html">utils/arrayChecking.js</a>, <a href="utils_arrayChecking.js.html#line41">line 41</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-author">Author:</dt>
-    <dd class="tag-author">
-        <ul>
-            <li>Octene</li>
-        </ul>
-    </dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <h5 class="h5-parameters">Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>right</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>右值</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>arr</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array.&lt;Entry></span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>会议数组</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>ub</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>时间上界（含），时间戳</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5 class="h5-returns">Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>右值是否合法</p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Boolean</span>
-
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-    
-
-    
-        <h3 class="subsection-title">Type Definitions</h3>
-
-        
-                
-<h4 class="name" id="~Entry">Entry</h4>
-
-
-
-
-
-<dl class="details">
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_arrayChecking.js.html">utils/arrayChecking.js</a>, <a href="utils_arrayChecking.js.html#line10">line 10</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
     
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-    <h5 class="subsection-title">Properties:</h5>
-
-    
-
-<table class="props">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>start_time</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>开始时间戳</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>end_time</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>结束时间戳</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-    <h5 class="h5-types">Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">Object</span>
-
-
-
-        </li>
-    </ul>
-
-
-
-
-
 
-            
     
 
     
@@ -1899,7 +2073,7 @@
 
     
 
-    <h4 class="name" id=".findNextLargerTime"><span class="type-signature type-signature-static">(static) </span>findNextLargerTime<span class="signature">(arr, target, lb, ub)</span><span class="type-signature"> &rarr; {Number}</span></h4>
+    <h4 class="name" id="~ceilScaleTs"><span class="type-signature type-signature-inner">(inner) </span>ceilScaleTs<span class="signature">(ts, resolution)</span><span class="type-signature"> &rarr; {Number}</span></h4>
 
     
 
@@ -1909,13 +2083,13 @@
 <dl class="details">
     
     <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>下一个较大值</p></li></ul></dd>
+    <dd class="tag-description"><ul class="dummy"><li><p>寻找下一个整点(正好是0、15、30、45分钟的时间戳)</p></li></ul></dd>
     
 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_arraySearching.js.html">utils/arraySearching.js</a>, <a href="utils_arraySearching.js.html#line20">line 20</a>
+        <a href="utils_timestampTool.js.html">utils/timestampTool.js</a>, <a href="utils_timestampTool.js.html#line40">line 40</a>
     </li></ul></dd>
     
 
@@ -1994,13 +2168,13 @@
 
         <tr>
             
-                <td class="name"><code>arr</code></td>
+                <td class="name"><code>ts</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Array.&lt;Entry></span>
+<span class="param-type">Number</span>
 
 
 
@@ -2011,14 +2185,1312 @@
 
             
 
-            <td class="description last"><p>会议数组</p></td>
+            <td class="description last"><p>当前点位</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>target</code></td>
+                <td class="name"><code>resolution</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>最小会议间隔，秒</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>下一个整点时间戳（向上取整），如果现在正好是整点则返回</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Number</span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~datetimeFormatTzLocale"><span class="type-signature type-signature-inner">(inner) </span>datetimeFormatTzLocale<span class="signature">(serverTime, timezone, locale, is12)</span><span class="type-signature"> &rarr; {String}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>根据语言、时区、unix时间戳显示格式化字符串</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_tzDateTimeFormat.js.html">utils/tzDateTimeFormat.js</a>, <a href="utils_tzDateTimeFormat.js.html#line42">line 42</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li>Octene</li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>serverTime</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>服务器时间, unix时间戳</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>timezone</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>区域所在的时区</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>locale</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>当前的语言</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>is12</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>是否为12小时制</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>格式化完成的字符串，年月日按locale显示，时、分按固定格式显示</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">String</span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~localHourList"><span class="type-signature type-signature-inner">(inner) </span>localHourList<span class="signature">(begTs, endTs, timezone, is12)</span><span class="type-signature"> &rarr; {Array}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>计算当地时间戳与当地显示时间的组合</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_tzDateTimeFormat.js.html">utils/tzDateTimeFormat.js</a>, <a href="utils_tzDateTimeFormat.js.html#line89">line 89</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li>Octene</li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>begTs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>当地区域开始时间戳</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>endTs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>当地区域结束时间戳</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>timezone</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>区域所在的时区</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>is12</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    <code>true</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>是否为12小时制，否则是24小时</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>时间列表</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array</span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~localHourListScroll"><span class="type-signature type-signature-inner">(inner) </span>localHourListScroll<span class="signature">(begTs, endTs, timezone)</span><span class="type-signature"> &rarr; {Array}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>计算当地显示时间</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_tzDateTimeFormat.js.html">utils/tzDateTimeFormat.js</a>, <a href="utils_tzDateTimeFormat.js.html#line128">line 128</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li>Octene</li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>begTs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>当地区域开始时间戳</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>endTs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>当地区域结束时间戳</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>timezone</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>区域所在的时区</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>时间列表</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array</span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~localHourToTs"><span class="type-signature type-signature-inner">(inner) </span>localHourToTs<span class="signature">(serverTime, timezone, hr)</span><span class="type-signature"> &rarr; {Number}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>计算在当地的某个小时的时间戳（例如纽约早上8:00和我们的早上8:00实际上是两个时间戳）</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_tzDateTimeFormat.js.html">utils/tzDateTimeFormat.js</a>, <a href="utils_tzDateTimeFormat.js.html#line58">line 58</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li>Octene</li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>serverTime</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>服务器时间</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>timezone</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>区域所在的时区</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>hr</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>当地小时</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>当地时间戳</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Number</span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~localTsToHour"><span class="type-signature type-signature-inner">(inner) </span>localTsToHour<span class="signature">(localTs, timezone, is12)</span><span class="type-signature"> &rarr; {String}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>计算当地时间戳的小时和分钟</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_tzDateTimeFormat.js.html">utils/tzDateTimeFormat.js</a>, <a href="utils_tzDateTimeFormat.js.html#line73">line 73</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li>Octene</li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>localTs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>当地时间戳</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>timezone</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>区域所在的时区</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>is12</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>是否为12小时制</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>格式化字符串，12或24小时制</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">String</span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~nearestScaleTs"><span class="type-signature type-signature-inner">(inner) </span>nearestScaleTs<span class="signature">(ts, lb, ub, resolution)</span><span class="type-signature"> &rarr; {Number}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>寻找当前点位附近最近的整点，超出边界的则返回边界</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_timestampTool.js.html">utils/timestampTool.js</a>, <a href="utils_timestampTool.js.html#line61">line 61</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li>Octene</li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>ts</code></td>
             
 
             <td class="type">
@@ -2059,7 +3531,7 @@
 
             
 
-            <td class="description last"><p>时间下界（含），时间戳</p></td>
+            <td class="description last"><p>时间下界（含）</p></td>
         </tr>
 
     
@@ -2083,7 +3555,31 @@
 
             
 
-            <td class="description last"><p>时间上界（含），时间戳</p></td>
+            <td class="description last"><p>时间上界（含）</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>resolution</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>最小会议间隔，秒</p></td>
         </tr>
 
     
@@ -2109,7 +3605,7 @@
 
         
 <div class="param-desc">
-    <p>当前点位的下一个较大值</p>
+    <p>最近的整点时间戳</p>
 </div>
 
 
@@ -2136,7 +3632,7 @@
 
     
 
-    <h4 class="name" id=".findPreviousSmallerTime"><span class="type-signature type-signature-static">(static) </span>findPreviousSmallerTime<span class="signature">(arr, target, lb, ub)</span><span class="type-signature"> &rarr; {Number}</span></h4>
+    <h4 class="name" id="~nextScaleTs"><span class="type-signature type-signature-inner">(inner) </span>nextScaleTs<span class="signature">(ts, resolution)</span><span class="type-signature"> &rarr; {Number}</span></h4>
 
     
 
@@ -2146,13 +3642,13 @@
 <dl class="details">
     
     <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>上一个较小值</p></li></ul></dd>
+    <dd class="tag-description"><ul class="dummy"><li><p>寻找下一个整点(正好是0、15、30、45分钟的时间戳)</p></li></ul></dd>
     
 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_arraySearching.js.html">utils/arraySearching.js</a>, <a href="utils_arraySearching.js.html#line37">line 37</a>
+        <a href="utils_timestampTool.js.html">utils/timestampTool.js</a>, <a href="utils_timestampTool.js.html#line23">line 23</a>
     </li></ul></dd>
     
 
@@ -2231,31 +3727,7 @@
 
         <tr>
             
-                <td class="name"><code>arr</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array.&lt;Entry></span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>会议数组</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>target</code></td>
+                <td class="name"><code>ts</code></td>
             
 
             <td class="type">
@@ -2279,315 +3751,6 @@
 
         <tr>
             
-                <td class="name"><code>lb</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>时间下界（含），时间戳</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>ub</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>时间上界（含），时间戳</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5 class="h5-returns">Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>当前点位的上一个较小值</p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Number</span>
-
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="~fullCheck"><span class="type-signature type-signature-inner">(inner) </span>fullCheck<span class="signature">(left, right, arr, lb, ub, resolution)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-    
-    <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>全部检查</p></li></ul></dd>
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_arrayChecking.js.html">utils/arrayChecking.js</a>, <a href="utils_arrayChecking.js.html#line87">line 87</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-author">Author:</dt>
-    <dd class="tag-author">
-        <ul>
-            <li>Octene</li>
-        </ul>
-    </dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <h5 class="h5-parameters">Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>left</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>左值</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>right</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>右值</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>arr</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array.&lt;Entry></span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>会议数组</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>lb</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>时间下界（含），时间戳</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>ub</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>时间上界（含），时间戳</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
                 <td class="name"><code>resolution</code></td>
             
 
@@ -2605,7 +3768,7 @@
 
             
 
-            <td class="description last"><p>最小间隔，时间戳</p></td>
+            <td class="description last"><p>最小会议间隔，秒</p></td>
         </tr>
 
     
@@ -2631,7 +3794,7 @@
 
         
 <div class="param-desc">
-    <p>全部检查完成返回true</p>
+    <p>下一个整点时间戳（向上取整）</p>
 </div>
 
 
@@ -2642,7 +3805,7 @@
     </dt>
     <dd>
         
-<span class="param-type">Boolean</span>
+<span class="param-type">Number</span>
 
 
 
@@ -2658,7 +3821,7 @@
 
     
 
-    <h4 class="name" id="~isBothValid"><span class="type-signature type-signature-inner">(inner) </span>isBothValid<span class="signature">(left, right, arr)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
+    <h4 class="name" id="~tsDiff"><span class="type-signature type-signature-inner">(inner) </span>tsDiff<span class="signature">(begTs, endTs)</span><span class="type-signature"> &rarr; {String}</span></h4>
 
     
 
@@ -2668,13 +3831,13 @@
 <dl class="details">
     
     <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>检查两手柄之间是否有会议</p></li></ul></dd>
+    <dd class="tag-description"><ul class="dummy"><li><p>计算两个时间戳的差值，并将差值转换为可读的字符串</p></li></ul></dd>
     
 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_arrayChecking.js.html">utils/arrayChecking.js</a>, <a href="utils_arrayChecking.js.html#line56">line 56</a>
+        <a href="utils_timestampTool.js.html">utils/timestampTool.js</a>, <a href="utils_timestampTool.js.html#line82">line 82</a>
     </li></ul></dd>
     
 
@@ -2753,7 +3916,7 @@
 
         <tr>
             
-                <td class="name"><code>left</code></td>
+                <td class="name"><code>begTs</code></td>
             
 
             <td class="type">
@@ -2770,14 +3933,14 @@
 
             
 
-            <td class="description last"><p>左值</p></td>
+            <td class="description last"><p>较小的时间戳</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>right</code></td>
+                <td class="name"><code>endTs</code></td>
             
 
             <td class="type">
@@ -2794,31 +3957,7 @@
 
             
 
-            <td class="description last"><p>右值</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>arr</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array.&lt;Entry></span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>会议数组</p></td>
+            <td class="description last"><p>较大的时间戳</p></td>
         </tr>
 
     
@@ -2844,7 +3983,7 @@
 
         
 <div class="param-desc">
-    <p>两手柄之间无会议返回true</p>
+    <p>最小单位为分钟的字符串，如“1小时23分”</p>
 </div>
 
 
@@ -2855,7 +3994,7 @@
     </dt>
     <dd>
         
-<span class="param-type">Boolean</span>
+<span class="param-type">String</span>
 
 
 
@@ -2867,799 +4006,8 @@
 
 
         
-            
-
-    
-
-    <h4 class="name" id="~isCorrectOrder"><span class="type-signature type-signature-inner">(inner) </span>isCorrectOrder<span class="signature">(left, right, resolution)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-    
-    <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>检查两手柄之间的关系</p></li></ul></dd>
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_arrayChecking.js.html">utils/arrayChecking.js</a>, <a href="utils_arrayChecking.js.html#line70">line 70</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-author">Author:</dt>
-    <dd class="tag-author">
-        <ul>
-            <li>Octene</li>
-        </ul>
-    </dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <h5 class="h5-parameters">Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>left</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>左值</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>right</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>右值</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>resolution</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>最小间隔，时间戳</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5 class="h5-returns">Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>左手柄严格小于右手柄，差值大于等于最小间隔，返回true</p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Boolean</span>
-
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="~isLeftHandleValid"><span class="type-signature type-signature-inner">(inner) </span>isLeftHandleValid<span class="signature">(left, arr, lb)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-    
-    <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>检查左值是否合法</p></li></ul></dd>
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_arrayChecking.js.html">utils/arrayChecking.js</a>, <a href="utils_arrayChecking.js.html#line26">line 26</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-author">Author:</dt>
-    <dd class="tag-author">
-        <ul>
-            <li>Octene</li>
-        </ul>
-    </dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <h5 class="h5-parameters">Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>left</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>左值</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>arr</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array.&lt;Entry></span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>会议数组</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>lb</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>时间下界（含），时间戳</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5 class="h5-returns">Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>左值是否合法</p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Boolean</span>
-
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="~isRightHandleValid"><span class="type-signature type-signature-inner">(inner) </span>isRightHandleValid<span class="signature">(right, arr, ub)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-    
-    <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>检查右值是否合法</p></li></ul></dd>
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_arrayChecking.js.html">utils/arrayChecking.js</a>, <a href="utils_arrayChecking.js.html#line41">line 41</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-author">Author:</dt>
-    <dd class="tag-author">
-        <ul>
-            <li>Octene</li>
-        </ul>
-    </dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <h5 class="h5-parameters">Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>right</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>右值</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>arr</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array.&lt;Entry></span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>会议数组</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>ub</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>时间上界（含），时间戳</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5 class="h5-returns">Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>右值是否合法</p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Boolean</span>
-
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-    
-
-    
-        <h3 class="subsection-title">Type Definitions</h3>
-
-        
-                
-<h4 class="name" id="~Entry">Entry</h4>
-
-
-
-
-
-<dl class="details">
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_arrayChecking.js.html">utils/arrayChecking.js</a>, <a href="utils_arrayChecking.js.html#line10">line 10</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
     
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-    <h5 class="subsection-title">Properties:</h5>
-
-    
-
-<table class="props">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>start_time</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>开始时间戳</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>end_time</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>结束时间戳</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-    <h5 class="h5-types">Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">Object</span>
-
-
-
-        </li>
-    </ul>
-
-
-
-
-
 
-            
     
 
     
@@ -3677,7 +4025,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.4</a> on Tue Dec 10 2024 11:44:48 GMT+0800 (中国标准时间) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.4</a> on Tue Dec 10 2024 11:44:47 GMT+0800 (中国标准时间) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

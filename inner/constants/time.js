@@ -3,6 +3,7 @@
  * @type {Number}
  * @default
  * @description 每小时的秒数
+ * @default
 */ 
 const SEC_PER_HOUR = 3600
 
@@ -19,6 +20,7 @@ const SEC_PER_MINUTE = 60
  * @type {String}
  * @default
  * @description 上海时区（UTC +08:00）
+ * @default
 */ 
 const TIMEZONE_ZH = 'Asia/Shanghai'
 
@@ -27,6 +29,7 @@ const TIMEZONE_ZH = 'Asia/Shanghai'
  * @type {String}
  * @default
  * @description 韩国时区
+ * @default
 */ 
 const TIMEZONE_KO = 'Asia/Seoul'
 
@@ -35,6 +38,7 @@ const TIMEZONE_KO = 'Asia/Seoul'
  * @type {String}
  * @default
  * @description 美国时区
+ * @default
 */ 
 const TIMEZONE_EN = 'America/New_York'
 
@@ -44,6 +48,7 @@ const TIMEZONE_EN = 'America/New_York'
  * @type {Object}
  * @default
  * @description 年月日格式表 key: locale，两位英文小写字母 value: 年月日格式
+ * @default
 */ 
 const DATE_FORMAT_LIST = {
 	'zh': 'YYYY年MM月DD日',

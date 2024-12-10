@@ -9,15 +9,26 @@ const manager = new RequestManager() //创建请求管理表
 
 
 export default class Request {
+	/**
+	 * @class
+	 * @classdesc 创建一个请求实例，并发送uni请求
+	 * @param {Object} param 构造参数
+	 * @param {String} [param.host=store.state.baseURL] 请求地址前缀，如无，默认使用vue-store里面存储的请求地址
+	 * @param {String} param.url 请求的具体接口
+	 * @param {String} [param.method=POST] 请求方法，GET|POST，默认为POST
+	 * @param {Object} [param.data={}] POST携带的body对象，默认为空
+	 * @param {String} [param.token=''] token，默认为空
+	 * @param {Object} [param.header={}] 请求头, 默认为空（最后会默认添加一项 'content-type': "application/json"）
+	 * @param {Boolean} [param.hideLoading=false] 隐藏加载圈，默认为false，即不隐藏
+	*/
     http(param) {
         // 请求参数
-        var host = param.host,
+        var host = param.host || store.state.baseURL,
 			url = param.url,
-            method = param.method,
-            header = {},
+            method = param.method || "POST",
             data = param.data || {},
             token = param.token || "",
-			header = param.header || {'content-type': "application/json"},
+			header = {'content-type': "application/json", ...param.header},
             hideLoading = param.hideLoading || false;
 
 		// console.log(param.url);
@@ -27,8 +38,7 @@ export default class Request {
        //拼接完整请求地址（根据环境切换）
        // var requestUrl = operate.api() + url;
 
-        //请求方式:GET或POST(POST需配置
-        // header: {'content-type' : "application/x-www-form-urlencoded"},)
+        // 请求方式:GET或POST
         // if (method) {
         //     method = method.toUpperCase(); //小写改为大写
         //     if (method == "POST") {

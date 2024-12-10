@@ -9,9 +9,13 @@ const store = createStore({
 		"timeFormat": "24", // 时间格式 "12"（有AM的） | "24"
 		"timezone": 'Asia/Shanghai', // 时区代码
 		"baseURL": "", // 请求地址
-		"deviceInfo": {},
-		"batteryInfo": {},
-		"innerAddress": "" 
+		"deviceInfo": {"deviceId": "E37A3ACCCF19E6BD73C03DE47EB1D41B"},
+		"batteryInfo": {
+			"isCharging": 0,
+			"level": 78
+		},
+		"innerAddress": "",
+		"version":"1.0" // 版本号
 	},
 	getters: {
 		currentTheme: state => {
@@ -37,6 +41,9 @@ const store = createStore({
 		},
 		currentInnerAddress: state=>{
 			return state.innerAddress
+		},
+		currentVersion: state=>{
+			return state.version
 		},
 	},
 	mutations: {
@@ -64,6 +71,9 @@ const store = createStore({
 		changeInnerAddress(state, newInnerAddress) {
 			state.innerAddress = newInnerAddress
 		},
+		changeVersion(state, newVersion) {
+			state.version = newVersion
+		},
 	}
 })
 
@@ -71,6 +81,7 @@ const store = createStore({
 // 如果 localStorage 中有之前保存的 state，就将其替换当前的 state
 let savedState = undefined
 if(uni.getStorageSync('vuex-state')) savedState = JSON.parse(uni.getStorageSync('vuex-state'))
+console.log(savedState);
 if (savedState) {
   store.replaceState(savedState)
 }
