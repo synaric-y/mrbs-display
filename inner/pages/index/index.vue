@@ -171,9 +171,17 @@
 <script>
 	import moment from 'moment-timezone';
 	import AraleQRCode from 'arale-qrcode'
+	import {
+		dateDisplayLocaleOnly,
+		formatDate,
+		formatTime,
+		displayHM
+	} from '../../utils/indexTimeTool.js'
 	import { datetimeFormatTzLocale,localHourToTs,localHourList,localTsToHour } from '@/utils/tzDateTimeFormat.js' 
 	import {
+		hourDisplay,
 		nextScaleTs,
+		hourToTimestamp,
 	} from '@/utils/timestampTool.js'
 	import { SEC_PER_MINUTE } from '@/constants/time.js';
 	import LanguageSelect from '../../components/LanguageSelect.vue';
@@ -188,9 +196,14 @@
 	import BatteryShow from '../../components/BatteryShow.vue';
 	import ocMarquee from '../../components/oc-marquee.vue';
 	import {
-		syncRoomApi
-	} from '@/api/api.js'
-	import { wrappedCancelMeetingApi,wrappedGetQRCode,wrappedForceEndMeetingApi } from '@/api/meeting';
+		quickMeetApi,
+		quickMeetMessageMapping,
+		syncRoomApi,
+		getSettingApi,
+		cancelMeetingApi,
+		forceEndMeetingApi,
+		wxOauth2Url
+	} from '../../api/api.js'
 	import {
 		Decimal
 	} from 'decimal.js';
@@ -303,7 +316,7 @@
 				}
 			},
 			hasTimeInCurrentAvaliable() { // 下一个15分钟(scale)在不在区域可用时间内
-				// return true
+				return true
 				const next15 = nextScaleTs(this.serverTime, this.scale * SEC_PER_MINUTE)
 				return (this.serverTime && (this.lb<=next15) && (next15<=this.ub))
 			},
@@ -370,8 +383,10 @@
 				title: this.$t('message.initializing')
 			})
 			setTimeout(() => {
-				syncRoomApi(this.languageSet)
-				.then(res => {
+				syncRoomApi(this.currentBaseURL, {}, {
+					'Content-type': 'application/json',
+					'Accept-Language': this.languageSet
+				}, ).then(res => {
 					console.log(JSON.stringify(res));
 					let data = res.data.data;
 					let code = res.data.code
@@ -476,8 +491,10 @@
 			},
 
 			syncRoom() {
-				syncRoomApi(this.languageSet)
-				.then(({data}) => {
+				syncRoomApi(this.currentBaseURL, {}, {
+					'Content-type': 'application/json',
+					'Accept-Language': this.languageSet
+				}, ).then(({data}) => {
 					console.log(data);
 					let {
 						code,
@@ -580,12 +597,6 @@
 					this.changeTheme(theme_type == 0 ? 'default' : 'dark' ) // 主题
 					
 					this.inner_address = inner_address ?? '' // 内核网页最新地址
-					
-					const regexStr = /[\d]+(\.[\d]+)+/
-					const version = inner_address.match(regexStr)[0]
-					console.log(version);
-					
-					this.changeVersion(version)
 
 					// 检查更新
 					if((!this.cancelUpdate) && (this.inner_address) && window.location.href != this.inner_address){ // 需要更新且用户没有取消过更新
@@ -630,6 +641,20 @@
 			prepareSetting() { // 预先请求一下，成功则跳过登录
 			
 				this.loginViewShow = true
+				// return
+			
+				// const that = this
+				// getSettingApi(this.currentBaseURL, {}).then(res => {
+				// 	// that.loginViewShow = true
+				// 	if (res.data.data == null) { // 未登录，则打开登录页面
+				// 		that.loginViewShow = true
+				// 	} else { // 已登录，直接进
+				// 		that.settingViewShow = true
+				// 	}
+
+				// }).catch(e => {
+				// 	console.log(e);
+				// })
 			},
 			prepareQuickMeet(opt) {
 				if (opt) {
@@ -662,7 +687,12 @@
 			  
 			  console.log(this.area_id,this.room_id);
 			  
-			  wrappedGetQRCode(this.area_id,this.room_id).then(({data})=>{
+			  wxOauth2Url(this.currentBaseURL, {
+				  area_id: this.area_id,
+				  room_id: this.room_id,
+				  // area_id: 20, // 测试
+				  // room_id: 18, // 测试
+			  }).then(({data})=>{
 				  console.log(data);
 				  
 				  that.$nextTick(() => {
@@ -737,11 +767,26 @@
 				this.$refs.popupCancelQuickMeet.open()
 			},
 			cancelQuickMeet() {
-				wrappedCancelMeetingApi(this.toCancelId)
-				.finally(()=>{
-					this.syncRoom() // 手动刷新
-					this.popupCancelQuickMeetClose()
-				})
+				cancelMeetingApi(this.currentBaseURL,{
+						meeting_id: this.toCancelId,
+					}).then(res => {
+						console.log(res)
+						uni.showToast({
+							title: this.$t('message.index.left.success'),
+							icon: 'none'
+						})
+					})
+					.catch((e) => {
+						console.log(e);
+						uni.showToast({
+							title: this.$t('message.index.left.fail'),
+							icon: 'none'
+						})
+					})
+					.finally(()=>{
+						this.syncRoom() // 手动刷新
+						this.popupCancelQuickMeetClose()
+					})
 			},
 			prepareForceEndEntry(item){
 				if(!this.enableCancel) return // 滑动则不要触发此事件
@@ -777,11 +822,26 @@
 				
 			},
 			forceEndQuickMeet(){
-				wrappedForceEndMeetingApi(this.toCancelId)
-				.finally(()=>{
-					this.syncRoom() // 手动刷新
-					this.popupForceEndQuickMeetClose()
-				})
+				forceEndMeetingApi(this.currentBaseURL,{
+						"id": this.toCancelId,
+					}).then(res => {
+						console.log(res)
+						uni.showToast({
+							title: this.$t('message.index.left.success'),
+							icon: 'none'
+						})
+					})
+					.catch((e) => {
+						console.log(e);
+						uni.showToast({
+							title: this.$t('message.index.left.fail'),
+							icon: 'none'
+						})
+					})
+					.finally(()=>{
+						this.syncRoom() // 手动刷新
+						this.popupForceEndQuickMeetClose()
+					})
 			},
 			popupForceEndQuickMeetClose(){
 				this.$refs.popupForceEndQuickMeet.close()

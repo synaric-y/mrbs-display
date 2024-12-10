@@ -4,11 +4,10 @@
  * @file 取消重复请求
  */
 
-/** @module Request */
 
 /**
  * @class
- * @classdesc 请求管理器
+ * @description 请求管理器
  */
 class RequestManager {
 	constructor() {

@@ -37,18 +37,10 @@ MRBS-Display（会议预约系统平板端，以下简称**平板端**）是**BC
 
 - 安卓平板
 
-  | 机型   | Android 版本 | API Level        | 架构  | 备注   |
-  | ------ | ------------ | ---------------- | ----- | ------ |
-  | Xiaomi | 13.0         | 33（"Tiramisu"） | arm64 | 测试用 |
-  |        |              |                  |       |        |
-
-# Environment And Dependencies
-
-- uni-app SDK 4.24
-- HbuilderX 4.24
-- 8-11 inch Android tablet, the system has screen fixing function (optional)
-
-> Recommend Google native system, which has fixed system-level evaluation functions.
+  | 机型   | Android 版本 | API Level        | 分辨率      | 架构  | 备注   |
+  | ------ | ------------ | ---------------- | ----------- | ----- | ------ |
+  | Xiaomi | 13.0         | 33（"Tiramisu"） | 1200 x 1920 | arm64 | 测试用 |
+  | HJC    |              |                  |             |       |        |
 
 # Install
 

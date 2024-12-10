@@ -95,8 +95,7 @@
         "online_status": "Online Status",
         "room_area": "Room & Area",
         "unique_id": "Device Unique ID",
-		"unknown_brand": "Unknown",
-		"version": "Version"
+		"unknown_brand": "Unknown"
       },
       "right": {
         "12hour_format": "12 Hour Format",
@@ -130,8 +129,6 @@
       "hours": "h",
       "minute": "min",
       "minutes": "min",
-	  "second": "s",
-	  "seconds": "s",
       "not_available": "Not Available"
     }
   }

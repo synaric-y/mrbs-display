@@ -29,10 +29,6 @@
 					<div class="info-desc">{{this.currentStatus=='online'?$t('message.setting.left.normal'):$t('message.setting.left.offline')}}</div>
 				</div>
 				<div class="info-row">
-					<div class="info-title">{{$t('message.setting.left.version')}}</div>
-					<div class="info-desc">{{this.currentVersion}}</div>
-				</div>
-				<div class="info-row">
 					<div class="info-title">{{$t('message.setting.left.about_us')}}</div>
 				</div>
 			</div>
@@ -115,8 +111,7 @@
 <script>
 import LanguageSelect from '../components/LanguageSelect.vue';
 import {PageMixin} from '@/mixin/index.js'
-import { getAllAreaApi,getAllRoomsApi,testBaseUrl } from '@/api/api';
-import { getSettingApi,changeBindApi } from '@/api/device.js'
+import { getAllAreaApi,getAllRoomsApi,activateDeviceApi,getSettingApi,changeBindApi } from '@/api/api';
 import _ from 'lodash'; // lodash，用于数组运算
 	
 export default {
@@ -222,8 +217,10 @@ export default {
 				that.roomList = [] // 清空现有房间
 				that.room = -1 // 恢复默认值
 				
-				getAllRoomsApi(area_id)
-				.then(res=>{
+				getAllRoomsApi(that.currentBaseURL,{
+					"type": "area",
+					"id": area_id,
+				}).then(res=>{
 					const li = res.data.data?.areas?.rooms ?? null
 					
 					if(!li) return // 如果区域无会议室，直接返回，不报错
@@ -265,8 +262,8 @@ export default {
 			
 			const that = this
 			return new Promise((resolve,reject)=>{
-				getAllAreaApi()
-				.then(({data})=>{
+				getAllAreaApi(that.currentBaseURL,{
+				}).then(({data})=>{
 					
 					const {data:li} = data
 					
@@ -296,7 +293,7 @@ export default {
 		},
 		resetSetting(){
 			return new Promise((resolve,reject)=>{
-				getSettingApi()
+				getSettingApi(this.currentBaseURL,{})
 					.then(({data})=>{
 						const {room:roomText, area:areaText} = data.data // 字符串
 						this.basicInfo.room = roomText
@@ -376,8 +373,8 @@ export default {
 			
 			// 尝试调这个接口，返回成功就是联通了
 			this.verifyStatus = 'verifying'
-			testBaseUrl(this.requestURL)
-			.then(({data})=>{
+			getAllAreaApi(this.requestURL,{
+			}).then(({data})=>{
 				
 				const {
 					code,
@@ -456,8 +453,9 @@ export default {
 			
 			
 			// 换绑
-			await changeBindApi(that.room)
-			.then((res)=>{
+			await changeBindApi(that.currentBaseURL,{
+				"room_id": that.room,
+			}).then((res)=>{
 				console.log(res);
 			}).catch(e=>{
 				uni.showToast({

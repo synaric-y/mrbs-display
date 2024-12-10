@@ -95,8 +95,7 @@
         "online_status": "온라인 상태",
         "room_area": "소속 공간 및 영역",
         "unique_id": "장치 고유 일련번호",
-		"unknown_brand": "알 수 없음",
-		"version": "버전 번호"
+		"unknown_brand": "알 수 없음"
       },
       "right": {
         "12hour_format": "12시간제",
@@ -130,8 +129,6 @@
       "hours": "시간",
       "minute": "분",
       "minutes": "분",
-	  "second": "초",
-	  "seconds": "초",
       "not_available": "사용 불가능"
     }
   }

@@ -31,7 +31,7 @@
 <script>
 // import LanguageSelect from '../components/LanguageSelect.vue';
 import {mapGetters} from 'vuex';
-import {loginApi} from '@/api/login';
+import {loginApi} from '@/api/api';
 export default {
 	name:"ActivateView",
 	components:{
@@ -81,8 +81,12 @@ export default {
 			},30*1000) // 30s自动关闭
 		},
 		finish(){
-			loginApi(this.accountNumber, this.password)
-			.then(res=>{
+			loginApi(this.currentBaseURL,
+				{
+					"username": this.accountNumber,
+					"password": this.password
+				}
+			).then(res=>{
 				console.log(res);
 				
 				

@@ -6,7 +6,7 @@
 			
 			<div class="header">
 				<div class="title">{{$t('message.fast_meeting.title')}}</div>
-				<uni-icons type="closeempty" size="30" @click="$emit('close')"></uni-icons>
+				<uni-icons type="closeempty" size="30" @click="closeDialog"></uni-icons>
 			</div>
 			<div :class="'info info'+(currentTheme!='dark'?'':'-dark')">{{$t('message.fast_meeting.tip_left')+avaliableHours+$t('message.fast_meeting.tip_right')}}</div>
 			<div class="tip">
@@ -30,7 +30,7 @@
 			<input @input="wordLimit2" :class="'my-input '+inputBlink2" :maxlength="inputMaxLength2" :placeholder="$t('message.fast_meeting.name')" v-model="booker"/>
 			
 			<div class="btns">
-				<button class="btn btn-default" type="default" @click.stop="$emit('close')">{{$t('message.fast_meeting.cancel')}}</button>
+				<button class="btn btn-default" type="default" @click.stop="cancelReserve">{{$t('message.fast_meeting.cancel')}}</button>
 				<button :class="'btn btn-confirm btn-confirm'+(currentTheme!='dark'?'':'-dark')" type="default" @click.stop="confirmReserve">{{$t('message.fast_meeting.confirm')}}</button>
 			</div>
 		</view>
@@ -42,7 +42,12 @@
 	import {SEC_PER_HOUR,SEC_PER_MINUTE} from '@/constants/time.js'
 	import {nextScaleTs} from '@/utils/timestampTool.js'
 	import { PageMixin } from '@/mixin';
-	import { wrappedQuickMeeting } from '@/api/meeting';
+	import {
+		quickMeetApi,
+		quickMeetMessageMapping,
+		syncRoomApi,
+		getSettingApi
+	} from '@/api/api.js'
 
 	export default {
 		mixins: [PageMixin],
@@ -76,10 +81,6 @@
 		},
 		unmounted(){
 			console.log('组件销毁');
-			
-			// 清空表单
-			this.theme = ''
-			this.booker = ''
 			
 			// 清空旧的定时器
 			if(this.autoCloseTimer){ 
@@ -123,6 +124,20 @@
 				if(len>=this.inputMaxLength2) this.inputBlink2 = 'input-blink'
 				else this.inputBlink2 = ''
 			},
+			closeDialog(){
+				this.$emit('close')
+			},
+			cancelReserve(){
+				this.theme = ''
+				this.booker = ''
+				
+				this.$emit('close')
+			},
+			testNumber(val){ // 判断是否为纯数字
+				const str = /^[0-9]+$/
+				const reg = new RegExp(str)
+				return reg.test(val)
+			},
 			confirmReserve(){
 				// 校验
 				if(this.theme && this.theme.length>this.inputMaxLength1){
@@ -139,9 +154,17 @@
 					})
 					return
 				}
-
 				
-				wrappedQuickMeeting(this.leftHandle,this.rightHandle,this.booker,this.theme)
+				const pack = {
+					"begin_time": this.leftHandle,
+					"end_time": this.rightHandle,
+					"booker": this.testNumber(this.booker)?('"'+this.booker+'"'):this.booker,
+					"theme": this.testNumber(this.theme)?('"'+this.theme+'"'):this.theme
+				}
+				
+				console.log(pack);
+				
+				quickMeetApi(this.currentBaseURL,pack)
 				.then(res => {
 					
 					const code = res.data.code
@@ -156,6 +179,10 @@
 				.catch((e) => {
 					console.error(e)
 					this.$emit('fail')
+				})
+				.finally(()=>{
+					this.theme = ''
+					this.booker = ''
 				})
 				
 				

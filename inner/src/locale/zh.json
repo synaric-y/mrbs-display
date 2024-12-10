@@ -95,8 +95,7 @@
         "online_status": "在线状态",
         "room_area": "所属房间&区域",
         "unique_id": "设备唯一ID",
-		"unknown_brand": "未知",
-		"version": "版本号"
+		"unknown_brand": "未知"
       },
       "right": {
         "12hour_format": "12小时制",
@@ -130,8 +129,6 @@
       "hours": "小时",
       "minute": "分钟",
       "minutes": "分钟",
-	  "second": "秒",
-	  "seconds": "秒",
       "not_available": "不可用"
     }
   }
