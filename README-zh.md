@@ -117,3 +117,77 @@ MRBS-Display（会议预约系统平板端，以下简称**平板端**）是**BC
 - `uni.promisfy.adaptor.js`：uniapp库函数，作用未知
 - `uni.scss`：uniapp全局样式
 
+### shell-new
+
+- pages：存放主页
+  - `index/index.vue`：主页
+- static：测试用，存放静态网页
+- unpackage：导出的资源
+  - cache：编译缓存
+  - dist：编译结果
+  - release
+    - apk：云打包存放apk的文件夹
+  - resources
+    - \_\_UNI\_\_2E5D094：本地打包Android资源，其中`__UNI__2E5D094`是appid
+- `App.vue`：主组件
+- `index.html`：入口网页
+- `main.js`：入口程序
+- `manifest.json`：uniapp发行配置
+- `pages.json`：uniapp路由|页面配置
+- `uni.promisfy.adaptor.js`：uniapp库函数，作用未知
+- `uni.scss`：uniapp全局样式
+
+### uniapp-android
+
+- app：主项目文件夹
+- gradle
+  - wrapper：存放下载的gradle
+- `.gitignore`
+- `build.gradle`：这个目录下的不重要（app目录下的build.gradle非常重要）
+- `gradle.properties`：未知
+- `gradlew`：gradle脚本文件
+- `gradlew.bat`：gradle脚本文件
+- `HBuilder-Hello.iml`：未知
+- `local.properties`：未知
+- `MyApplication.iml`：未知
+- `settings.gradle`：未知
+
+#### app
+
+- build：debug版本输出目录
+
+- libs：依赖库
+
+- release：release版本输出目录
+
+- src：源码
+
+- `app.iml`：未知
+
+- `build.gradle`：**极其重要**，与Android版本、包名、依赖有关
+
+- `proguard-rules`：未知
+
+- `test.jks`：测试用安卓签名证书，现无作用
+
+- `test.keystore`：目前在用的安卓签名证书
+
+  ```
+  key store password:
+  123456
+  
+  Key alias:
+  testalias
+  
+  Key password:
+  123456
+  ```
+
+  使用以下命令查看keystore：
+
+  ```shell
+  keytool -list -v -keystore test.keystore 
+  ```
+
+  按要求输入密钥即可。
+
