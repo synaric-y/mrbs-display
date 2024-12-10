@@ -1,12 +1,13 @@
 # MRBS-Display
 
 <div style="background-color: #591bb7; height: 100px;border-radius: 8px;display:flex;justify-content: center; align-items: center;">
-<img src="C:\Users\octene.wang\Desktop\mrbs-display\assets\bcc-logo-en-CmDVMASO - 副本.png" alt="image-20241210095740692" />
+<img src="https://github.com/synaric-y/mrbs-display/blob/octene-dev/assets/bcc-logo-en-CmDVMASO%20-%20%E5%89%AF%E6%9C%AC.png?raw=true" alt="image-20241210095740692" />
 </div>
+
 
 MRBS-Display（会议预约系统平板端，以下简称**平板端**）是**BCC MRBS**（BCC会议室预约系统）的平板端应用，供用户浏览和快速预约会议。
 
-<img src="C:\Users\octene.wang\Desktop\mrbs-display\assets\image-20241210112331408.png" alt="image-20241210112331408" style="zoom: 25%;" />
+<img src="https://github.com/synaric-y/mrbs-display/blob/octene-dev/assets/image-20241210112331408.png?raw=true" alt="image-20241210112331408" style="zoom: 25%;" />
 
 > 图1  正式版页面。目前并没有会议
 
